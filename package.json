@@ -1,0 +1,62 @@
+{
+  "name": "mirror-protocol",
+  "version": "1.0.0",
+  "description": "Behavioral Liquidity Infrastructure Powered by Envio HyperCore",
+  "main": "src/index.js",
+  "scripts": {
+    "dev": "cd src/envio && envio dev",
+    "compile": "forge build",
+    "test": "forge test",
+    "deploy": "forge script script/Deploy.s.sol --rpc-url $MONAD_RPC_URL --broadcast",
+    "envio:codegen": "cd src/envio && envio codegen",
+    "envio:dev": "cd src/envio && envio dev",
+    "frontend": "cd src/frontend && npm run dev",
+    "frontend:build": "cd src/frontend && npm run build",
+    "lint": "forge fmt --check",
+    "format": "forge fmt"
+  },
+  "keywords": [
+    "envio",
+    "metamask",
+    "monad",
+    "delegations",
+    "behavioral-liquidity",
+    "defi",
+    "nft"
+  ],
+  "author": "Mirror Protocol Team",
+  "license": "MIT",
+  "dependencies": {
+    "@envio-dev/hypersync-client": "^0.5.0",
+    "@metamask/delegation-framework": "^1.0.0",
+    "@metamask/sdk": "^0.26.0",
+    "@openzeppelin/contracts": "^5.0.0",
+    "axios": "^1.6.0",
+    "dotenv": "^16.3.1",
+    "ethers": "^6.9.0",
+    "express": "^4.18.2",
+    "viem": "^2.0.0",
+    "wagmi": "^2.0.0",
+    "ws": "^8.14.2"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^4.0.0",
+    "@nomicfoundation/hardhat-ethers": "^3.0.0",
+    "@typechain/ethers-v6": "^0.5.0",
+    "@typechain/hardhat": "^9.0.0",
+    "@types/node": "^20.0.0",
+    "chai": "^4.3.10",
+    "envio-cli": "^2.0.0",
+    "eslint": "^8.54.0",
+    "hardhat": "^2.19.0",
+    "hardhat-gas-reporter": "^1.0.9",
+    "prettier": "^3.1.0",
+    "prettier-plugin-solidity": "^1.2.0",
+    "solidity-coverage": "^0.8.5",
+    "typechain": "^8.3.0"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  }
+}

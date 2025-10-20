@@ -1,0 +1,65 @@
+# Dependencies
+node_modules/
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Environment variables
+.env
+.env.local
+.env.production
+
+# Build outputs
+dist/
+build/
+out/
+artifacts/
+cache/
+typechain-types/
+
+# Hardhat
+coverage/
+coverage.json
+*.log
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Testing
+.nyc_output/
+test-results/
+
+# Envio
+.envio/
+envio_output/
+
+# Misc
+*.tgz
+*.zip
+temp/
+tmp/
+
+# Build artifacts
+cache/
+cache_foundry/
+out/
+node_modules/
+
+# Logs
+logs/
+*.log
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store

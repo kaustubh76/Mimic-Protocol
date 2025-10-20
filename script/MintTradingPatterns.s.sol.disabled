@@ -1,0 +1,385 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
+
+import "forge-std/Script.sol";
+import "../contracts/BehavioralNFT.sol";
+import "../contracts/PatternDetector.sol";
+
+/**
+ * @title MintTradingPatterns
+ * @notice Script to mint diverse trading pattern NFTs via PatternDetector
+ * @dev Creates 5 different trading strategies showcasing various approaches
+ */
+contract MintTradingPatterns is Script {
+    PatternDetector public detector;
+    BehavioralNFT public nft;
+
+    // Contract addresses on Monad testnet
+    address constant PATTERN_DETECTOR = 0x8768e4E5c8c3325292A201f824FAb86ADae398d0;
+    address constant BEHAVIORAL_NFT = 0x3ceBC8049BdAC66BfbAECC94Cce756122ed25DAc;
+
+    function run() external {
+        // Get deployer private key from environment
+        uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
+        address deployer = vm.addr(deployerPrivateKey);
+
+        console.log("===========================================");
+        console.log("MINTING TRADING PATTERN NFTs");
+        console.log("===========================================");
+        console.log("Deployer:", deployer);
+        console.log("PatternDetector:", PATTERN_DETECTOR);
+        console.log("BehavioralNFT:", BEHAVIORAL_NFT);
+        console.log("");
+
+        detector = PatternDetector(PATTERN_DETECTOR);
+        nft = BehavioralNFT(BEHAVIORAL_NFT);
+
+        vm.startBroadcast(deployerPrivateKey);
+
+        // Strategy 1: Aggressive Momentum Trading
+        mintPattern(
+            "AggressiveMomentum",
+            createAggressiveMomentumTxs(),
+            "High-frequency momentum trading with 5-15% profit targets"
+        );
+
+        // Strategy 2: Conservative Mean Reversion
+        mintPattern(
+            "ConservativeMeanReversion",
+            createConservativeMeanReversionTxs(),
+            "Low-risk mean reversion with 2-5% profit targets"
+        );
+
+        // Strategy 3: Breakout Trading
+        mintPattern(
+            "BreakoutTrading",
+            createBreakoutTradingTxs(),
+            "Volume-based breakout strategy targeting 10-20% gains"
+        );
+
+        // Strategy 4: Scalping Strategy
+        mintPattern(
+            "ScalpingStrategy",
+            createScalpingTxs(),
+            "Ultra-short term scalping with 0.5-2% profit per trade"
+        );
+
+        // Strategy 5: Swing Trading
+        mintPattern(
+            "SwingTrading",
+            createSwingTradingTxs(),
+            "Multi-day swing trades targeting 5-10% per position"
+        );
+
+        vm.stopBroadcast();
+
+        console.log("");
+        console.log("===========================================");
+        console.log("PATTERN MINTING COMPLETE!");
+        console.log("===========================================");
+        console.log("Total patterns minted: 5");
+        console.log("Total patterns on-chain:", nft.totalPatterns());
+        console.log("");
+        console.log("View your patterns in the frontend at:");
+        console.log("http://localhost:3002/");
+    }
+
+    function mintPattern(
+        string memory patternType,
+        PatternDetector.Transaction[] memory transactions,
+        string memory description
+    ) internal {
+        console.log("-------------------------------------------");
+        console.log("Minting Pattern:", patternType);
+        console.log("Description:", description);
+        console.log("Transactions:", transactions.length);
+
+        try detector.submitPattern(transactions, patternType) {
+            uint256 tokenId = nft.totalPatterns();
+            console.log("SUCCESS! Pattern minted as NFT #", tokenId);
+            console.log("");
+        } catch Error(string memory reason) {
+            console.log("FAILED:", reason);
+            console.log("");
+        }
+    }
+
+    // ============================================
+    // STRATEGY 1: AGGRESSIVE MOMENTUM
+    // ============================================
+    function createAggressiveMomentumTxs() internal pure returns (PatternDetector.Transaction[] memory) {
+        PatternDetector.Transaction[] memory txs = new PatternDetector.Transaction[](8);
+
+        // Strong uptrend momentum trades
+        txs[0] = PatternDetector.Transaction({
+            tokenIn: address(0x1111111111111111111111111111111111111111),
+            tokenOut: address(0x2222222222222222222222222222222222222222),
+            amountIn: 1000 ether,
+            amountOut: 1150 ether, // 15% gain
+            timestamp: block.timestamp - 7 days,
+            isProfit: true
+        });
+
+        txs[1] = PatternDetector.Transaction({
+            tokenIn: address(0x2222222222222222222222222222222222222222),
+            tokenOut: address(0x3333333333333333333333333333333333333333),
+            amountIn: 1150 ether,
+            amountOut: 1265 ether, // 10% gain
+            timestamp: block.timestamp - 6 days,
+            isProfit: true
+        });
+
+        txs[2] = PatternDetector.Transaction({
+            tokenIn: address(0x3333333333333333333333333333333333333333),
+            tokenOut: address(0x4444444444444444444444444444444444444444),
+            amountIn: 1265 ether,
+            amountOut: 1391 ether, // 10% gain
+            timestamp: block.timestamp - 5 days,
+            isProfit: true
+        });
+
+        txs[3] = PatternDetector.Transaction({
+            tokenIn: address(0x4444444444444444444444444444444444444444),
+            tokenOut: address(0x1111111111111111111111111111111111111111),
+            amountIn: 1391 ether,
+            amountOut: 1460 ether, // 5% gain
+            timestamp: block.timestamp - 4 days,
+            isProfit: true
+        });
+
+        txs[4] = PatternDetector.Transaction({
+            tokenIn: address(0x1111111111111111111111111111111111111111),
+            tokenOut: address(0x5555555555555555555555555555555555555555),
+            amountIn: 1000 ether,
+            amountOut: 1120 ether, // 12% gain
+            timestamp: block.timestamp - 3 days,
+            isProfit: true
+        });
+
+        txs[5] = PatternDetector.Transaction({
+            tokenIn: address(0x5555555555555555555555555555555555555555),
+            tokenOut: address(0x6666666666666666666666666666666666666666),
+            amountIn: 1120 ether,
+            amountOut: 1232 ether, // 10% gain
+            timestamp: block.timestamp - 2 days,
+            isProfit: true
+        });
+
+        // One losing trade (realistic)
+        txs[6] = PatternDetector.Transaction({
+            tokenIn: address(0x6666666666666666666666666666666666666666),
+            tokenOut: address(0x7777777777777777777777777777777777777777),
+            amountIn: 1232 ether,
+            amountOut: 1170 ether, // 5% loss
+            timestamp: block.timestamp - 1 days,
+            isProfit: false
+        });
+
+        txs[7] = PatternDetector.Transaction({
+            tokenIn: address(0x7777777777777777777777777777777777777777),
+            tokenOut: address(0x1111111111111111111111111111111111111111),
+            amountIn: 1170 ether,
+            amountOut: 1287 ether, // 10% gain (recovery)
+            timestamp: block.timestamp - 12 hours,
+            isProfit: true
+        });
+
+        // Win rate: 7/8 = 87.5%
+        return txs;
+    }
+
+    // ============================================
+    // STRATEGY 2: CONSERVATIVE MEAN REVERSION
+    // ============================================
+    function createConservativeMeanReversionTxs() internal pure returns (PatternDetector.Transaction[] memory) {
+        PatternDetector.Transaction[] memory txs = new PatternDetector.Transaction[](10);
+
+        // Small, consistent gains from mean reversion
+        for (uint i = 0; i < 10; i++) {
+            bool isProfit = i < 9; // 9 wins, 1 loss = 90% win rate
+            uint256 baseAmount = 500 ether;
+            uint256 outputAmount = isProfit
+                ? baseAmount + (baseAmount * (2 + (i % 3))) / 100  // 2-4% gains
+                : baseAmount - (baseAmount * 3) / 100;              // 3% loss
+
+            txs[i] = PatternDetector.Transaction({
+                tokenIn: address(uint160(0x1111111111111111111111111111111111111111 + i)),
+                tokenOut: address(uint160(0x2222222222222222222222222222222222222222 + i)),
+                amountIn: baseAmount,
+                amountOut: outputAmount,
+                timestamp: block.timestamp - ((10 - i) * 1 days),
+                isProfit: isProfit
+            });
+        }
+
+        // Win rate: 9/10 = 90%
+        return txs;
+    }
+
+    // ============================================
+    // STRATEGY 3: BREAKOUT TRADING
+    // ============================================
+    function createBreakoutTradingTxs() internal pure returns (PatternDetector.Transaction[] memory) {
+        PatternDetector.Transaction[] memory txs = new PatternDetector.Transaction[](6);
+
+        // Large gains when breakouts work, some failures
+        txs[0] = PatternDetector.Transaction({
+            tokenIn: address(0xAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA),
+            tokenOut: address(0xBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB),
+            amountIn: 2000 ether,
+            amountOut: 2400 ether, // 20% gain - successful breakout
+            timestamp: block.timestamp - 14 days,
+            isProfit: true
+        });
+
+        txs[1] = PatternDetector.Transaction({
+            tokenIn: address(0xBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB),
+            tokenOut: address(0xCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC),
+            amountIn: 2000 ether,
+            amountOut: 1900 ether, // 5% loss - false breakout
+            timestamp: block.timestamp - 12 days,
+            isProfit: false
+        });
+
+        txs[2] = PatternDetector.Transaction({
+            tokenIn: address(0xCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC),
+            tokenOut: address(0xDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD),
+            amountIn: 2000 ether,
+            amountOut: 2300 ether, // 15% gain
+            timestamp: block.timestamp - 10 days,
+            isProfit: true
+        });
+
+        txs[3] = PatternDetector.Transaction({
+            tokenIn: address(0xDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD),
+            tokenOut: address(0xEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE),
+            amountIn: 2000 ether,
+            amountOut: 2200 ether, // 10% gain
+            timestamp: block.timestamp - 8 days,
+            isProfit: true
+        });
+
+        txs[4] = PatternDetector.Transaction({
+            tokenIn: address(0xEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE),
+            tokenOut: address(0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF),
+            amountIn: 2000 ether,
+            amountOut: 1850 ether, // 7.5% loss
+            timestamp: block.timestamp - 5 days,
+            isProfit: false
+        });
+
+        txs[5] = PatternDetector.Transaction({
+            tokenIn: address(0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF),
+            tokenOut: address(0xAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA),
+            amountIn: 2000 ether,
+            amountOut: 2500 ether, // 25% gain - strong breakout
+            timestamp: block.timestamp - 2 days,
+            isProfit: true
+        });
+
+        // Win rate: 4/6 = 66.7%
+        return txs;
+    }
+
+    // ============================================
+    // STRATEGY 4: SCALPING STRATEGY
+    // ============================================
+    function createScalpingTxs() internal pure returns (PatternDetector.Transaction[] memory) {
+        PatternDetector.Transaction[] memory txs = new PatternDetector.Transaction[](15);
+
+        // Many small trades, high win rate
+        for (uint i = 0; i < 15; i++) {
+            bool isProfit = i != 3 && i != 9 && i != 12; // 12 wins, 3 losses = 80% win rate
+            uint256 baseAmount = 100 ether;
+            uint256 outputAmount = isProfit
+                ? baseAmount + (baseAmount * (5 + (i % 15))) / 1000  // 0.5-2% gains
+                : baseAmount - (baseAmount * 10) / 1000;              // 1% loss
+
+            txs[i] = PatternDetector.Transaction({
+                tokenIn: address(uint160(0x8888888888888888888888888888888888888888 + i * 2)),
+                tokenOut: address(uint160(0x9999999999999999999999999999999999999999 + i * 2)),
+                amountIn: baseAmount,
+                amountOut: outputAmount,
+                timestamp: block.timestamp - ((15 - i) * 1 hours),
+                isProfit: isProfit
+            });
+        }
+
+        // Win rate: 12/15 = 80%
+        return txs;
+    }
+
+    // ============================================
+    // STRATEGY 5: SWING TRADING
+    // ============================================
+    function createSwingTradingTxs() internal pure returns (PatternDetector.Transaction[] memory) {
+        PatternDetector.Transaction[] memory txs = new PatternDetector.Transaction[](7);
+
+        // Multi-day positions with moderate gains
+        txs[0] = PatternDetector.Transaction({
+            tokenIn: address(0x1234567890123456789012345678901234567890),
+            tokenOut: address(0x2345678901234567890123456789012345678901),
+            amountIn: 1500 ether,
+            amountOut: 1650 ether, // 10% gain
+            timestamp: block.timestamp - 21 days,
+            isProfit: true
+        });
+
+        txs[1] = PatternDetector.Transaction({
+            tokenIn: address(0x2345678901234567890123456789012345678901),
+            tokenOut: address(0x3456789012345678901234567890123456789012),
+            amountIn: 1500 ether,
+            amountOut: 1425 ether, // 5% loss
+            timestamp: block.timestamp - 18 days,
+            isProfit: false
+        });
+
+        txs[2] = PatternDetector.Transaction({
+            tokenIn: address(0x3456789012345678901234567890123456789012),
+            tokenOut: address(0x4567890123456789012345678901234567890123),
+            amountIn: 1500 ether,
+            amountOut: 1575 ether, // 5% gain
+            timestamp: block.timestamp - 15 days,
+            isProfit: true
+        });
+
+        txs[3] = PatternDetector.Transaction({
+            tokenIn: address(0x4567890123456789012345678901234567890123),
+            tokenOut: address(0x5678901234567890123456789012345678901234),
+            amountIn: 1500 ether,
+            amountOut: 1650 ether, // 10% gain
+            timestamp: block.timestamp - 12 days,
+            isProfit: true
+        });
+
+        txs[4] = PatternDetector.Transaction({
+            tokenIn: address(0x5678901234567890123456789012345678901234),
+            tokenOut: address(0x6789012345678901234567890123456789012345),
+            amountIn: 1500 ether,
+            amountOut: 1575 ether, // 5% gain
+            timestamp: block.timestamp - 9 days,
+            isProfit: true
+        });
+
+        txs[5] = PatternDetector.Transaction({
+            tokenIn: address(0x6789012345678901234567890123456789012345),
+            tokenOut: address(0x7890123456789012345678901234567890123456),
+            amountIn: 1500 ether,
+            amountOut: 1605 ether, // 7% gain
+            timestamp: block.timestamp - 6 days,
+            isProfit: true
+        });
+
+        txs[6] = PatternDetector.Transaction({
+            tokenIn: address(0x7890123456789012345678901234567890123456),
+            tokenOut: address(0x1234567890123456789012345678901234567890),
+            amountIn: 1500 ether,
+            amountOut: 1545 ether, // 3% gain
+            timestamp: block.timestamp - 3 days,
+            isProfit: true
+        });
+
+        // Win rate: 6/7 = 85.7%
+        return txs;
+    }
+}

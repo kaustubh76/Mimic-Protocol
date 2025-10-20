@@ -1,0 +1,51 @@
+{
+  "name": "mirror-protocol-frontend",
+  "version": "1.0.0",
+  "description": "Mirror Protocol Frontend - MetaMask Delegation Toolkit Integration",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "build:check": "tsc && vite build",
+    "preview": "vite preview",
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directs --max-warnings 0"
+  },
+  "dependencies": {
+    "@metamask/delegation-toolkit": "^0.13.0",
+    "@radix-ui/react-avatar": "^1.1.10",
+    "@radix-ui/react-label": "^2.1.7",
+    "@radix-ui/react-separator": "^1.1.7",
+    "@radix-ui/react-slot": "^1.2.3",
+    "@tanstack/react-query": "^5.90.2",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "ethers": "^6.8.0",
+    "framer-motion": "^12.23.24",
+    "lucide-react": "^0.545.0",
+    "permissionless": "^0.2.57",
+    "react": "^18.2.0",
+    "react-countup": "^6.5.3",
+    "react-dom": "^18.2.0",
+    "recharts": "^3.2.1",
+    "tailwind-merge": "^3.3.1",
+    "viem": "^2.21.0",
+    "wagmi": "^2.18.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.14",
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "@vitejs/plugin-react": "^4.0.0",
+    "autoprefixer": "^10.4.21",
+    "eslint": "^8.45.0",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-refresh": "^0.4.0",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^4.1.14",
+    "tailwindcss-animate": "^1.0.7",
+    "typescript": "^5.0.2",
+    "vite": "^5.0.0"
+  }
+}
