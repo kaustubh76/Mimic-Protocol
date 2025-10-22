@@ -131,7 +131,8 @@ contract FinalFlowTest is Script {
             uint256 patternId,
             uint256 allocation,
             bool isActive,
-            address smartAccount
+            address smartAccount,
+            uint256 createdAt
         ) = DelegationRouter(ROUTER).getDelegationBasics(delegationId1);
 
         console.log("SUCCESS! No memory error!");

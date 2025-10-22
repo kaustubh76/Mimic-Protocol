@@ -13,6 +13,7 @@ export interface Delegation {
   createdAt: bigint;
   smartAccountAddress: string;
   patternName?: string;
+  patternROI?: bigint; // Pattern's ROI for earnings calculation
 }
 
 export function useDelegations() {
@@ -63,17 +64,25 @@ export function useDelegations() {
 
         const delegationPromises = userDelegations.map(async (delegationId) => {
           try {
-            // Use getDelegationBasics instead of delegations (refactored contract)
-            const [delegator, patternTokenId, percentageAllocation, isActive, smartAccountAddress] =
-              await publicClient.readContract({
+            // Use getDelegation to get full delegation struct
+            const delegation = await publicClient.readContract({
                 address: CONTRACTS.DELEGATION_ROUTER,
                 abi: ABIS.DELEGATION_ROUTER,
-                functionName: 'getDelegationBasics',
+                functionName: 'getDelegation',
                 args: [delegationId],
-              }) as [string, bigint, bigint, boolean, string];
+              }) as any;
 
-            // Get pattern name
-            let patternName = 'Unknown';
+            // Extract fields from the delegation struct
+            const delegator = delegation.delegator;
+            const patternTokenId = delegation.patternTokenId;
+            const percentageAllocation = delegation.percentageAllocation;
+            const isActive = delegation.isActive;
+            const smartAccountAddress = delegation.smartAccountAddress;
+            const createdAt = delegation.createdAt || BigInt(Math.floor(Date.now() / 1000));
+
+            // Get pattern name and ROI
+            let patternName = `Pattern #${patternTokenId}`;
+            let patternROI = BigInt(0);
             try {
               const pattern = await publicClient.readContract({
                 address: CONTRACTS.BEHAVIORAL_NFT,
@@ -81,9 +90,26 @@ export function useDelegations() {
                 functionName: 'patterns',
                 args: [patternTokenId],
               }) as any;
-              patternName = pattern.patternType;
+
+              // Safely extract pattern type and ROI
+              if (pattern && typeof pattern === 'object') {
+                if (pattern.patternType && typeof pattern.patternType === 'string') {
+                  patternName = pattern.patternType;
+                } else if (Array.isArray(pattern) && pattern[1]) {
+                  // If it's an array, pattern type might be at index 1
+                  patternName = pattern[1];
+                }
+
+                // Extract ROI (usually at index 6 in the pattern struct)
+                if (pattern.roi !== undefined) {
+                  patternROI = BigInt(pattern.roi);
+                } else if (Array.isArray(pattern) && pattern[6] !== undefined) {
+                  patternROI = BigInt(pattern[6]);
+                }
+              }
             } catch (e) {
-              console.error('Error fetching pattern name:', e);
+              console.error('Error fetching pattern data:', e);
+              // Keep the default Pattern #X name and 0 ROI
             }
 
             return {
@@ -93,9 +119,10 @@ export function useDelegations() {
               patternTokenId,
               percentageAllocation,
               isActive,
-              createdAt: BigInt(Math.floor(Date.now() / 1000)), // Placeholder - not in getDelegationBasics
+              createdAt, // Now properly fetched from contract
               smartAccountAddress,
               patternName,
+              patternROI, // Add ROI for earnings calculation
             };
           } catch (err) {
             console.error(`Failed to fetch delegation ${delegationId}:`, err);

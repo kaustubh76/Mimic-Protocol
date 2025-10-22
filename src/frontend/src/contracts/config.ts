@@ -10,7 +10,7 @@ export const MONAD_CHAIN_ID = 10143;
 // Last updated: 2025-10-18 (Refactored contracts with memory bug fixes)
 export const CONTRACTS = {
   BEHAVIORAL_NFT: '0x3ceBC8049BdAC66BfbAECC94Cce756122ed25DAc' as `0x${string}`,
-  DELEGATION_ROUTER: '0xd5499e0d781b123724dF253776Aa1EB09780AfBf' as `0x${string}`, // NEW - Refactored
+  DELEGATION_ROUTER: '0xd5499e0d781b123724dF253776Aa1EB09780AfBf' as `0x${string}`, // Original - Has your 4 delegations
   PATTERN_DETECTOR: '0x8768e4E5c8c3325292A201f824FAb86ADae398d0' as `0x${string}`,
   EXECUTION_ENGINE: '0x28BEC7E4d25D385BBf5FD4d2CF5163c513662CaE' as `0x${string}` // NEW - Refactored
 };
@@ -18,10 +18,10 @@ export const CONTRACTS = {
 export const CONTRACT_ADDRESSES = CONTRACTS;
 
 export const ABIS = {
-  BEHAVIORAL_NFT: BehavioralNFTABI as Abi,
-  DELEGATION_ROUTER: DelegationRouterABI as Abi,
-  PATTERN_DETECTOR: PatternDetectorABI as Abi,
-  EXECUTION_ENGINE: ExecutionEngineABI as Abi
+  BEHAVIORAL_NFT: (BehavioralNFTABI as any).abi as Abi,
+  DELEGATION_ROUTER: (DelegationRouterABI as any).abi as Abi,
+  PATTERN_DETECTOR: (PatternDetectorABI as any).abi as Abi,
+  EXECUTION_ENGINE: (ExecutionEngineABI as any).abi as Abi
 };
 
 export const MONAD_RPC_URL = 'https://rpc.ankr.com/monad_testnet'; // Using Ankr RPC (more reliable)

@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { usePatterns, Pattern } from '../hooks/usePatterns';
-import { formatEther } from 'viem';
 import { CreateDelegationModal } from './CreateDelegationModal';
+import { EnhancedPatternCard } from './EnhancedPatternCard';
 
 export function PatternBrowser() {
-  const { patterns, isLoading, error, usingTestData, refetch } = usePatterns();
+  const { patterns, isLoading, error, usingTestData, isSyncing, refetch } = usePatterns();
   const [selectedPattern, setSelectedPattern] = useState<Pattern | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -99,8 +99,16 @@ export function PatternBrowser() {
           <h2 className="text-3xl font-bold">Available Trading Patterns</h2>
           {usingTestData ? (
             <p className="text-sm text-warning mt-1 flex items-center gap-2">
-              <span>📊</span>
-              <span>Showing demo data (RPC unavailable or no patterns on-chain)</span>
+              <span>⚠️</span>
+              <span>Showing test data - Connect wallet for live data</span>
+            </p>
+          ) : isSyncing ? (
+            <p className="text-sm text-blue-400 mt-1 flex items-center gap-2">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
+              </span>
+              <span>Envio indexer syncing - Using blockchain data</span>
             </p>
           ) : (
             <p className="text-sm text-muted mt-1 flex items-center gap-2">
@@ -108,7 +116,7 @@ export function PatternBrowser() {
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
               </span>
-              <span>Real-time data from Monad testnet</span>
+              <span>⚡ Real-time data from Envio GraphQL</span>
             </p>
           )}
         </div>
@@ -118,105 +126,15 @@ export function PatternBrowser() {
         </div>
       </div>
 
-      {/* Pattern Grid */}
+      {/* Pattern Grid - Now with Enhanced Cards */}
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 stagger-animation">
-        {patterns.map((pattern) => {
-          const winRate = Number(pattern.winRate) / 100;
-          const volume = formatEther(pattern.totalVolume);
-          const roi = Number(pattern.roi) / 100;
-
-          return (
-            <div key={pattern.id} className="pattern-card">
-              {/* Card Header */}
-              <div className="pattern-header">
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className={`pattern-badge pattern-badge--${pattern.patternType}`}>
-                        {pattern.patternType.replace('_', ' ')}
-                      </span>
-                    </div>
-                    <h3 className="text-xl font-bold">
-                      Pattern #{pattern.id}
-                    </h3>
-                  </div>
-
-                  {pattern.isActive ? (
-                    <div className="px-3 py-1 rounded-full bg-green-500/20 border border-green-500/30 text-green-400 text-xs font-bold flex items-center gap-1">
-                      <span className="relative flex h-1.5 w-1.5">
-                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                        <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-green-500"></span>
-                      </span>
-                      ACTIVE
-                    </div>
-                  ) : (
-                    <div className="px-3 py-1 rounded-full bg-gray-500/20 border border-gray-500/30 text-gray-400 text-xs font-bold">
-                      INACTIVE
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Stats Grid */}
-              <div className="grid grid-cols-3 gap-3 my-4">
-                <div className="stat-inline flex-col items-start">
-                  <span className="stat-label">Win Rate</span>
-                  <span className="stat-value text-lg">{winRate}%</span>
-                </div>
-                <div className="stat-inline flex-col items-start">
-                  <span className="stat-label">Volume</span>
-                  <span className="stat-value text-lg">{parseFloat(volume).toFixed(0)}</span>
-                </div>
-                <div className="stat-inline flex-col items-start">
-                  <span className="stat-label">ROI</span>
-                  <span className={`stat-value text-lg ${roi >= 0 ? 'text-success' : 'text-error'}`}>
-                    {roi > 0 ? '+' : ''}{roi}%
-                  </span>
-                </div>
-              </div>
-
-              {/* Performance Bar */}
-              <div className="space-y-2 mb-4">
-                <div className="flex items-center justify-between text-xs">
-                  <span className="text-muted">Performance Score</span>
-                  <span className="font-bold text-gradient-primary">{winRate}%</span>
-                </div>
-                <div className="h-2 bg-white/5 rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-gradient-primary rounded-full transition-all duration-1000"
-                    style={{
-                      width: `${Math.min(winRate, 100)}%`,
-                      animation: 'slideRight 1s ease-out'
-                    }}
-                  ></div>
-                </div>
-              </div>
-
-              {/* Creator Info */}
-              <div className="glass-card p-3 space-y-2 mb-4">
-                <div className="flex items-center justify-between text-xs">
-                  <span className="text-muted">Creator</span>
-                  <code className="hash-code-small">
-                    {pattern.creator.slice(0, 6)}...{pattern.creator.slice(-4)}
-                  </code>
-                </div>
-                <div className="flex items-center justify-between text-xs">
-                  <span className="text-muted">Token ID</span>
-                  <span className="font-bold text-gradient-secondary">#{pattern.id}</span>
-                </div>
-              </div>
-
-              {/* Action Button */}
-              <button
-                className={`btn ${pattern.isActive ? 'btn--primary' : 'btn--secondary'} btn--block`}
-                disabled={!pattern.isActive}
-                onClick={() => handleDelegateClick(pattern)}
-              >
-                <span>{pattern.isActive ? '🤝 Delegate to Pattern' : '⏸ Pattern Inactive'}</span>
-              </button>
-            </div>
-          );
-        })}
+        {patterns.map((pattern) => (
+          <EnhancedPatternCard
+            key={pattern.id}
+            pattern={pattern}
+            onDelegateClick={handleDelegateClick}
+          />
+        ))}
       </div>
 
       {/* Delegation Modal */}

@@ -1,9 +1,56 @@
-import { useDelegations } from '../hooks/useDelegations';
+import { useState } from 'react';
+import { useDelegations, type Delegation } from '../hooks/useDelegations';
 import { useAccount } from 'wagmi';
+import { useRevokeDelegation } from '../hooks/useRevokeDelegation';
+import { UpdateDelegationModal } from './UpdateDelegationModal';
+import { DelegationExecutionStats } from './DelegationExecutionStats';
+import { ExecutionIndicator } from './ExecutionStats';
+import { DelegationEarningsDisplay } from './DelegationEarningsDisplay';
+import { usePortfolioStats } from '../hooks/usePortfolioStats';
+import { formatEther } from 'viem';
 
 export function MyDelegations() {
   const { delegations, isLoading, error, usingTestData } = useDelegations();
   const { address, isConnected } = useAccount();
+  const { revokeDelegation, isWriting: isRevoking } = useRevokeDelegation();
+  const portfolioStats = usePortfolioStats(delegations);
+
+  const [selectedDelegation, setSelectedDelegation] = useState<Delegation | null>(null);
+  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
+  const [revokingId, setRevokingId] = useState<number | null>(null);
+
+  const handleUpdateClick = (delegation: Delegation) => {
+    setSelectedDelegation(delegation);
+    setIsUpdateModalOpen(true);
+  };
+
+  const handleUpdateModalClose = () => {
+    setIsUpdateModalOpen(false);
+    setSelectedDelegation(null);
+  };
+
+  const handleUpdateSuccess = () => {
+    // Refresh delegations list
+    window.location.reload();
+  };
+
+  const handleRevokeClick = async (delegation: Delegation) => {
+    const confirmed = window.confirm(
+      `Are you sure you want to revoke your delegation to ${delegation.patternName}? This action cannot be undone.`
+    );
+
+    if (!confirmed) return;
+
+    try {
+      setRevokingId(delegation.id);
+      await revokeDelegation(delegation.delegationId);
+      // Refresh after successful revoke
+      setTimeout(() => window.location.reload(), 3000);
+    } catch (err) {
+      console.error('Failed to revoke delegation:', err);
+      setRevokingId(null);
+    }
+  };
 
   if (!isConnected) {
     return (
@@ -183,12 +230,14 @@ export function MyDelegations() {
                   </div>
                   <div className="text-xs text-muted">Allocation</div>
                 </div>
-                <div className="glass-card p-4 text-center">
-                  <div className="text-2xl font-bold text-gradient-secondary mb-1">
-                    0.00
-                  </div>
-                  <div className="text-xs text-muted">Earnings (MONAD)</div>
-                </div>
+
+                {/* Real earnings from blockchain/Envio */}
+                <DelegationEarningsDisplay
+                  delegationId={delegation.delegationId}
+                  isActive={delegation.isActive}
+                  patternROI={delegation.patternROI || BigInt(0)}
+                />
+
                 <div className="glass-card p-4 text-center">
                   <div className="text-2xl font-bold text-gradient-accent mb-1">
                     {createdDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
@@ -214,6 +263,14 @@ export function MyDelegations() {
                 </div>
               </div>
 
+              {/* ExecutionEngine Stats - REAL DATA from Envio/Blockchain */}
+              <div className="mb-6">
+                <DelegationExecutionStats
+                  delegationId={delegation.delegationId}
+                  isActive={delegation.isActive}
+                />
+              </div>
+
               {/* Account Info */}
               <div className="glass-card p-4 mb-6">
                 <div className="flex items-center justify-between text-sm">
@@ -228,17 +285,26 @@ export function MyDelegations() {
               <div className="grid grid-cols-2 gap-3">
                 <button
                   className="btn btn--secondary"
-                  disabled={!delegation.isActive}
+                  disabled={!delegation.isActive || isRevoking}
                   title="Update allocation percentage"
+                  onClick={() => handleUpdateClick(delegation)}
                 >
                   <span>📊 Update</span>
                 </button>
                 <button
                   className="btn btn--ghost border border-error/30 hover:bg-error/10 hover:border-error"
-                  disabled={!delegation.isActive}
+                  disabled={!delegation.isActive || revokingId === delegation.id}
                   title="Revoke this delegation"
+                  onClick={() => handleRevokeClick(delegation)}
                 >
-                  <span className="text-error">❌ Revoke</span>
+                  {revokingId === delegation.id ? (
+                    <>
+                      <div className="spinner-small"></div>
+                      <span className="text-error">Revoking...</span>
+                    </>
+                  ) : (
+                    <span className="text-error">❌ Revoke</span>
+                  )}
                 </button>
               </div>
 
@@ -252,23 +318,69 @@ export function MyDelegations() {
         })}
       </div>
 
-      {/* Summary Footer */}
+      {/* Portfolio Summary Dashboard */}
       <div className="glass-card p-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h3 className="font-bold mb-1">Total Active Delegations</h3>
-            <p className="text-sm text-muted">
-              You're delegating to {delegations.filter(d => d.isActive).length} trading pattern{delegations.filter(d => d.isActive).length !== 1 ? 's' : ''}
-            </p>
-          </div>
-          <div className="text-right">
-            <div className="text-3xl font-bold text-gradient-primary">
+        <h3 className="font-bold mb-4 text-lg">Portfolio Summary</h3>
+
+        <div className="grid grid-cols-4 gap-4">
+          {/* Active Delegations */}
+          <div className="text-center">
+            <div className="text-3xl font-bold text-gradient-primary mb-1">
               {delegations.filter(d => d.isActive).length}
             </div>
-            <div className="text-xs text-muted">Active</div>
+            <div className="text-xs text-muted">Active Delegations</div>
+          </div>
+
+          {/* Total Volume */}
+          <div className="text-center">
+            <div className="text-3xl font-bold text-gradient-secondary mb-1">
+              {portfolioStats.totalVolume > 0
+                ? parseFloat(formatEther(portfolioStats.totalVolume)).toFixed(2)
+                : '0.00'}
+            </div>
+            <div className="text-xs text-muted">Total Volume (MONAD)</div>
+          </div>
+
+          {/* Total Earnings */}
+          <div className="text-center">
+            <div className="text-3xl font-bold text-gradient-accent mb-1">
+              {portfolioStats.totalEarnings > 0
+                ? parseFloat(formatEther(portfolioStats.totalEarnings)).toFixed(4)
+                : '0.00'}
+            </div>
+            <div className="text-xs text-muted">Total Earnings (MONAD)</div>
+          </div>
+
+          {/* Total Executions */}
+          <div className="text-center">
+            <div className="text-3xl font-bold text-gray-300 mb-1">
+              {portfolioStats.totalExecutions}
+            </div>
+            <div className="text-xs text-muted">
+              Total Executions
+              {portfolioStats.totalExecutions > 0 && (
+                <div className="text-[10px] text-green-400 mt-0.5">
+                  {portfolioStats.successfulExecutions} successful
+                </div>
+              )}
+            </div>
           </div>
         </div>
+
+        {portfolioStats.totalExecutions === 0 && (
+          <div className="mt-4 text-center text-sm text-muted bg-blue-500/10 border border-blue-500/20 rounded-lg p-3">
+            Trades will execute automatically when pattern conditions match. Stats will update in real-time via Envio.
+          </div>
+        )}
       </div>
+
+      {/* Update Delegation Modal */}
+      <UpdateDelegationModal
+        isOpen={isUpdateModalOpen}
+        onClose={handleUpdateModalClose}
+        delegation={selectedDelegation}
+        onSuccess={handleUpdateSuccess}
+      />
     </div>
   );
 }

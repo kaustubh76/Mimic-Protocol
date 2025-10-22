@@ -80,7 +80,7 @@
    ============================================ */
 @layer base {
   * {
-    @apply border-white/5;
+    border-color: rgba(255, 255, 255, 0.05);
   }
 
   body {
@@ -343,11 +343,41 @@
   }
 
   .pattern-card {
-    @apply glass-card glass-card-hover;
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    position: relative;
+    overflow: hidden;
+    transition: all var(--duration-normal) var(--ease-out-expo);
     padding: var(--spacing-xl);
     display: flex;
     flex-direction: column;
     gap: var(--spacing-md);
+  }
+
+  .pattern-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg,
+      transparent,
+      rgba(255, 255, 255, 0.1),
+      transparent
+    );
+  }
+
+  .pattern-card:hover {
+    transform: translateY(-4px) scale(1.01);
+    box-shadow:
+      var(--shadow-xl),
+      var(--shadow-glow);
+    border-color: rgba(139, 92, 246, 0.3);
   }
 
   .pattern-card .pattern-header {
@@ -413,10 +443,31 @@
    ============================================ */
 @layer components {
   .stat-card {
-    @apply glass-card;
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    position: relative;
+    overflow: hidden;
     padding: var(--spacing-lg);
     text-align: center;
     transition: all var(--duration-normal) var(--ease-out-expo);
+  }
+
+  .stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg,
+      transparent,
+      rgba(255, 255, 255, 0.1),
+      transparent
+    );
   }
 
   .stat-card:hover {

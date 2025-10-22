@@ -153,8 +153,9 @@ export function getTestDelegations(address?: string): Delegation[] {
  */
 export function getTestUserStats() {
   return {
-    totalPatterns: 0, // Patterns owned by user
+    patternsCreated: 0, // Patterns owned by user
     activeDelegations: 2,
-    totalDelegations: 3,
+    totalVolume: 0,
+    totalEarnings: 0
   };
 }

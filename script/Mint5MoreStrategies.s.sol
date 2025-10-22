@@ -131,11 +131,10 @@ contract Mint5MoreStrategies is Script {
             totalVolume: totalVolume,
             totalPnL: int256(totalPnL),
             confidence: confidence,
-            firstTradeTimestamp: block.timestamp - 90 days,
-            lastTradeTimestamp: block.timestamp
+            detectedAt: block.timestamp
         });
 
-        try detector.registerPattern(pattern) returns (uint256 tokenId) {
+        try detector.validateAndMintPattern(pattern) returns (uint256 tokenId) {
             console.log("SUCCESS! Token ID:", tokenId);
             console.log("-------------------------------------------");
             console.log("");

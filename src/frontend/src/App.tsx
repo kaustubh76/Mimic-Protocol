@@ -8,6 +8,7 @@ import { useAccount, useChainId } from 'wagmi'
 import { WalletConnect } from './components/WalletConnect'
 import { useSmartAccount } from './hooks/useSmartAccount'
 import { PatternBrowser } from './components/PatternBrowser'
+import { PatternLeaderboard } from './components/PatternLeaderboard'
 import { MyDelegations } from './components/MyDelegations'
 import { useUserStats } from './hooks/useUserStats'
 import { MONAD_CHAIN_ID } from './contracts/config'
@@ -237,7 +238,15 @@ export function App() {
 
             {/* Tab Content */}
             <div className="animate-fade-in">
-              {activeTab === 'patterns' && <PatternBrowser />}
+              {activeTab === 'patterns' && (
+                <div className="space-y-8">
+                  {/* Leaderboard - Show Top 10 Patterns */}
+                  <PatternLeaderboard />
+
+                  {/* All Patterns Browser */}
+                  <PatternBrowser />
+                </div>
+              )}
 
               {activeTab === 'delegations' && <MyDelegations />}
 

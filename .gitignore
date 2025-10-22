@@ -15,12 +15,18 @@ build/
 out/
 artifacts/
 cache/
+cache_foundry/
 typechain-types/
+
+# Foundry
+broadcast/
+cache/
+out/
+lib/
 
 # Hardhat
 coverage/
 coverage.json
-*.log
 
 # IDE
 .vscode/
@@ -41,25 +47,20 @@ test-results/
 .envio/
 envio_output/
 
-# Misc
-*.tgz
-*.zip
-temp/
-tmp/
-
-# Build artifacts
-cache/
-cache_foundry/
-out/
-node_modules/
-
 # Logs
 logs/
 *.log
 
-# IDE
-.vscode/
-.idea/
+# Temporary files
+temp/
+tmp/
+*_backup/
+*.bak
 
-# OS
-.DS_Store
+# Archives
+*.tgz
+*.zip
+
+# Database
+*.db
+*.sqlite

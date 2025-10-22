@@ -823,6 +823,7 @@ contract DelegationRouter is Ownable, Pausable, ReentrancyGuard {
      * @return percentageAllocation Allocation percentage
      * @return isActive Whether delegation is active
      * @return smartAccountAddress Smart account address
+     * @return createdAt Creation timestamp
      */
     function getDelegationBasics(uint256 delegationId)
         external
@@ -832,7 +833,8 @@ contract DelegationRouter is Ownable, Pausable, ReentrancyGuard {
             uint256 patternTokenId,
             uint256 percentageAllocation,
             bool isActive,
-            address smartAccountAddress
+            address smartAccountAddress,
+            uint256 createdAt
         )
     {
         Delegation storage d = delegations[delegationId];
@@ -841,7 +843,8 @@ contract DelegationRouter is Ownable, Pausable, ReentrancyGuard {
             d.patternTokenId,
             d.percentageAllocation,
             d.isActive,
-            d.smartAccountAddress
+            d.smartAccountAddress,
+            d.createdAt
         );
     }
 
