@@ -87,7 +87,7 @@ contract SimpleIntegrationTest is Test {
         console.log("  SUCCESS: Delegation #", delegationId, "created");
 
         // Verify delegation
-        (address delegatorAddr, uint256 pTokenId, uint256 allocation, bool active,) = 
+        (address delegatorAddr, uint256 pTokenId, uint256 allocation, bool active, , ) =
             delegationRouter.getDelegationBasics(delegationId);
         assertEq(delegatorAddr, delegator1);
         assertEq(pTokenId, tokenId);
@@ -100,7 +100,7 @@ contract SimpleIntegrationTest is Test {
         vm.prank(delegator1);
         delegationRouter.updateDelegationPercentage(delegationId, 7500);
 
-        (, , uint256 newAlloc, ,) = delegationRouter.getDelegationBasics(delegationId);
+        (, , uint256 newAlloc, , , ) = delegationRouter.getDelegationBasics(delegationId);
         assertEq(newAlloc, 7500);
         console.log("  SUCCESS: Delegation updated to 75%");
 
