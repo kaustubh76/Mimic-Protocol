@@ -29,11 +29,9 @@ contract MintAdditionalStrategies is Script {
         );
         
         nft.mintPattern(
+            msg.sender,
             "Arbitrage",
-            arbitrageData,
-            9000,  // 90% win rate
-            500000e18,  // 500k volume
-            2870   // +28.7% ROI
+            arbitrageData
         );
         console.log("Strategy 3: Arbitrage - 90% win rate, +28.7% ROI");
         
@@ -45,11 +43,9 @@ contract MintAdditionalStrategies is Script {
         );
         
         nft.mintPattern(
+            msg.sender,
             "Liquidity",
-            liquidityData,
-            9000,  // 90% win rate
-            350000e18,  // 350k volume
-            2200   // +22% ROI
+            liquidityData
         );
         console.log("Strategy 4: Liquidity - 90% win rate, +22% ROI");
         
@@ -61,11 +57,9 @@ contract MintAdditionalStrategies is Script {
         );
         
         nft.mintPattern(
+            msg.sender,
             "Yield",
-            yieldData,
-            7000,  // 70% win rate
-            280000e18,  // 280k volume
-            4300   // +43% ROI (high risk/reward)
+            yieldData
         );
         console.log("Strategy 5: Yield - 70% win rate, +43% ROI");
         
@@ -77,11 +71,9 @@ contract MintAdditionalStrategies is Script {
         );
         
         nft.mintPattern(
+            msg.sender,
             "Composite",
-            compositeData,
-            8000,  // 80% win rate
-            420000e18,  // 420k volume
-            1350   // +13.5% ROI (balanced)
+            compositeData
         );
         console.log("Strategy 6: Composite - 80% win rate, +13.5% ROI");
         
@@ -93,11 +85,9 @@ contract MintAdditionalStrategies is Script {
         );
         
         nft.mintPattern(
+            msg.sender,
             "AdvancedMeanReversion",
-            advMeanReversionData,
-            9000,  // 90% win rate
-            380000e18,  // 380k volume
-            3300   // +33% ROI
+            advMeanReversionData
         );
         console.log("Strategy 7: AdvancedMeanReversion - 90% win rate, +33% ROI");
         
