@@ -5,6 +5,7 @@ import "forge-std/Test.sol";
 import "../contracts/BehavioralNFT.sol";
 import "../contracts/DelegationRouter.sol";
 import "../contracts/ExecutionEngine.sol";
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
 /**
  * @title SimpleEndToEndTest
@@ -15,23 +16,33 @@ contract SimpleEndToEndTest is Test {
     BehavioralNFT public nft;
     DelegationRouter public router;
     ExecutionEngine public engine;
+    TestToken public token;
+    TestDEX public dex;
 
     address public owner;
     address public trader1;
     address public trader2;
+    address public smartAccount;
 
     function setUp() public {
         owner = address(this);
         trader1 = makeAddr("trader1");
         trader2 = makeAddr("trader2");
+        smartAccount = makeAddr("smartAccount");
 
         // Deploy contracts
-        nft = new BehavioralNFT();
-        router = new DelegationRouter(address(nft));
+        nft = new BehavioralNFT(owner);
+        router = new DelegationRouter(address(nft), owner);
         engine = new ExecutionEngine(address(router), address(nft));
+
+        // Deploy mock infrastructure
+        token = new TestToken("Test Token", "TEST");
+        dex = new TestDEX();
 
         // Setup
         router.setExecutionEngine(address(engine));
+        nft.setPatternDetector(trader1);
+        engine.addExecutor(trader1);
 
         // Fund test accounts
         vm.deal(trader1, 100 ether);
@@ -64,7 +75,7 @@ contract SimpleEndToEndTest is Test {
         console.log("-----------------------");
 
         vm.prank(trader2);
-        router.createSimpleDelegation(tokenId, 2500); // 25%
+        router.createSimpleDelegation(tokenId, 2500, smartAccount); // 25%
 
         uint256[] memory delegations = router.getDelegatorDelegations(trader2);
         console.log("  Delegation created: ID", delegations[0]);
@@ -76,20 +87,35 @@ contract SimpleEndToEndTest is Test {
         console.log("\n3. EXECUTING TRADE");
         console.log("-------------------");
 
+        // Fund smart account with tokens
+        token.mint(smartAccount, 1000 ether);
+
+        // Advance time to satisfy execution interval (1 minute minimum)
+        vm.warp(block.timestamp + 2 minutes);
+
+        ExecutionEngine.TradeParams memory tradeParams = ExecutionEngine.TradeParams({
+            delegationId: 1,
+            token: address(token),
+            amount: 1 ether,
+            targetContract: address(dex),
+            callData: abi.encodeWithSignature("swap(address,uint256)", address(token), 1 ether)
+        });
+
+        ExecutionEngine.PerformanceMetrics memory metrics = ExecutionEngine.PerformanceMetrics({
+            currentWinRate: 8000,
+            currentROI: 2500,
+            currentVolume: 100 ether,
+            lastUpdated: block.timestamp
+        });
+
         vm.prank(trader1); // Pattern owner executes
-        engine.executeTrade(
-            1, // delegationId
-            address(0x1111),
-            address(0x2222),
-            1 ether,
-            1.1 ether
-        );
+        engine.executeTrade(tradeParams, metrics);
 
         console.log("  Trade executed successfully");
         console.log("  [OK] ExecutionEngine interacted!");
 
         // STEP 4: Verify delegation state
-        (,,,,,,,, bool isActive,) = router.delegations(1);
+        (,,, bool isActive,,) = router.getDelegationBasics(1);
         assertTrue(isActive);
         console.log("  Delegation still active:", isActive);
 
@@ -100,7 +126,7 @@ contract SimpleEndToEndTest is Test {
         vm.prank(trader2);
         router.revokeDelegation(1);
 
-        (,,,,,,,, bool isActiveAfter,) = router.delegations(1);
+        (,,, bool isActiveAfter,,) = router.getDelegationBasics(1);
         assertFalse(isActiveAfter);
         console.log("  Delegation revoked");
         console.log("  Is active:", isActiveAfter);
@@ -119,20 +145,22 @@ contract SimpleEndToEndTest is Test {
 
         // Mint pattern
         vm.prank(trader1);
-        uint256 tokenId = nft.mintPattern(trader1, "PopularStrategy", "");
+        uint256 tokenId = nft.mintPattern(trader1, "PopularStrategy", abi.encode("popular"));
 
         // Create multiple delegations
         address trader3 = makeAddr("trader3");
         address trader4 = makeAddr("trader4");
+        address sa2 = makeAddr("sa2");
+        address sa3 = makeAddr("sa3");
 
         vm.prank(trader2);
-        router.createSimpleDelegation(tokenId, 2500);
+        router.createSimpleDelegation(tokenId, 2500, smartAccount);
 
         vm.prank(trader3);
-        router.createSimpleDelegation(tokenId, 5000);
+        router.createSimpleDelegation(tokenId, 5000, sa2);
 
         vm.prank(trader4);
-        router.createSimpleDelegation(tokenId, 2500);
+        router.createSimpleDelegation(tokenId, 2500, sa3);
 
         // Verify
         assertEq(router.getDelegatorDelegations(trader2).length, 1);
@@ -149,38 +177,79 @@ contract SimpleEndToEndTest is Test {
 
         // Setup
         vm.prank(trader1);
-        uint256 tokenId = nft.mintPattern(trader1, "TestPattern", "");
+        uint256 tokenId = nft.mintPattern(trader1, "TestPattern", abi.encode("test"));
 
         vm.prank(trader2);
-        router.createSimpleDelegation(tokenId, 2500);
+        router.createSimpleDelegation(tokenId, 2500, smartAccount);
 
-        // Test: Non-owner cannot execute
+        // Fund smart account
+        token.mint(smartAccount, 1000 ether);
+
+        ExecutionEngine.TradeParams memory tradeParams = ExecutionEngine.TradeParams({
+            delegationId: 1,
+            token: address(token),
+            amount: 1 ether,
+            targetContract: address(dex),
+            callData: abi.encodeWithSignature("swap(address,uint256)", address(token), 1 ether)
+        });
+
+        ExecutionEngine.PerformanceMetrics memory metrics = ExecutionEngine.PerformanceMetrics({
+            currentWinRate: 8000,
+            currentROI: 2500,
+            currentVolume: 100 ether,
+            lastUpdated: block.timestamp
+        });
+
+        // Advance time to satisfy execution interval
+        vm.warp(block.timestamp + 2 minutes);
+
+        // Test: Non-executor cannot execute
         vm.prank(trader2);
         vm.expectRevert();
-        engine.executeTrade(1, address(0x1111), address(0x2222), 1 ether, 1.1 ether);
+        engine.executeTrade(tradeParams, metrics);
 
-        // Test: Owner can execute
+        // Test: Executor (trader1) can execute
         vm.prank(trader1);
-        engine.executeTrade(1, address(0x1111), address(0x2222), 1 ether, 1.1 ether);
+        engine.executeTrade(tradeParams, metrics);
 
-        console.log("  [OK] Only pattern owner can execute trades");
+        console.log("  [OK] Only executors can execute trades");
     }
 
     function testDelegationLimits() public {
         console.log("\n=== Testing Delegation Limits ===");
 
         vm.prank(trader1);
-        uint256 tokenId = nft.mintPattern(trader1, "LimitTest", "");
+        uint256 tokenId = nft.mintPattern(trader1, "LimitTest", abi.encode("limit"));
 
         // Test: Cannot delegate > 100%
         vm.prank(trader2);
         vm.expectRevert();
-        router.createSimpleDelegation(tokenId, 10001); // 100.01%
+        router.createSimpleDelegation(tokenId, 10001, smartAccount); // 100.01%
 
         // Test: Can delegate exactly 100%
         vm.prank(trader2);
-        router.createSimpleDelegation(tokenId, 10000); // 100%
+        router.createSimpleDelegation(tokenId, 10000, smartAccount); // 100%
 
         console.log("  [OK] Delegation limits enforced");
+    }
+}
+
+/**
+ * @notice Simple ERC20 token for testing
+ */
+contract TestToken is ERC20 {
+    constructor(string memory name, string memory symbol) ERC20(name, symbol) {}
+
+    function mint(address to, uint256 amount) external {
+        _mint(to, amount);
+    }
+}
+
+/**
+ * @notice Simple DEX mock for testing trade execution
+ */
+contract TestDEX {
+    function swap(address, uint256) external pure returns (bool) {
+        return true;
     }
 }
