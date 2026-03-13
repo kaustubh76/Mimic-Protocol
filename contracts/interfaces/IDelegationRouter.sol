@@ -203,7 +203,8 @@ interface IDelegationRouter {
             uint256 patternTokenId,
             uint256 percentageAllocation,
             bool isActive,
-            address smartAccountAddress
+            address smartAccountAddress,
+            uint256 createdAt
         );
 
     function getDelegationPermissions(uint256 delegationId)
