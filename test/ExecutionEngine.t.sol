@@ -276,8 +276,8 @@ contract ExecutionEngineTest is Test {
     }
 
     function testRevert_ExecuteTrade_DelegationInactive() public {
-        // Revoke delegation
-        vm.prank(user1);
+        // Revoke delegation (user2 is the delegator who created delegationId1)
+        vm.prank(user2);
         router.revokeDelegation(delegationId1);
 
         ExecutionEngine.TradeParams memory params = ExecutionEngine.TradeParams({
@@ -395,7 +395,11 @@ contract ExecutionEngineTest is Test {
     }
 
     function test_ExecuteBatch_PartialSuccess() public {
-        // Create trades where one will fail
+        // Revoke second delegation so it fails at validation
+        vm.prank(user1);
+        router.revokeDelegation(delegationId2);
+
+        // Create trades where one will fail (delegation2 is now inactive)
         ExecutionEngine.TradeParams[] memory tradeParams = new ExecutionEngine.TradeParams[](2);
         tradeParams[0] = ExecutionEngine.TradeParams({
             delegationId: delegationId1,
@@ -420,19 +424,19 @@ contract ExecutionEngineTest is Test {
             lastUpdated: block.timestamp
         });
         metricsArray[1] = ExecutionEngine.PerformanceMetrics({
-            currentWinRate: 3000, // Below threshold - will fail
-            currentROI: -1000,
-            currentVolume: 1 ether,
+            currentWinRate: 7000,
+            currentROI: 2000,
+            currentVolume: 10 ether,
             lastUpdated: block.timestamp
         });
 
         token.mint(smartAccount1, 1000 ether);
-        // Don't fund smartAccount2 - will fail
+        token.mint(smartAccount2, 2000 ether);
 
         vm.prank(executor);
         uint256 successCount = engine.executeBatch(tradeParams, metricsArray);
 
-        assertEq(successCount, 1); // Only first trade should succeed
+        assertEq(successCount, 1); // Only first trade should succeed (delegation2 is inactive)
     }
 
     /*//////////////////////////////////////////////////////////////
@@ -471,6 +475,10 @@ contract ExecutionEngineTest is Test {
         token.mint(smartAccount1, 1000 ether);
         token.mint(smartAccount3, 1000 ether);
 
+        // Disable execution interval for multi-layer test (avoids interval conflicts between layers)
+        vm.prank(owner);
+        engine.setMinExecutionInterval(0);
+
         vm.prank(executor);
         uint256 executionCount = engine.executeMultiLayer(delegationId1, params, metrics);
 
@@ -501,8 +509,8 @@ contract ExecutionEngineTest is Test {
     }
 
     function test_CanExecuteTrade_DelegationInactive() public {
-        // Revoke delegation
-        vm.prank(user1);
+        // Revoke delegation (user2 is the delegator who created delegationId1)
+        vm.prank(user2);
         router.revokeDelegation(delegationId1);
 
         ExecutionEngine.PerformanceMetrics memory metrics = ExecutionEngine.PerformanceMetrics({
