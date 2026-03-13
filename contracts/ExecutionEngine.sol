@@ -245,7 +245,8 @@ contract ExecutionEngine is Ownable, Pausable, ReentrancyGuard {
             uint256 patternTokenId,
             uint256 percentageAllocation,
             , // isActive (already validated)
-              // smartAccountAddress
+            , // smartAccountAddress
+              // createdAt
         ) = delegationRouter.getDelegationBasics(params.delegationId);
 
         // Calculate allocated amount based on percentage (percentageAllocation is in basis points)
@@ -392,7 +393,7 @@ contract ExecutionEngine is Ownable, Pausable, ReentrancyGuard {
         returns (bool canExecute, string memory reason)
     {
         // Get delegation basics - separate to avoid stack too deep
-        (, uint256 patternTokenId, , bool isActive, ) = delegationRouter.getDelegationBasics(delegationId);
+        (, uint256 patternTokenId, , bool isActive, , ) = delegationRouter.getDelegationBasics(delegationId);
 
         if (!isActive) {
             return (false, "Delegation inactive");
@@ -443,7 +444,8 @@ contract ExecutionEngine is Ownable, Pausable, ReentrancyGuard {
             uint256 patternTokenId,
             , // percentageAllocation
             bool isActive,
-              // smartAccountAddress
+            , // smartAccountAddress
+              // createdAt
         ) = delegationRouter.getDelegationBasics(delegationId);
 
         if (!isActive) revert DelegationInactive();
@@ -495,7 +497,8 @@ contract ExecutionEngine is Ownable, Pausable, ReentrancyGuard {
             , // patternTokenId
             , // percentageAllocation
             , // isActive
-            address smartAccountAddress
+            address smartAccountAddress,
+              // createdAt
         ) = delegationRouter.getDelegationBasics(delegationId);
 
         // Check smart account has sufficient balance
@@ -571,7 +574,7 @@ contract ExecutionEngine is Ownable, Pausable, ReentrancyGuard {
         {
             if (!canExecute) {
                 // Get pattern token ID for event using optimized getter
-                (, uint256 failedPatternTokenId, , , ) = delegationRouter.getDelegationBasics(params.delegationId);
+                (, uint256 failedPatternTokenId, , , , ) = delegationRouter.getDelegationBasics(params.delegationId);
                 emit ExecutionFailed(params.delegationId, failedPatternTokenId, reason, block.timestamp);
                 return false;
             }
@@ -582,7 +585,8 @@ contract ExecutionEngine is Ownable, Pausable, ReentrancyGuard {
                 uint256 patternTokenId,
                 uint256 percentageAllocation,
                 , // isActive
-                  // smartAccountAddress
+                , // smartAccountAddress
+                  // createdAt
             ) = delegationRouter.getDelegationBasics(params.delegationId);
             uint256 allocatedAmount = (params.amount * percentageAllocation) / 10000;
 
@@ -631,7 +635,8 @@ contract ExecutionEngine is Ownable, Pausable, ReentrancyGuard {
             uint256 patternTokenId,
             uint256 percentageAllocation,
             , // isActive
-              // smartAccountAddress
+            , // smartAccountAddress
+              // createdAt
         ) = delegationRouter.getDelegationBasics(delegationId);
         uint256 allocatedAmount = (params.amount * percentageAllocation) / 10000;
 
