@@ -1,12 +1,11 @@
 name: mirror-protocol-indexer
 description: Real-time behavioral pattern indexing for Mirror Protocol
 
-chains:
+networks:
   - id: 10143
     start_block: 19213700
-    rpc:
+    rpc_config:
       url: https://monad-testnet.g.alchemy.com/v2/pFkOAygOyJ72KbT_I-LM0
-
     contracts:
       - name: BehavioralNFT
         address:
@@ -17,7 +16,6 @@ chains:
           - event: "PatternPerformanceUpdated(uint256 indexed tokenId, uint256 winRate, uint256 totalVolume, int256 roi)"
           - event: "PatternDeactivated(uint256 indexed tokenId, string reason)"
           - event: "Transfer(address indexed from, address indexed to, uint256 indexed tokenId)"
-
       - name: DelegationRouter
         address:
           - "0xd5499e0d781b123724dF253776Aa1EB09780AfBf"
