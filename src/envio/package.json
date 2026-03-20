@@ -1,6 +1,7 @@
 {
   "name": "mirror-protocol-envio",
   "version": "1.0.0",
+  "packageManager": "pnpm@9.10.0",
   "description": "Envio HyperCore integration for Mirror Protocol - Real-time behavioral pattern indexing",
   "author": "Mirror Protocol Team",
   "license": "MIT",
