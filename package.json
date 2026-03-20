@@ -50,7 +50,7 @@
     "@typechain/hardhat": "^9.0.0",
     "@types/node": "^20.0.0",
     "chai": "^4.3.10",
-    "envio-cli": "^2.0.0",
+    "envio": "2.32.6",
     "eslint": "^8.54.0",
     "hardhat": "^2.19.0",
     "hardhat-gas-reporter": "^1.0.9",
