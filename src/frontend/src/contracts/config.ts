@@ -33,4 +33,4 @@ export const MONAD_RPC_URL = 'https://monad-testnet.g.alchemy.com/v2/pFkOAygOyJ7
 // Envio GraphQL endpoint for real-time indexing
 // Note: Update this with your actual Envio deployment URL
 export const ENVIO_GRAPHQL_URL = import.meta.env.VITE_ENVIO_GRAPHQL_URL ||
-  'https://indexer.bigdevenergy.link/mirror-protocol/v1/graphql';
+  'https://indexer.dev.hyperindex.xyz/3bafdb4/v1/graphql';
