@@ -25,7 +25,7 @@ export function useRevokeDelegation() {
         abi: ABIS.DELEGATION_ROUTER,
         functionName: 'revokeDelegation',
         args: [delegationId],
-      });
+      } as any);
     } catch (err) {
       console.error('Failed to revoke delegation:', err);
       throw err;

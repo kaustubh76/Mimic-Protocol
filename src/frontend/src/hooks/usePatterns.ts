@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { usePublicClient } from 'wagmi';
 import { CONTRACTS, ABIS } from '../contracts/config';
 import { getTestPatterns } from '../config/testData';
@@ -14,12 +14,16 @@ export interface Pattern {
   roi: bigint;
   isActive: boolean;
   createdAt: bigint;
+  successfulExecutions: number;
+  failedExecutions: number;
 }
 
-// GraphQL endpoint for Envio indexer
-const GRAPHQL_ENDPOINT = 'http://localhost:8080/v1/graphql';
+// GraphQL endpoint for Envio indexer — configurable via env, fallback to localhost for dev
+const GRAPHQL_ENDPOINT =
+  (typeof import.meta !== 'undefined' && (import.meta as any).env?.VITE_ENVIO_GRAPHQL_URL) ||
+  'http://localhost:8080/v1/graphql';
 
-export function usePatterns() {
+export function usePatterns(pollIntervalMs = 10000) {
   const [patterns, setPatterns] = useState<Pattern[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
@@ -27,8 +31,7 @@ export function usePatterns() {
   const [isSyncing, setIsSyncing] = useState(false);
   const publicClient = usePublicClient();
 
-  useEffect(() => {
-    async function fetchPatterns() {
+  const fetchPatterns = useCallback(async () => {
       try {
         setIsLoading(true);
 
@@ -45,6 +48,13 @@ export function usePatterns() {
               winRate
               totalVolume
               roi
+              createdAt
+              delegationCount
+              successfulExecutions
+              failedExecutions
+              creator {
+                id
+              }
             }
           }
         `;
@@ -76,14 +86,16 @@ export function usePatterns() {
           const formattedPatterns: Pattern[] = indexedPatterns.map((p: any) => ({
             id: parseInt(p.tokenId),
             tokenId: BigInt(p.tokenId),
-            creator: p.id, // In Envio schema, 'id' is the creator address
-            owner: p.id,
+            creator: p.creator?.id || p.id,
+            owner: p.creator?.id || p.id,
             patternType: p.patternType,
             winRate: BigInt(p.winRate || 0),
             totalVolume: BigInt(p.totalVolume || 0),
             roi: BigInt(p.roi || 0),
             isActive: p.isActive,
-            createdAt: BigInt(Math.floor(Date.now() / 1000)), // Approximate
+            createdAt: BigInt(p.createdAt || Math.floor(Date.now() / 1000)),
+            successfulExecutions: p.successfulExecutions || 0,
+            failedExecutions: p.failedExecutions || 0,
           }));
 
           setPatterns(formattedPatterns);
@@ -106,7 +118,7 @@ export function usePatterns() {
             address: CONTRACTS.BEHAVIORAL_NFT,
             abi: ABIS.BEHAVIORAL_NFT,
             functionName: 'totalPatterns',
-          }) as bigint;
+          } as any) as bigint;
 
           if (Number(totalPatterns) > 0) {
             console.log(`Found ${totalPatterns} patterns on blockchain`);
@@ -119,7 +131,7 @@ export function usePatterns() {
                   abi: ABIS.BEHAVIORAL_NFT,
                   functionName: 'patterns',
                   args: [BigInt(i)],
-                })
+                } as any)
               );
             }
 
@@ -148,6 +160,8 @@ export function usePatterns() {
                 roi,
                 isActive,
                 createdAt,
+                successfulExecutions: 0,
+                failedExecutions: 0,
               };
             });
 
@@ -180,10 +194,14 @@ export function usePatterns() {
       } finally {
         setIsLoading(false);
       }
-    }
-
-    fetchPatterns();
   }, [publicClient]);
 
-  return { patterns, isLoading, error, usingTestData, isSyncing, refetch: () => {} };
+  useEffect(() => {
+    fetchPatterns();
+    // Poll Envio for real-time updates
+    const interval = setInterval(fetchPatterns, pollIntervalMs);
+    return () => clearInterval(interval);
+  }, [fetchPatterns, pollIntervalMs]);
+
+  return { patterns, isLoading, error, usingTestData, isSyncing, refetch: fetchPatterns };
 }

@@ -28,12 +28,12 @@ export function useUpdateDelegation() {
       writeContract({
         address: CONTRACTS.DELEGATION_ROUTER,
         abi: ABIS.DELEGATION_ROUTER,
-        functionName: 'updateDelegation',
+        functionName: 'updateDelegationPercentage',
         args: [
           params.delegationId,
           BigInt(params.newPercentageAllocation),
         ],
-      });
+      } as any);
     } catch (err) {
       console.error('Failed to update delegation:', err);
       throw err;

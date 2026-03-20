@@ -56,7 +56,7 @@ export function useCreateDelegation() {
           params.percentageAllocation,
           params.smartAccountAddress,
         ],
-      });
+      } as any);
 
     } catch (err) {
       const error = err as Error;

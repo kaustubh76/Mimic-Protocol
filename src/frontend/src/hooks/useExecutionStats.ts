@@ -3,12 +3,14 @@ import { usePublicClient } from 'wagmi';
 import { CONTRACTS, ABIS } from '../contracts/config';
 import type { ExecutionStats } from '../components/ExecutionStats';
 
-// GraphQL endpoint for Envio indexer
-const GRAPHQL_ENDPOINT = 'http://localhost:8080/v1/graphql';
+// GraphQL endpoint for Envio indexer — configurable via env
+const GRAPHQL_ENDPOINT =
+  (typeof import.meta !== 'undefined' && (import.meta as any).env?.VITE_ENVIO_GRAPHQL_URL) ||
+  'http://localhost:8080/v1/graphql';
 
 /**
  * Hook to fetch execution statistics for a delegation
- * Prioritizes GraphQL from Envio, falls back to blockchain RPC
+ * Prioritizes GraphQL from Envio (TradeExecution entity), falls back to blockchain RPC
  */
 export function useExecutionStats(delegationId: bigint | undefined) {
   const [stats, setStats] = useState<ExecutionStats | null>(null);
@@ -29,11 +31,10 @@ export function useExecutionStats(delegationId: bigint | undefined) {
         setIsLoading(true);
 
         // PRIMARY DATA SOURCE: GraphQL from Envio
-        console.log(`Fetching execution stats for delegation ${delegationId} from Envio GraphQL...`);
-
+        // Entity name is TradeExecution (matches schema.graphql)
         const query = `
           query GetExecutionStats($delegationId: String!) {
-            TradeExecuted(
+            TradeExecution(
               where: {delegationId: {_eq: $delegationId}}
               order_by: {timestamp: desc}
             ) {
@@ -41,17 +42,15 @@ export function useExecutionStats(delegationId: bigint | undefined) {
               delegationId
               success
               amount
-              gasUsed
               timestamp
+              txHash
             }
           }
         `;
 
         const response = await fetch(GRAPHQL_ENDPOINT, {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             query,
             variables: { delegationId: delegationId.toString() },
@@ -62,10 +61,9 @@ export function useExecutionStats(delegationId: bigint | undefined) {
           const result = await response.json();
 
           if (result.data && !result.errors) {
-            const trades = result.data.TradeExecuted || [];
+            const trades = result.data.TradeExecution || [];
 
             if (trades.length > 0) {
-              // Calculate stats from indexed trades
               const totalExecutions = trades.length;
               const successfulExecutions = trades.filter((t: any) => t.success).length;
               const failedExecutions = totalExecutions - successfulExecutions;
@@ -75,14 +73,9 @@ export function useExecutionStats(delegationId: bigint | undefined) {
                 BigInt(0)
               );
 
-              const totalGasUsed = trades.reduce(
-                (sum: bigint, t: any) => sum + BigInt(t.gasUsed || 0),
-                BigInt(0)
-              );
+              const lastExecutionTime = trades[0].timestamp;
 
-              const lastExecutionTime = trades[0].timestamp; // Most recent (ordered desc)
-
-              console.log(`✅ Using Envio data: ${totalExecutions} executions for delegation ${delegationId}`);
+              console.log(`✅ Envio: ${totalExecutions} executions for delegation ${delegationId}`);
 
               setStats({
                 delegationId,
@@ -90,7 +83,7 @@ export function useExecutionStats(delegationId: bigint | undefined) {
                 successfulExecutions,
                 failedExecutions,
                 totalVolumeExecuted,
-                totalGasUsed,
+                totalGasUsed: BigInt(0), // Not tracked in TradeExecution entity
                 lastExecutionTime: Number(lastExecutionTime),
               });
               setUsingGraphQL(true);
@@ -102,21 +95,19 @@ export function useExecutionStats(delegationId: bigint | undefined) {
         }
 
         // FALLBACK: Query ExecutionEngine contract directly
-        console.warn(`⏳ No GraphQL data for delegation ${delegationId}, querying blockchain...`);
-
         if (!publicClient) {
-          throw new Error('No public client available');
+          setStats(null);
+          setIsLoading(false);
+          return;
         }
 
-        // Query the public executionStats mapping
         const contractStats = await publicClient.readContract({
           address: CONTRACTS.EXECUTION_ENGINE,
           abi: ABIS.EXECUTION_ENGINE,
           functionName: 'executionStats',
           args: [delegationId],
-        }) as any;
+        } as any) as any;
 
-        // ExecutionStats struct: [totalExecutions, successfulExecutions, failedExecutions, totalVolumeExecuted, totalGasUsed, lastExecutionTime]
         const [
           totalExecutions,
           successfulExecutions,
@@ -125,8 +116,6 @@ export function useExecutionStats(delegationId: bigint | undefined) {
           totalGasUsed,
           lastExecutionTime,
         ] = contractStats;
-
-        console.log(`✅ Using blockchain data: ${totalExecutions} executions for delegation ${delegationId}`);
 
         setStats({
           delegationId,
@@ -142,8 +131,6 @@ export function useExecutionStats(delegationId: bigint | undefined) {
 
       } catch (err) {
         console.error(`❌ Error fetching execution stats for delegation ${delegationId}:`, err);
-
-        // If everything fails, return null (will show "No executions yet" UI)
         setStats(null);
         setError(err as Error);
       } finally {
