@@ -64,7 +64,7 @@ export function PatternBrowser() {
           </div>
           <button
             className="btn btn--primary"
-            onClick={() => window.location.reload()}
+            onClick={() => refetch()}
           >
             <span>🔄 Retry</span>
           </button>
@@ -148,22 +148,4 @@ export function PatternBrowser() {
       )}
     </div>
   );
-}
-
-// Add slideRight animation to CSS if not already present
-const style = document.createElement('style');
-style.textContent = `
-  @keyframes slideRight {
-    from {
-      width: 0;
-      opacity: 0;
-    }
-    to {
-      opacity: 1;
-    }
-  }
-`;
-if (!document.querySelector('style[data-pattern-animations]')) {
-  style.setAttribute('data-pattern-animations', 'true');
-  document.head.appendChild(style);
 }

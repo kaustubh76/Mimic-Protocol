@@ -10,6 +10,7 @@ import { useSmartAccount } from './hooks/useSmartAccount'
 import { PatternBrowser } from './components/PatternBrowser'
 import { PatternLeaderboard } from './components/PatternLeaderboard'
 import { MyDelegations } from './components/MyDelegations'
+import { EnvioMetricsDashboard } from './components/EnvioMetricsDashboard'
 import { useUserStats } from './hooks/useUserStats'
 import { MONAD_CHAIN_ID } from './contracts/config'
 import './globals.css'
@@ -196,6 +197,11 @@ export function App() {
                 </div>
               </section>
             )}
+
+            {/* Envio Live Metrics Dashboard */}
+            <section className="animate-fade-in" style={{ animationDelay: '200ms' }}>
+              <EnvioMetricsDashboard />
+            </section>
 
             {/* Tab Navigation */}
             <nav className="glass-card p-2 inline-flex gap-2 animate-slide-up">

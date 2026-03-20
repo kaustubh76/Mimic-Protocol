@@ -93,7 +93,7 @@ export function CreateDelegationModal({
 
             <h2 className="text-3xl font-bold mb-3">Delegation Created!</h2>
             <p className="text-secondary mb-6">
-              Your delegation to <span className="text-gradient-primary font-bold">{pattern.patternType.replace('_', ' ')}</span> has been created successfully.
+              Your delegation to <span className="text-gradient-primary font-bold">{pattern.patternType.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}</span> has been created successfully.
             </p>
 
             {hash && (
@@ -103,7 +103,7 @@ export function CreateDelegationModal({
                   {hash.slice(0, 10)}...{hash.slice(-8)}
                 </code>
                 <a
-                  href={`https://explorer.monad.xyz/tx/${hash}`}
+                  href={`https://explorer.testnet.monad.xyz/tx/${hash}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-xs text-gradient-secondary hover:underline flex items-center justify-center gap-1"
@@ -145,7 +145,7 @@ export function CreateDelegationModal({
               <div className="glass-card p-6 mb-6 space-y-4">
                 <div className="flex items-center gap-3">
                   <span className={`pattern-badge pattern-badge--${pattern.patternType}`}>
-                    {pattern.patternType.replace('_', ' ')}
+                    {pattern.patternType.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}
                   </span>
                   <h3 className="text-xl font-bold">
                     Pattern #{Number(pattern.tokenId)}

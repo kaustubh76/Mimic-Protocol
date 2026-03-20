@@ -75,7 +75,7 @@ export function PatternLeaderboard() {
                     <div className="flex items-center gap-2">
                       <span className="font-bold">Pattern #{pattern.id}</span>
                       <span className={`pattern-badge pattern-badge--${pattern.patternType} text-xs`}>
-                        {pattern.patternType.replace('_', ' ')}
+                        {pattern.patternType.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}
                       </span>
                     </div>
                     <div className="text-sm font-bold text-gradient-primary">

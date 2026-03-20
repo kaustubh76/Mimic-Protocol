@@ -29,12 +29,15 @@ export function UpdateDelegationModal({
     reset
   } = useUpdateDelegation();
 
-  // Initialize with current allocation
+  // Initialize with current allocation and reset error state on open
   useEffect(() => {
-    if (delegation) {
+    if (delegation && isOpen) {
       setPercentage((Number(delegation.percentageAllocation) / 100).toString());
+      setShowSuccess(false);
+      setCountdown(3);
+      reset();
     }
-  }, [delegation]);
+  }, [delegation, isOpen]);
 
   // Handle success state
   useEffect(() => {

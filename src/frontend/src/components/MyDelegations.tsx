@@ -30,8 +30,10 @@ export function MyDelegations() {
   };
 
   const handleUpdateSuccess = () => {
-    // Refresh delegations list
-    window.location.reload();
+    // Polling (every 12s) will pick up the updated delegation automatically.
+    // Close modal — the user sees the change on next poll cycle.
+    setIsUpdateModalOpen(false);
+    setSelectedDelegation(null);
   };
 
   const handleRevokeClick = async (delegation: Delegation) => {
@@ -44,8 +46,7 @@ export function MyDelegations() {
     try {
       setRevokingId(delegation.id);
       await revokeDelegation(delegation.delegationId);
-      // Refresh after successful revoke
-      setTimeout(() => window.location.reload(), 3000);
+      // Polling (every 12s) will pick up the revocation automatically.
     } catch (err) {
       console.error('Failed to revoke delegation:', err);
       setRevokingId(null);

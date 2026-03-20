@@ -26,6 +26,8 @@ export const TEST_PATTERNS: Pattern[] = [
     roi: BigInt(2870), // 28.7%
     isActive: true,
     createdAt: BigInt(Math.floor(Date.now() / 1000) - 7 * 24 * 60 * 60), // 7 days ago
+    successfulExecutions: 0,
+    failedExecutions: 0,
   },
   {
     id: 2,
@@ -38,6 +40,8 @@ export const TEST_PATTERNS: Pattern[] = [
     roi: BigInt(270), // 2.7%
     isActive: true,
     createdAt: BigInt(Math.floor(Date.now() / 1000) - 10 * 24 * 60 * 60), // 10 days ago
+    successfulExecutions: 0,
+    failedExecutions: 0,
   },
   {
     id: 3,
@@ -50,6 +54,8 @@ export const TEST_PATTERNS: Pattern[] = [
     roi: BigInt(4583), // 45.83%
     isActive: true,
     createdAt: BigInt(Math.floor(Date.now() / 1000) - 14 * 24 * 60 * 60), // 14 days ago
+    successfulExecutions: 0,
+    failedExecutions: 0,
   },
   {
     id: 4,
@@ -62,6 +68,8 @@ export const TEST_PATTERNS: Pattern[] = [
     roi: BigInt(125), // 1.25%
     isActive: true,
     createdAt: BigInt(Math.floor(Date.now() / 1000) - 15 * 60 * 60), // 15 hours ago
+    successfulExecutions: 0,
+    failedExecutions: 0,
   },
   {
     id: 5,
@@ -74,6 +82,8 @@ export const TEST_PATTERNS: Pattern[] = [
     roi: BigInt(3900), // 39%
     isActive: true,
     createdAt: BigInt(Math.floor(Date.now() / 1000) - 21 * 24 * 60 * 60), // 21 days ago
+    successfulExecutions: 0,
+    failedExecutions: 0,
   },
   {
     id: 6,
@@ -86,6 +96,8 @@ export const TEST_PATTERNS: Pattern[] = [
     roi: BigInt(1200), // 12%
     isActive: false, // Inactive example
     createdAt: BigInt(Math.floor(Date.now() / 1000) - 30 * 24 * 60 * 60), // 30 days ago
+    successfulExecutions: 0,
+    failedExecutions: 0,
   },
 ];
 

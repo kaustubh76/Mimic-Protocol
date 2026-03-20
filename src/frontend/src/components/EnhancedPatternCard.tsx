@@ -42,7 +42,7 @@ export function EnhancedPatternCard({ pattern, onDelegateClick }: EnhancedPatter
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-2 flex-wrap">
               <span className={`pattern-badge pattern-badge--${pattern.patternType}`}>
-                {pattern.patternType.replace('_', ' ')}
+                {pattern.patternType.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}
               </span>
               {pattern.isActive ? (
                 <div className="px-2 py-0.5 rounded-full bg-green-500/20 border border-green-500/30 text-green-400 text-xs font-bold flex items-center gap-1">
@@ -242,7 +242,7 @@ export function EnhancedPatternCard({ pattern, onDelegateClick }: EnhancedPatter
         <div className="mt-3">
           <ExecutionIndicator
             isActive={pattern.isActive && !analytics?.circuitBreakerStatus.isTripped}
-            executionCount={0} // Would come from ExecutionEngine contract
+            executionCount={(pattern.successfulExecutions || 0) + (pattern.failedExecutions || 0)}
             successRate={analytics ? analytics.riskScore.score : winRate}
           />
         </div>
@@ -257,26 +257,4 @@ export function EnhancedPatternCard({ pattern, onDelegateClick }: EnhancedPatter
       </div>
     </div>
   );
-}
-
-// Add fadeIn animation
-const style = document.createElement('style');
-style.textContent = `
-  @keyframes fadeIn {
-    from {
-      opacity: 0;
-      transform: translateY(-10px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-  .animate-fadeIn {
-    animation: fadeIn 0.3s ease-out;
-  }
-`;
-if (!document.querySelector('style[data-enhanced-animations]')) {
-  style.setAttribute('data-enhanced-animations', 'true');
-  document.head.appendChild(style);
 }
