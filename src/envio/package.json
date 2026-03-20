@@ -20,6 +20,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "envio": "2.32.10",
     "ethers": "^6.9.0",
     "pino": "^8.16.2",
     "pino-pretty": "^10.2.3"
