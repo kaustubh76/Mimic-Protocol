@@ -1,0 +1,436 @@
+#
+# Mirror Protocol - Example GraphQL Queries
+# @description Common query patterns for the Envio GraphQL API
+# @author Mirror Protocol Team
+#
+# Performance: All queries optimized for <50ms response time
+#
+
+# ============================================================================
+# PATTERN QUERIES
+# ============================================================================
+
+# Get single pattern by ID
+# Target latency: <20ms
+query GetPattern($tokenId: String!) {
+  pattern(id: $tokenId) {
+    id
+    tokenId
+    creator {
+      id
+      address
+      totalPatterns
+      averageWinRate
+    }
+    owner
+    patternType
+    patternData
+    patternDataDecoded
+    createdAt
+    winRate
+    totalVolume
+    roi
+    isActive
+    deactivationReason
+    delegationCount
+    totalEarnings
+    successfulExecutions
+    failedExecutions
+    lastUpdatedAt
+  }
+}
+
+# Get all patterns by creator
+# Target latency: <30ms
+query GetPatternsByCreator($creator: String!, $limit: Int = 10) {
+  patterns(
+    where: { creator: $creator }
+    orderBy: createdAt
+    orderDirection: desc
+    first: $limit
+  ) {
+    id
+    tokenId
+    patternType
+    winRate
+    totalVolume
+    roi
+    isActive
+    createdAt
+  }
+}
+
+# Get active patterns only
+# Target latency: <30ms
+query GetActivePatterns($limit: Int = 20) {
+  patterns(
+    where: { isActive: true }
+    orderBy: createdAt
+    orderDirection: desc
+    first: $limit
+  ) {
+    id
+    tokenId
+    creator {
+      address
+    }
+    patternType
+    winRate
+    totalVolume
+    roi
+    createdAt
+  }
+}
+
+# Search patterns by type
+# Target latency: <25ms
+query GetPatternsByType($patternType: String!, $limit: Int = 20) {
+  patterns(
+    where: { patternType: $patternType, isActive: true }
+    orderBy: winRate
+    orderDirection: desc
+    first: $limit
+  ) {
+    id
+    tokenId
+    creator {
+      address
+    }
+    winRate
+    totalVolume
+    roi
+    delegationCount
+    createdAt
+  }
+}
+
+# ============================================================================
+# LEADERBOARD QUERIES
+# ============================================================================
+
+# Top patterns by win rate
+# Target latency: <50ms
+query TopPatternsByWinRate($limit: Int = 10) {
+  patterns(
+    where: { isActive: true }
+    orderBy: winRate
+    orderDirection: desc
+    first: $limit
+  ) {
+    id
+    tokenId
+    creator {
+      address
+    }
+    patternType
+    winRate
+    totalVolume
+    roi
+    successfulExecutions
+    failedExecutions
+    delegationCount
+  }
+}
+
+# Top patterns by ROI
+# Target latency: <50ms
+query TopPatternsByROI($limit: Int = 10) {
+  patterns(
+    where: { isActive: true, roi_gt: 0 }
+    orderBy: roi
+    orderDirection: desc
+    first: $limit
+  ) {
+    id
+    tokenId
+    creator {
+      address
+    }
+    patternType
+    winRate
+    totalVolume
+    roi
+    totalEarnings
+    delegationCount
+  }
+}
+
+# Top patterns by volume
+# Target latency: <50ms
+query TopPatternsByVolume($limit: Int = 10) {
+  patterns(
+    where: { isActive: true }
+    orderBy: totalVolume
+    orderDirection: desc
+    first: $limit
+  ) {
+    id
+    tokenId
+    creator {
+      address
+    }
+    patternType
+    winRate
+    totalVolume
+    roi
+    delegationCount
+  }
+}
+
+# Top creators by pattern count
+# Target latency: <40ms
+query TopCreators($limit: Int = 10) {
+  creators(
+    orderBy: totalPatterns
+    orderDirection: desc
+    first: $limit
+  ) {
+    id
+    address
+    totalPatterns
+    activePatterns
+    totalVolume
+    averageWinRate
+    averageROI
+    totalEarnings
+    reputationScore
+  }
+}
+
+# ============================================================================
+# ANALYTICS QUERIES
+# ============================================================================
+
+# Real-time system metrics
+# Target latency: <30ms
+query RealtimeMetrics {
+  systemMetrics(id: "1") {
+    totalPatterns
+    activePatterns
+    last24hPatterns
+    last7dPatterns
+    totalCreators
+    activeCreators
+    averageWinRate
+    medianWinRate
+    totalVolume
+    totalEarnings
+    eventsProcessed
+    eventsLastHour
+    averageProcessingTime
+    averageQueryLatency
+    peakEventsPerSecond
+    currentEventsPerSecond
+    momentumPatterns
+    arbitragePatterns
+    meanReversionPatterns
+    otherPatterns
+    lastPatternMintedAt
+    lastPerformanceUpdateAt
+  }
+}
+
+# Pattern type distribution
+# Target latency: <35ms
+query PatternTypeDistribution {
+  systemMetrics(id: "1") {
+    totalPatterns
+    momentumPatterns
+    arbitragePatterns
+    meanReversionPatterns
+    otherPatterns
+  }
+}
+
+# Recent pattern activity (last 24h)
+# Target latency: <40ms
+query RecentPatternActivity($since: BigInt!) {
+  patterns(
+    where: { createdAt_gte: $since }
+    orderBy: createdAt
+    orderDirection: desc
+    first: 50
+  ) {
+    id
+    tokenId
+    creator {
+      address
+    }
+    patternType
+    winRate
+    createdAt
+  }
+}
+
+# Performance updates for a pattern
+# Target latency: <35ms
+query PatternPerformanceHistory($tokenId: String!, $limit: Int = 20) {
+  performanceUpdates(
+    where: { pattern: $tokenId }
+    orderBy: timestamp
+    orderDirection: desc
+    first: $limit
+  ) {
+    id
+    winRate
+    totalVolume
+    roi
+    timestamp
+    winRateDelta
+    volumeDelta
+    roiDelta
+  }
+}
+
+# ============================================================================
+# SUBSCRIPTION QUERIES (Real-time updates)
+# ============================================================================
+
+# Subscribe to new patterns
+subscription OnPatternMinted {
+  pattern {
+    id
+    tokenId
+    creator {
+      address
+    }
+    patternType
+    createdAt
+  }
+}
+
+# Subscribe to performance updates
+subscription OnPerformanceUpdated {
+  performanceUpdate {
+    id
+    pattern {
+      tokenId
+    }
+    winRate
+    totalVolume
+    roi
+    timestamp
+  }
+}
+
+# Subscribe to system metrics updates
+subscription OnMetricsUpdated {
+  systemMetrics {
+    currentEventsPerSecond
+    activePatterns
+    totalVolume
+  }
+}
+
+# ============================================================================
+# ADVANCED QUERIES
+# ============================================================================
+
+# Get patterns with performance above threshold
+# Target latency: <45ms
+query HighPerformancePatterns(
+  $minWinRate: BigInt!
+  $minROI: BigInt!
+  $limit: Int = 20
+) {
+  patterns(
+    where: {
+      isActive: true
+      winRate_gte: $minWinRate
+      roi_gte: $minROI
+    }
+    orderBy: totalVolume
+    orderDirection: desc
+    first: $limit
+  ) {
+    id
+    tokenId
+    creator {
+      address
+      reputationScore
+    }
+    patternType
+    winRate
+    totalVolume
+    roi
+    delegationCount
+    totalEarnings
+  }
+}
+
+# Get creator profile with all patterns
+# Target latency: <50ms
+query CreatorProfile($address: String!) {
+  creator(id: $address) {
+    address
+    totalPatterns
+    activePatterns
+    deactivatedPatterns
+    totalVolume
+    averageWinRate
+    averageROI
+    totalEarnings
+    reputationScore
+    firstPatternAt
+    lastPatternAt
+    patterns(orderBy: createdAt, orderDirection: desc, first: 20) {
+      id
+      tokenId
+      patternType
+      winRate
+      totalVolume
+      roi
+      isActive
+      createdAt
+    }
+  }
+}
+
+# Pagination example
+# Target latency: <40ms
+query PaginatedPatterns($skip: Int = 0, $first: Int = 20) {
+  patterns(
+    where: { isActive: true }
+    orderBy: createdAt
+    orderDirection: desc
+    skip: $skip
+    first: $first
+  ) {
+    id
+    tokenId
+    creator {
+      address
+    }
+    patternType
+    winRate
+    totalVolume
+    createdAt
+  }
+}
+
+# Trending patterns (high recent activity)
+# Target latency: <50ms
+query TrendingPatterns($minDelegations: Int = 5, $limit: Int = 10) {
+  patterns(
+    where: {
+      isActive: true
+      delegationCount_gte: $minDelegations
+    }
+    orderBy: lastUpdatedAt
+    orderDirection: desc
+    first: $limit
+  ) {
+    id
+    tokenId
+    creator {
+      address
+    }
+    patternType
+    winRate
+    totalVolume
+    roi
+    delegationCount
+    totalEarnings
+    lastUpdatedAt
+  }
+}

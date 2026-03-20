@@ -1,0 +1,47 @@
+{
+  "name": "mirror-protocol-envio",
+  "version": "1.0.0",
+  "description": "Envio HyperCore integration for Mirror Protocol - Real-time behavioral pattern indexing",
+  "author": "Mirror Protocol Team",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "scripts": {
+    "codegen": "envio codegen",
+    "dev": "envio dev",
+    "start": "envio start",
+    "test": "vitest",
+    "test:watch": "vitest --watch",
+    "test:coverage": "vitest --coverage",
+    "test:performance": "node tests/performance.test.js",
+    "lint": "eslint . --ext .ts,.js",
+    "format": "prettier --write \"**/*.{ts,js,json,yaml}\"",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "ethers": "^6.9.0",
+    "pino": "^8.16.2",
+    "pino-pretty": "^10.2.3"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "@typescript-eslint/eslint-plugin": "^6.13.2",
+    "@typescript-eslint/parser": "^6.13.2",
+    "@vitest/coverage-v8": "^1.0.4",
+    "eslint": "^8.55.0",
+    "prettier": "^3.1.0",
+    "typescript": "^5.3.3",
+    "vitest": "^1.0.4"
+  },
+  "keywords": [
+    "envio",
+    "hypersync",
+    "blockchain",
+    "indexer",
+    "monad",
+    "behavioral-patterns",
+    "defi",
+    "nft"
+  ]
+}

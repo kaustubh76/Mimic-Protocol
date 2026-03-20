@@ -1,0 +1,49 @@
+# Envio - Mirror Protocol Indexer .gitignore
+
+# Envio generated code
+generated/
+
+# Node modules
+node_modules/
+
+# Envio runtime
+.envio/
+
+# Logs
+*.log
+logs/
+
+# OS files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Environment variables (if any)
+.env
+.env.local
+.env.*.local
+
+# Build artifacts
+dist/
+build/
+.cache/
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Temporary files
+tmp/
+temp/
