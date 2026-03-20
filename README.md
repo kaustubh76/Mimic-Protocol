@@ -143,9 +143,10 @@ Mimic Protocol/
 
 | Contract | Address | Status |
 |----------|---------|--------|
-| **BehavioralNFT** | [`0x3ceBC8049BdAC66BfbAECC94Cce756122ed25DAc`](https://explorer.testnet.monad.xyz/address/0x3ceBC8049BdAC66BfbAECC94Cce756122ed25DAc) | ✅ Deployed |
-| **DelegationRouter** | [`0x56C145f5567f8DB77533c825cf4205F1427c5517`](https://explorer.testnet.monad.xyz/address/0x56C145f5567f8DB77533c825cf4205F1427c5517) | ✅ Deployed |
-| **PatternDetector** | [`0x8768e4E5c8c3325292A201f824FAb86ADae398d0`](https://explorer.testnet.monad.xyz/address/0x8768e4E5c8c3325292A201f824FAb86ADae398d0) | ✅ Deployed |
+| **BehavioralNFT** | [`0x6943e7D39F3799d0b8fa9D6aD6B63861a15a8d26`](https://explorer.testnet.monad.xyz/address/0x6943e7D39F3799d0b8fa9D6aD6B63861a15a8d26) | ✅ Deployed |
+| **DelegationRouter** | [`0xd5499e0d781b123724dF253776Aa1EB09780AfBf`](https://explorer.testnet.monad.xyz/address/0xd5499e0d781b123724dF253776Aa1EB09780AfBf) | ✅ Deployed |
+| **PatternDetector** | [`0x28BEC7E4d25D385BBf5FD4d2CF5163c513662CaE`](https://explorer.testnet.monad.xyz/address/0x28BEC7E4d25D385BBf5FD4d2CF5163c513662CaE) | ✅ Deployed |
+| **ExecutionEngine** | [`0x4364457325CeB1Af9f0BDD72C0927eD30CB69eD8`](https://explorer.testnet.monad.xyz/address/0x4364457325CeB1Af9f0BDD72C0927eD30CB69eD8) | ✅ Deployed |
 
 ---
 
