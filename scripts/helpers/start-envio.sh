@@ -35,7 +35,7 @@ echo -e "${GREEN}✓ pnpm is installed${NC}"
 # Navigate to envio directory
 echo ""
 echo "📁 Navigating to Envio directory..."
-cd "$(dirname "$0")/src/envio"
+cd "$(dirname "$0")/../../src/envio"
 echo -e "${GREEN}✓ In directory: $(pwd)${NC}"
 
 # Install dependencies
