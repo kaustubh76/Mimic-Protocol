@@ -31,6 +31,10 @@ export const ABIS = {
 export const MONAD_RPC_URL = 'https://monad-testnet.g.alchemy.com/v2/pFkOAygOyJ72KbT_I-LM0';
 
 // Envio GraphQL endpoint for real-time indexing
-// Note: Update this with your actual Envio deployment URL
-export const ENVIO_GRAPHQL_URL = import.meta.env.VITE_ENVIO_GRAPHQL_URL ||
-  'https://indexer.dev.hyperindex.xyz/3bafdb4/v1/graphql';
+// Production: uses env var (set in Vercel dashboard) with Vercel rewrite proxy as fallback
+// Development: connects directly to local Envio Docker instance
+export const ENVIO_GRAPHQL_URL: string =
+  import.meta.env.VITE_ENVIO_GRAPHQL_URL ||
+  (typeof window !== 'undefined' && window.location.hostname !== 'localhost'
+    ? '/api/envio/graphql'
+    : 'http://localhost:8080/v1/graphql');

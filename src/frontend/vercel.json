@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/envio/:path*",
+      "destination": "https://indexer.dev.hyperindex.xyz/3bafdb4/v1/:path*"
+    }
+  ]
+}
