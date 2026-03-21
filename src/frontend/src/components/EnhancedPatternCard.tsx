@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useAccount } from 'wagmi';
 import { Pattern } from '../hooks/usePatterns';
 import { usePatternAnalytics } from '../hooks/usePatternAnalytics';
 import { formatEther } from 'viem';
@@ -19,6 +20,8 @@ interface EnhancedPatternCardProps {
 export function EnhancedPatternCard({ pattern, onDelegateClick }: EnhancedPatternCardProps) {
   const { analytics, isLoading: analyticsLoading } = usePatternAnalytics(pattern);
   const [showAdvanced, setShowAdvanced] = useState(false);
+  const { address } = useAccount();
+  const isOwner = address && pattern.creator.toLowerCase() === address.toLowerCase();
 
   const winRate = Number(pattern.winRate || 0) / 100;
   const volume = formatEther(pattern.totalVolume || BigInt(0));
@@ -209,7 +212,11 @@ export function EnhancedPatternCard({ pattern, onDelegateClick }: EnhancedPatter
         <div className="flex items-center justify-between text-xs">
           <span className="text-muted">Creator</span>
           <code className="hash-code-small">
-            {pattern.creator.slice(0, 6)}...{pattern.creator.slice(-4)}
+            {isOwner ? (
+              <span className="text-gradient-primary font-bold">You</span>
+            ) : (
+              <>{pattern.creator.slice(0, 6)}...{pattern.creator.slice(-4)}</>
+            )}
           </code>
         </div>
         <div className="flex items-center justify-between text-xs">
