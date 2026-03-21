@@ -1,8 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-
-const GRAPHQL_ENDPOINT =
-  (typeof import.meta !== 'undefined' && (import.meta as any).env?.VITE_ENVIO_GRAPHQL_URL) ||
-  'http://localhost:8080/v1/graphql';
+import { ENVIO_GRAPHQL_URL } from '../contracts/config';
 
 export interface EnvioMetrics {
   // Indexer health
@@ -82,7 +79,7 @@ export function useEnvioMetrics(pollIntervalMs = 5000) {
 
   const fetchMetrics = useCallback(async () => {
     try {
-      const response = await fetch(GRAPHQL_ENDPOINT, {
+      const response = await fetch(ENVIO_GRAPHQL_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ query: METRICS_QUERY }),

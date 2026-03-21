@@ -1,12 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { usePublicClient, useAccount } from 'wagmi';
-import { CONTRACTS, ABIS } from '../contracts/config';
-import { getTestDelegations } from '../config/testData';
-
-// GraphQL endpoint — Envio primary data source
-const GRAPHQL_ENDPOINT =
-  (typeof import.meta !== 'undefined' && (import.meta as any).env?.VITE_ENVIO_GRAPHQL_URL) ||
-  'http://localhost:8080/v1/graphql';
+import { CONTRACTS, ABIS, ENVIO_GRAPHQL_URL } from '../contracts/config';
 
 export interface Delegation {
   id: number;
@@ -63,7 +57,7 @@ export function useDelegations(pollIntervalMs = 12000) {
         }
       `;
 
-      const response = await fetch(GRAPHQL_ENDPOINT, {
+      const response = await fetch(ENVIO_GRAPHQL_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -98,6 +92,9 @@ export function useDelegations(pollIntervalMs = 12000) {
             setIsLoading(false);
             return;
           }
+
+          // Envio returned 0 — also check RPC (may have data Envio missed)
+          console.log('ℹ️ Envio: 0 delegations, checking blockchain...');
         }
       }
 
@@ -114,9 +111,9 @@ export function useDelegations(pollIntervalMs = 12000) {
       } as any) as bigint[];
 
       if (userDelegationIds.length === 0) {
-        console.info('No delegations on chain, using test data');
-        setDelegations(getTestDelegations(address));
-        setUsingTestData(true);
+        console.info('No delegations on chain');
+        setDelegations([]);
+        setUsingTestData(false);
         setIsLoading(false);
         return;
       }
@@ -166,8 +163,8 @@ export function useDelegations(pollIntervalMs = 12000) {
       setError(null);
     } catch (err) {
       console.error('Error fetching delegations:', err);
-      setDelegations(getTestDelegations(address));
-      setUsingTestData(true);
+      setDelegations([]);
+      setUsingTestData(false);
       setError(null);
     } finally {
       setIsLoading(false);

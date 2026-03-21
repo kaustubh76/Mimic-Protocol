@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { usePublicClient } from 'wagmi';
-import { CONTRACTS, ABIS } from '../contracts/config';
-import { getTestPatterns } from '../config/testData';
+import { CONTRACTS, ABIS, ENVIO_GRAPHQL_URL } from '../contracts/config';
 
 export interface Pattern {
   id: number;
@@ -18,10 +17,6 @@ export interface Pattern {
   failedExecutions: number;
 }
 
-// GraphQL endpoint for Envio indexer — configurable via env, fallback to localhost for dev
-const GRAPHQL_ENDPOINT =
-  (typeof import.meta !== 'undefined' && (import.meta as any).env?.VITE_ENVIO_GRAPHQL_URL) ||
-  'http://localhost:8080/v1/graphql';
 
 export function usePatterns(pollIntervalMs = 10000) {
   const [patterns, setPatterns] = useState<Pattern[]>([]);
@@ -59,7 +54,7 @@ export function usePatterns(pollIntervalMs = 10000) {
           }
         `;
 
-        const response = await fetch(GRAPHQL_ENDPOINT, {
+        const response = await fetch(ENVIO_GRAPHQL_URL, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -175,22 +170,22 @@ export function usePatterns(pollIntervalMs = 10000) {
           }
         }
 
-        // FALLBACK 3: Use test data
-        console.warn('⚠️ No data from Envio or blockchain, using test data');
-        setPatterns(getTestPatterns());
-        setUsingTestData(true);
+        // FALLBACK 3: No data anywhere — show empty state (no test data)
+        console.warn('⚠️ No data from Envio or blockchain');
+        setPatterns([]);
+        setUsingTestData(false);
         setIsSyncing(false);
         setError(null);
 
       } catch (err) {
         console.error('❌ Error fetching patterns:', err);
 
-        // Final fallback: test data
-        console.info('Falling back to test data due to error');
-        setPatterns(getTestPatterns());
-        setUsingTestData(true);
+        // Final fallback: empty state (no test data)
+        console.info('Falling back to empty patterns due to error');
+        setPatterns([]);
+        setUsingTestData(false);
         setIsSyncing(false);
-        setError(null); // Don't show error if we have fallback data
+        setError(null);
       } finally {
         setIsLoading(false);
       }

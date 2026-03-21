@@ -1,12 +1,7 @@
 import { useState, useEffect } from 'react';
 import { usePublicClient } from 'wagmi';
-import { CONTRACTS, ABIS } from '../contracts/config';
+import { CONTRACTS, ABIS, ENVIO_GRAPHQL_URL } from '../contracts/config';
 import type { ExecutionStats } from '../components/ExecutionStats';
-
-// GraphQL endpoint for Envio indexer — configurable via env
-const GRAPHQL_ENDPOINT =
-  (typeof import.meta !== 'undefined' && (import.meta as any).env?.VITE_ENVIO_GRAPHQL_URL) ||
-  'http://localhost:8080/v1/graphql';
 
 /**
  * Hook to fetch execution statistics for a delegation
@@ -48,7 +43,7 @@ export function useExecutionStats(delegationId: bigint | undefined) {
           }
         `;
 
-        const response = await fetch(GRAPHQL_ENDPOINT, {
+        const response = await fetch(ENVIO_GRAPHQL_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({

@@ -1,12 +1,6 @@
 import { useState, useEffect } from 'react';
 import { usePublicClient } from 'wagmi';
-import { CONTRACTS, ABIS } from '../contracts/config';
-import { getTestUserStats } from '../config/testData';
-
-// GraphQL endpoint for Envio indexer — configurable via env, fallback to localhost for dev
-const GRAPHQL_ENDPOINT =
-  (typeof import.meta !== 'undefined' && (import.meta as any).env?.VITE_ENVIO_GRAPHQL_URL) ||
-  'http://localhost:8080/v1/graphql';
+import { CONTRACTS, ABIS, ENVIO_GRAPHQL_URL } from '../contracts/config';
 
 export function useUserStats(address: string | undefined) {
   const [stats, setStats] = useState<any>(null);
@@ -44,7 +38,7 @@ export function useUserStats(address: string | undefined) {
           }
         `;
 
-        const response = await fetch(GRAPHQL_ENDPOINT, {
+        const response = await fetch(ENVIO_GRAPHQL_URL, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -80,11 +74,40 @@ export function useUserStats(address: string | undefined) {
             );
             const totalEarnings = patternEarnings + delegationEarnings;
 
-            console.log(`✅ Using Envio data: ${patterns.length} patterns, ${delegations.length} active delegations`);
+            // If Envio has 0 delegations, supplement with RPC count
+            let activeDelegationCount = delegations.length;
+            if (activeDelegationCount === 0 && publicClient) {
+              try {
+                const rpcDelegationIds = await publicClient.readContract({
+                  address: CONTRACTS.DELEGATION_ROUTER,
+                  abi: ABIS.DELEGATION_ROUTER,
+                  functionName: 'getDelegatorDelegations',
+                  args: [address],
+                } as any) as bigint[];
+                if (rpcDelegationIds.length > 0) {
+                  let activeCount = 0;
+                  for (const did of rpcDelegationIds) {
+                    try {
+                      const d = await publicClient.readContract({
+                        address: CONTRACTS.DELEGATION_ROUTER,
+                        abi: ABIS.DELEGATION_ROUTER,
+                        functionName: 'getDelegation',
+                        args: [did],
+                      } as any) as any;
+                      if (d && d.isActive) activeCount++;
+                    } catch { /* skip */ }
+                  }
+                  activeDelegationCount = activeCount;
+                  console.log(`ℹ️ Supplemented delegation count from RPC: ${activeCount} active`);
+                }
+              } catch { /* keep Envio count */ }
+            }
+
+            console.log(`✅ Envio: ${patterns.length} patterns, ${activeDelegationCount} active delegations`);
 
             setStats({
               patternsCreated: patterns.length,
-              activeDelegations: delegations.length,
+              activeDelegations: activeDelegationCount,
               totalVolume: Number(totalVolume) / 1e18,
               totalEarnings: Number(totalEarnings) / 1e18,
             });
@@ -147,8 +170,8 @@ export function useUserStats(address: string | undefined) {
         });
       } catch (err) {
         console.error('❌ Failed to fetch user stats:', err);
-        console.info('Falling back to test user stats');
-        setStats(getTestUserStats());
+        console.info('Failed to fetch user stats');
+        setStats(null);
       } finally {
         setIsLoading(false);
       }
