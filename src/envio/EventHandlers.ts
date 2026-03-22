@@ -1,6 +1,6 @@
 /**
  * @file EventHandlers.ts
- * @description Main event handlers for Envio indexer — Mirror Protocol
+ * @description Main event handlers for Envio indexer — Mirror Protocol (with earnings)
  * @author Mirror Protocol Team
  *
  * Registers all 8 event handlers using Envio v2 registration API:
