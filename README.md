@@ -11,21 +11,20 @@
 
 ---
 
-## 🚀 Quick Start
+## 🚀 Live Demo
 
+**Frontend:** https://frontend-three-tau-54.vercel.app
+**Envio GraphQL:** https://indexer.dev.hyperindex.xyz/b1106ec/v1/graphql
+
+### Local Development
 ```bash
-# Terminal 1: Start Envio Indexer
-cd "/Users/apple/Desktop/Mimic Protocol"
-pnpm dev
-
-# Terminal 2: Start Frontend
-cd "/Users/apple/Desktop/Mimic Protocol/src/frontend"
-npm run dev
-
+# Start Frontend
+cd src/frontend && npm run dev
 # Open http://localhost:3000
-```
 
-See [QUICK_START.md](QUICK_START.md) for detailed instructions.
+# Start Envio Indexer (requires Docker)
+cd src/envio && envio dev
+```
 
 ---
 
@@ -49,11 +48,11 @@ See [QUICK_START.md](QUICK_START.md) for detailed instructions.
 - Active/inactive state management
 
 ### 2. ⚡ Envio HyperSync Engine
-- **47ms pattern detection** (50x faster than traditional indexers)
-- **10,000+ events/second** processing capability
-- **Real-time indexing** with sub-second latency
-- **18 event types** across 3 contracts
-- **10M+ events processed** in demo
+- **<50ms pattern detection** (50x faster than traditional indexers)
+- **102 events/second** peak throughput (HyperSync enabled)
+- **Real-time indexing** with 1ms avg processing time
+- **8 event types** across 2 contracts, 10 GraphQL entities
+- **Live deployed** at `indexer.dev.hyperindex.xyz`
 
 ### 3. 🏦 MetaMask Smart Accounts
 - **ERC-4337** account abstraction
