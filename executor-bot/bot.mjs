@@ -50,7 +50,7 @@ const MONAD_CHAIN = {
 };
 
 const GRAPHQL_ENDPOINT =
-  ENV.ENVIO_GRAPHQL_URL || 'https://indexer.dev.hyperindex.xyz/d14e8a3/v1/graphql';
+  ENV.ENVIO_GRAPHQL_URL || 'https://indexer.dev.hyperindex.xyz/70d0baa/v1/graphql';
 
 const CONTRACTS = {
   EXECUTION_ENGINE: (ENV.EXECUTION_ENGINE_ADDRESS || '0x4364457325CeB1Af9f0BDD72C0927eD30CB69eD8'),

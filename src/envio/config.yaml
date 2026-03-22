@@ -4,8 +4,8 @@ description: Real-time behavioral pattern indexing for Mirror Protocol
 networks:
   - id: 10143
     start_block: 19213700
-    rpc_config:
-      url: https://monad-testnet.g.alchemy.com/v2/pFkOAygOyJ72KbT_I-LM0
+    hypersync_config:
+      url: https://monad-testnet.hypersync.xyz
     contracts:
       - name: BehavioralNFT
         address:

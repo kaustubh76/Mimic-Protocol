@@ -35,4 +35,4 @@ export const MONAD_RPC_URL = 'https://monad-testnet.g.alchemy.com/v2/pFkOAygOyJ7
 // Development: connects directly to local Envio Docker instance
 export const ENVIO_GRAPHQL_URL: string =
   import.meta.env.VITE_ENVIO_GRAPHQL_URL ||
-  'https://indexer.dev.hyperindex.xyz/d14e8a3/v1/graphql';
+  'https://indexer.dev.hyperindex.xyz/70d0baa/v1/graphql';
