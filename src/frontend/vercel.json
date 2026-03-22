@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/api/envio/:path*",
-      "destination": "https://indexer.dev.hyperindex.xyz/d2ab55a/v1/:path*"
+      "destination": "https://indexer.dev.hyperindex.xyz/d14e8a3/v1/:path*"
     }
   ]
 }
