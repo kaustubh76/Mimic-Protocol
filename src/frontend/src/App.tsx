@@ -3,8 +3,9 @@
  * @description Mirror Protocol - Complete integration with stunning modern UI
  */
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useAccount, useChainId } from 'wagmi'
+import { motion, AnimatePresence } from 'framer-motion'
 import { WalletConnect } from './components/WalletConnect'
 import { useSmartAccount } from './hooks/useSmartAccount'
 import { PatternBrowser } from './components/PatternBrowser'
@@ -24,6 +25,7 @@ export function App() {
   const { data: userStats } = useUserStats(address)
   const [activeTab, setActiveTab] = useState<Tab>('patterns')
   const [mounted, setMounted] = useState(false)
+  const [scrolled, setScrolled] = useState(false)
 
   const isCorrectChain = chainId === MONAD_CHAIN_ID
 
@@ -31,10 +33,23 @@ export function App() {
     setMounted(true)
   }, [])
 
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 10)
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
+
+  const handleTabChange = useCallback((tab: Tab) => {
+    setActiveTab(tab)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }, [])
+
   return (
     <div className="min-h-screen relative" style={{ position: 'relative', zIndex: 1 }}>
       {/* Main Header */}
-      <header className="sticky top-0 z-50 backdrop-blur-xl border-b border-white/5">
+      <header className={`sticky top-0 z-50 backdrop-blur-xl border-b transition-all duration-300 ${
+        scrolled ? 'border-white/10 shadow-lg shadow-black/20' : 'border-white/5'
+      }`}>
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             {/* Brand Section */}
@@ -78,29 +93,49 @@ export function App() {
       <main className="max-w-7xl mx-auto px-6 py-8">
         {!isConnected ? (
           /* Hero Section - Not Connected */
-          <div className="space-y-16">
+          <motion.div
+            className="space-y-16"
+            initial="hidden"
+            animate="visible"
+            variants={{
+              hidden: {},
+              visible: { transition: { staggerChildren: 0.15 } }
+            }}
+          >
             {/* Hero Banner */}
-            <section className={`text-center space-y-6 py-16 ${mounted ? 'animate-fade-in' : 'opacity-0'}`}>
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-card text-sm font-semibold mb-4">
+            <section className="text-center space-y-6 py-16">
+              <motion.div
+                variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-card text-sm font-semibold mb-4"
+              >
                 <span className="relative flex h-2 w-2">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
                 </span>
                 <span className="text-gradient-secondary">Sub-50ms Pattern Detection</span>
-              </div>
+              </motion.div>
 
-              <h1 className="text-6xl md:text-7xl font-bold leading-tight">
+              <motion.h1
+                variants={{ hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0 } }}
+                className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-tight"
+              >
                 <span className="text-gradient-primary">Transform Trading</span>
                 <br />
                 <span className="text-white">Into Infrastructure</span>
-              </h1>
+              </motion.h1>
 
-              <p className="text-xl text-secondary max-w-2xl mx-auto">
+              <motion.p
+                variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}
+                className="text-xl text-secondary max-w-2xl mx-auto"
+              >
                 Mirror Protocol turns on-chain trading behavior into executable, delegatable NFTs.
                 Powered by Envio's lightning-fast indexing on Monad.
-              </p>
+              </motion.p>
 
-              <div className="flex items-center justify-center gap-4 pt-4">
+              <motion.div
+                variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}
+                className="flex flex-wrap items-center justify-center gap-4 pt-4"
+              >
                 <div className="glass-card px-6 py-3">
                   <div className="text-2xl font-bold text-gradient-primary">10,000+</div>
                   <div className="text-xs text-muted">Events/Second</div>
@@ -113,54 +148,51 @@ export function App() {
                   <div className="text-2xl font-bold text-gradient-accent">10M+</div>
                   <div className="text-xs text-muted">Transactions Analyzed</div>
                 </div>
-              </div>
+              </motion.div>
             </section>
 
             {/* Feature Grid */}
-            <section className="stagger-animation grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-              <div className="glass-card glass-card-hover p-6 space-y-3">
-                <div className="w-12 h-12 rounded-lg bg-gradient-primary flex items-center justify-center text-2xl">
-                  ⚡
-                </div>
-                <h3 className="text-lg font-bold">Real-time Detection</h3>
-                <p className="text-sm text-secondary">
-                  Envio HyperSync indexes trading patterns in sub-50ms, 50x faster than alternatives
-                </p>
-              </div>
-
-              <div className="glass-card glass-card-hover p-6 space-y-3">
-                <div className="w-12 h-12 rounded-lg bg-gradient-secondary flex items-center justify-center text-2xl">
-                  🎨
-                </div>
-                <h3 className="text-lg font-bold">NFT-based Patterns</h3>
-                <p className="text-sm text-secondary">
-                  Successful trading patterns become tradeable ERC-721 NFTs with performance metrics
-                </p>
-              </div>
-
-              <div className="glass-card glass-card-hover p-6 space-y-3">
-                <div className="w-12 h-12 rounded-lg bg-gradient-accent flex items-center justify-center text-2xl">
-                  🤝
-                </div>
-                <h3 className="text-lg font-bold">Smart Delegations</h3>
-                <p className="text-sm text-secondary">
-                  Delegate capital to proven patterns via MetaMask smart accounts
-                </p>
-              </div>
-
-              <div className="glass-card glass-card-hover p-6 space-y-3">
-                <div className="w-12 h-12 rounded-lg bg-gradient-success flex items-center justify-center text-2xl">
-                  ⚙️
-                </div>
-                <h3 className="text-lg font-bold">Auto Execution</h3>
-                <p className="text-sm text-secondary">
-                  Patterns execute automatically when on-chain conditions match
-                </p>
-              </div>
+            <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {[
+                { icon: '⚡', gradient: 'bg-gradient-primary', title: 'Real-time Detection', desc: "Envio HyperSync indexes trading patterns in sub-50ms, 50x faster than alternatives" },
+                { icon: '🎨', gradient: 'bg-gradient-secondary', title: 'NFT-based Patterns', desc: "Successful trading patterns become tradeable ERC-721 NFTs with performance metrics" },
+                { icon: '🤝', gradient: 'bg-gradient-accent', title: 'Smart Delegations', desc: "Delegate capital to proven patterns via MetaMask smart accounts" },
+                { icon: '⚙️', gradient: 'bg-gradient-success', title: 'Auto Execution', desc: "Patterns execute automatically when on-chain conditions match" },
+              ].map((feature, i) => (
+                <motion.div
+                  key={feature.title}
+                  variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}
+                  transition={{ delay: i * 0.08 }}
+                  className="glass-card glass-card-hover p-6 space-y-3"
+                >
+                  <div className={`w-12 h-12 rounded-lg ${feature.gradient} flex items-center justify-center text-2xl`}>
+                    {feature.icon}
+                  </div>
+                  <h3 className="text-lg font-bold">{feature.title}</h3>
+                  <p className="text-sm text-secondary">{feature.desc}</p>
+                </motion.div>
+              ))}
             </section>
 
+            {/* Live Envio Metrics — visible to everyone */}
+            <motion.section
+              variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}
+            >
+              <EnvioMetricsDashboard />
+            </motion.section>
+
+            {/* Live Pattern Leaderboard — show real indexed data */}
+            <motion.section
+              variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}
+            >
+              <PatternLeaderboard />
+            </motion.section>
+
             {/* CTA Section */}
-            <section className="text-center py-12 animate-fade-in" style={{ animationDelay: '400ms' }}>
+            <motion.section
+              variants={{ hidden: { opacity: 0, scale: 0.95 }, visible: { opacity: 1, scale: 1 } }}
+              className="text-center py-12"
+            >
               <div className="glass-card inline-block p-8 space-y-4">
                 <h2 className="text-2xl font-bold">Ready to Start?</h2>
                 <p className="text-secondary">Connect your wallet to browse patterns and create delegations</p>
@@ -171,30 +203,31 @@ export function App() {
                   </div>
                 </div>
               </div>
-            </section>
-          </div>
+            </motion.section>
+          </motion.div>
         ) : (
           /* Connected User Interface */
           <div className="space-y-8">
             {/* Stats Dashboard */}
             {userStats && (
-              <section className="grid grid-cols-2 md:grid-cols-4 gap-4 stagger-animation">
-                <div className="stat-card">
-                  <div className="stat-value">{userStats.patternsCreated}</div>
-                  <div className="stat-label">Patterns Created</div>
-                </div>
-                <div className="stat-card">
-                  <div className="stat-value">{userStats.activeDelegations}</div>
-                  <div className="stat-label">Active Delegations</div>
-                </div>
-                <div className="stat-card">
-                  <div className="stat-value">{userStats.totalVolume.toFixed(2)}</div>
-                  <div className="stat-label">Total Volume</div>
-                </div>
-                <div className="stat-card">
-                  <div className="stat-value">{userStats.totalEarnings.toFixed(2)}</div>
-                  <div className="stat-label">Total Earnings</div>
-                </div>
+              <section className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {[
+                  { value: userStats.patternsCreated, label: 'Patterns Created' },
+                  { value: userStats.activeDelegations, label: 'Active Delegations' },
+                  { value: userStats.totalVolume.toFixed(2), label: 'Total Volume' },
+                  { value: userStats.totalEarnings.toFixed(2), label: 'Total Earnings' },
+                ].map((stat, i) => (
+                  <motion.div
+                    key={stat.label}
+                    className="stat-card"
+                    initial={{ opacity: 0, y: 16 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: i * 0.08, duration: 0.3 }}
+                  >
+                    <div className="stat-value">{stat.value}</div>
+                    <div className="stat-label">{stat.label}</div>
+                  </motion.div>
+                ))}
               </section>
             )}
 
@@ -205,138 +238,141 @@ export function App() {
 
             {/* Tab Navigation */}
             <nav className="glass-card p-2 inline-flex gap-2 animate-slide-up">
-              <button
-                onClick={() => setActiveTab('patterns')}
-                className={`px-6 py-3 rounded-lg font-semibold transition-all ${
-                  activeTab === 'patterns'
-                    ? 'bg-gradient-primary text-white shadow-lg'
-                    : 'hover:bg-white/5 text-secondary'
-                }`}
-              >
-                Browse Patterns
-              </button>
-              <button
-                onClick={() => setActiveTab('delegations')}
-                className={`px-6 py-3 rounded-lg font-semibold transition-all relative ${
-                  activeTab === 'delegations'
-                    ? 'bg-gradient-primary text-white shadow-lg'
-                    : 'hover:bg-white/5 text-secondary'
-                }`}
-              >
-                My Delegations
-                {userStats && userStats.activeDelegations > 0 && (
-                  <span className="absolute -top-1 -right-1 w-5 h-5 bg-gradient-accent rounded-full flex items-center justify-center text-xs font-bold">
-                    {userStats.activeDelegations}
+              {([
+                { id: 'patterns' as Tab, label: 'Browse Patterns' },
+                { id: 'delegations' as Tab, label: 'My Delegations' },
+                { id: 'account' as Tab, label: 'Smart Account' },
+              ]).map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => handleTabChange(tab.id)}
+                  className="relative px-6 py-3 rounded-lg font-semibold transition-colors"
+                  style={{ color: activeTab === tab.id ? '#fff' : undefined }}
+                >
+                  {activeTab === tab.id && (
+                    <motion.div
+                      layoutId="tab-indicator"
+                      className="absolute inset-0 rounded-lg bg-gradient-primary shadow-lg"
+                      transition={{ type: 'spring', stiffness: 350, damping: 30 }}
+                    />
+                  )}
+                  <span className={`relative z-10 ${activeTab !== tab.id ? 'text-secondary hover:text-white/80' : ''}`}>
+                    {tab.label}
                   </span>
-                )}
-              </button>
-              <button
-                onClick={() => setActiveTab('account')}
-                className={`px-6 py-3 rounded-lg font-semibold transition-all ${
-                  activeTab === 'account'
-                    ? 'bg-gradient-primary text-white shadow-lg'
-                    : 'hover:bg-white/5 text-secondary'
-                }`}
-              >
-                Smart Account
-              </button>
+                  {tab.id === 'delegations' && userStats && userStats.activeDelegations > 0 && (
+                    <span className="absolute -top-1 -right-1 z-20 w-5 h-5 bg-gradient-accent rounded-full flex items-center justify-center text-xs font-bold">
+                      {userStats.activeDelegations}
+                    </span>
+                  )}
+                </button>
+              ))}
             </nav>
 
             {/* Tab Content */}
-            <div className="animate-fade-in">
-              {activeTab === 'patterns' && (
-                <div className="space-y-8">
-                  {/* Leaderboard - Show Top 10 Patterns */}
-                  <PatternLeaderboard />
-
-                  {/* All Patterns Browser */}
-                  <PatternBrowser />
-                </div>
-              )}
-
-              {activeTab === 'delegations' && <MyDelegations />}
-
-              {activeTab === 'account' && (
-                <div className="space-y-6">
-                  <div className="glass-card p-8">
-                    <h2 className="text-2xl font-bold mb-6">Smart Account Status</h2>
-
-                    {isLoading && (
-                      <div className="text-center py-12 space-y-4">
-                        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-primary animate-pulse">
-                          <div className="spinner-small"></div>
-                        </div>
-                        <p className="text-secondary">Creating smart account...</p>
-                      </div>
-                    )}
-
-                    {error && (
-                      <div className="error-message">
-                        <div className="flex items-start gap-3">
-                          <span className="text-2xl">❌</span>
-                          <div>
-                            <p className="font-semibold mb-2">Error creating smart account</p>
-                            <code className="text-sm">{error.message}</code>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-
-                    {smartAccount && (
-                      <div className="space-y-6">
-                        <div className="glass-card p-6 border-green-500/20 bg-green-500/5">
-                          <div className="flex items-center gap-3 mb-4">
-                            <span className="text-3xl">✅</span>
-                            <h3 className="text-xl font-bold text-success">Smart Account Active!</h3>
-                          </div>
-
-                          <div className="space-y-3">
-                            <div className="flex items-center justify-between p-3 rounded-lg bg-white/5">
-                              <span className="text-sm text-muted">Smart Account</span>
-                              <code className="hash-code text-xs">{smartAccount.address}</code>
-                            </div>
-                            <div className="flex items-center justify-between p-3 rounded-lg bg-white/5">
-                              <span className="text-sm text-muted">Owner (EOA)</span>
-                              <code className="hash-code text-xs">{address}</code>
-                            </div>
-                          </div>
-                        </div>
-
-                        {userStats && (
-                          <div className="grid md:grid-cols-2 gap-4">
-                            <div className="glass-card p-6 text-center">
-                              <div className="text-4xl font-bold text-gradient-primary mb-2">
-                                {userStats.patternsCreated}
-                              </div>
-                              <div className="text-sm text-muted">Patterns Created</div>
-                            </div>
-                            <div className="glass-card p-6 text-center">
-                              <div className="text-4xl font-bold text-gradient-secondary mb-2">
-                                {userStats.activeDelegations}
-                              </div>
-                              <div className="text-sm text-muted">Active Delegations</div>
-                            </div>
-                          </div>
-                        )}
-
-                        <div className="glass-card p-6 bg-blue-500/5 border-blue-500/20">
-                          <p className="text-success font-semibold">
-                            🎉 Your smart account is ready! You can now delegate to trading patterns.
-                          </p>
-                        </div>
-                      </div>
-                    )}
-
-                    {!isLoading && !error && !smartAccount && (
-                      <div className="text-center py-12 text-muted">
-                        <div className="loading-skeleton w-24 h-24 rounded-full mx-auto mb-4"></div>
-                        <p>Initializing smart account...</p>
-                      </div>
-                    )}
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={activeTab}
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -12 }}
+                transition={{ duration: 0.25, ease: [0.25, 0.1, 0.25, 1] }}
+              >
+                {activeTab === 'patterns' && (
+                  <div className="space-y-8">
+                    <PatternLeaderboard />
+                    <PatternBrowser />
                   </div>
-                </div>
-              )}
-            </div>
+                )}
+
+                {activeTab === 'delegations' && <MyDelegations />}
+
+                {activeTab === 'account' && (
+                  <div className="space-y-6">
+                    <div className="glass-card p-8">
+                      <h2 className="text-2xl font-bold mb-6">Smart Account Status</h2>
+
+                      {isLoading && (
+                        <div className="text-center py-12 space-y-4">
+                          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-primary animate-pulse">
+                            <div className="spinner-small"></div>
+                          </div>
+                          <p className="text-secondary">Creating smart account...</p>
+                        </div>
+                      )}
+
+                      {error && (
+                        <div className="error-message">
+                          <div className="flex items-start gap-3">
+                            <span className="text-2xl">❌</span>
+                            <div>
+                              <p className="font-semibold mb-2">Error creating smart account</p>
+                              <code className="text-sm">{error.message}</code>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
+                      {smartAccount && (
+                        <motion.div
+                          className="space-y-6"
+                          initial={{ opacity: 0, scale: 0.98 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          transition={{ duration: 0.3 }}
+                        >
+                          <div className="glass-card p-6 border-green-500/20 bg-green-500/5">
+                            <div className="flex items-center gap-3 mb-4">
+                              <span className="text-3xl">✅</span>
+                              <h3 className="text-xl font-bold text-success">Smart Account Active!</h3>
+                            </div>
+
+                            <div className="space-y-3">
+                              <div className="flex items-center justify-between p-3 rounded-lg bg-white/5">
+                                <span className="text-sm text-muted">Smart Account</span>
+                                <code className="hash-code text-xs">{smartAccount.address}</code>
+                              </div>
+                              <div className="flex items-center justify-between p-3 rounded-lg bg-white/5">
+                                <span className="text-sm text-muted">Owner (EOA)</span>
+                                <code className="hash-code text-xs">{address}</code>
+                              </div>
+                            </div>
+                          </div>
+
+                          {userStats && (
+                            <div className="grid md:grid-cols-2 gap-4">
+                              <div className="glass-card p-6 text-center">
+                                <div className="text-4xl font-bold text-gradient-primary mb-2">
+                                  {userStats.patternsCreated}
+                                </div>
+                                <div className="text-sm text-muted">Patterns Created</div>
+                              </div>
+                              <div className="glass-card p-6 text-center">
+                                <div className="text-4xl font-bold text-gradient-secondary mb-2">
+                                  {userStats.activeDelegations}
+                                </div>
+                                <div className="text-sm text-muted">Active Delegations</div>
+                              </div>
+                            </div>
+                          )}
+
+                          <div className="glass-card p-6 bg-blue-500/5 border-blue-500/20">
+                            <p className="text-success font-semibold">
+                              🎉 Your smart account is ready! You can now delegate to trading patterns.
+                            </p>
+                          </div>
+                        </motion.div>
+                      )}
+
+                      {!isLoading && !error && !smartAccount && (
+                        <div className="text-center py-12 text-muted">
+                          <div className="loading-skeleton w-24 h-24 rounded-full mx-auto mb-4"></div>
+                          <p>Initializing smart account...</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </motion.div>
+            </AnimatePresence>
           </div>
         )}
       </main>
