@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useAccount } from 'wagmi';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Pattern } from '../hooks/usePatterns';
 import { usePatternAnalytics } from '../hooks/usePatternAnalytics';
 import { formatEther } from 'viem';
@@ -27,8 +28,27 @@ export function EnhancedPatternCard({ pattern, onDelegateClick }: EnhancedPatter
   const volume = formatEther(pattern.totalVolume || BigInt(0));
   const roi = Number(pattern.roi || 0) / 100;
 
+  const glowColors: Record<string, string> = {
+    momentum: 'rgba(139, 92, 246, 0.25)',
+    arbitrage: 'rgba(6, 182, 212, 0.25)',
+    mean_reversion: 'rgba(245, 158, 11, 0.25)',
+    trend_following: 'rgba(16, 185, 129, 0.25)',
+    liquidity: 'rgba(59, 130, 246, 0.25)',
+    yield: 'rgba(236, 72, 153, 0.25)',
+    composite: 'rgba(168, 85, 247, 0.25)',
+  };
+  const glowColor = glowColors[pattern.patternType] || 'rgba(139, 92, 246, 0.2)';
+
   return (
-    <div className="pattern-card relative overflow-hidden">
+    <motion.div
+      className="pattern-card relative overflow-hidden"
+      whileHover={{
+        y: -6,
+        scale: 1.02,
+        boxShadow: `0 12px 40px ${glowColor}`,
+      }}
+      transition={{ type: 'spring', stiffness: 400, damping: 17 }}
+    >
       {/* Trending Indicator */}
       {analytics?.isTrending && (
         <div className="absolute top-0 right-0 z-10">
@@ -93,7 +113,7 @@ export function EnhancedPatternCard({ pattern, onDelegateClick }: EnhancedPatter
       )}
 
       {/* Core Stats Grid */}
-      <div className="grid grid-cols-3 gap-3 my-4">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 my-4">
         <div className="stat-inline flex-col items-start">
           <span className="stat-label">Win Rate</span>
           <span className="stat-value text-lg">{winRate}%</span>
@@ -108,6 +128,14 @@ export function EnhancedPatternCard({ pattern, onDelegateClick }: EnhancedPatter
             {roi > 0 ? '+' : ''}{roi}%
           </span>
         </div>
+        <div className="stat-inline flex-col items-start">
+          <span className="stat-label">Earnings</span>
+          <span className="stat-value text-lg text-green-400">
+            {roi > 0 && pattern.totalVolume > 0n
+              ? `+${(parseFloat(volume) * roi / 100).toFixed(1)}`
+              : '0'}
+          </span>
+        </div>
       </div>
 
       {/* Performance Bar */}
@@ -119,13 +147,12 @@ export function EnhancedPatternCard({ pattern, onDelegateClick }: EnhancedPatter
           </span>
         </div>
         <div className="h-2 bg-white/5 rounded-full overflow-hidden">
-          <div
-            className="h-full bg-gradient-primary rounded-full transition-all duration-1000"
-            style={{
-              width: `${analytics ? analytics.qualityScore.score : Math.min(winRate, 100)}%`,
-              animation: 'slideRight 1s ease-out',
-            }}
-          ></div>
+          <motion.div
+            className="h-full bg-gradient-primary rounded-full"
+            initial={{ width: 0 }}
+            animate={{ width: `${analytics ? analytics.qualityScore.score : Math.min(winRate, 100)}%` }}
+            transition={{ duration: 1, ease: 'easeOut' }}
+          />
         </div>
       </div>
 
@@ -133,15 +160,30 @@ export function EnhancedPatternCard({ pattern, onDelegateClick }: EnhancedPatter
       {analytics && (
         <div className="mb-4">
           <button
-            className="text-xs text-primary hover:text-primary-light transition-colors flex items-center gap-1"
+            className="text-xs text-primary hover:text-primary-light transition-colors flex items-center gap-1.5"
             onClick={() => setShowAdvanced(!showAdvanced)}
+            aria-expanded={showAdvanced}
           >
-            <span>{showAdvanced ? '▼' : '▶'}</span>
+            <motion.span
+              animate={{ rotate: showAdvanced ? 90 : 0 }}
+              transition={{ duration: 0.2 }}
+              className="inline-block"
+            >
+              ›
+            </motion.span>
             <span>{showAdvanced ? 'Hide' : 'Show'} Advanced Stats</span>
           </button>
 
+          <AnimatePresence>
           {showAdvanced && (
-            <div className="mt-3 space-y-3 animate-fadeIn">
+            <motion.div
+              className="mt-3 space-y-3"
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.25, ease: 'easeInOut' }}
+              style={{ overflow: 'hidden' }}
+            >
               {/* Health Metrics */}
               <HealthMetrics
                 consecutiveLosses={analytics.health.consecutiveLosses}
@@ -202,8 +244,9 @@ export function EnhancedPatternCard({ pattern, onDelegateClick }: EnhancedPatter
                   </ul>
                 </div>
               )}
-            </div>
+            </motion.div>
           )}
+          </AnimatePresence>
         </div>
       )}
 
@@ -262,6 +305,6 @@ export function EnhancedPatternCard({ pattern, onDelegateClick }: EnhancedPatter
           <span>Real-time analytics via Envio</span>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }
