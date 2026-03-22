@@ -28,12 +28,16 @@ export function useUserStats(address: string | undefined) {
               tokenId
               totalVolume
               totalEarnings
+              roi
             }
             delegations: Delegation(where: {delegator: {_eq: $address}, isActive: {_eq: true}}) {
               id
               isActive
               totalAmountTraded
               totalEarnings
+              pattern {
+                roi
+              }
             }
           }
         `;
@@ -65,14 +69,20 @@ export function useUserStats(address: string | undefined) {
             );
             const totalVolume = patternVolume + delegationVolume;
 
-            // Aggregate earnings
-            const patternEarnings = patterns.reduce(
-              (sum: bigint, p: any) => sum + BigInt(p.totalEarnings || 0), 0n
-            );
-            const delegationEarnings = delegations.reduce(
-              (sum: bigint, d: any) => sum + BigInt(d.totalEarnings || 0), 0n
-            );
-            const totalEarnings = patternEarnings + delegationEarnings;
+            // Aggregate earnings — compute from volume × ROI if indexed earnings are 0
+            let totalEarnings = 0n;
+            for (const p of patterns) {
+              const indexed = BigInt(p.totalEarnings || 0);
+              const vol = BigInt(p.totalVolume || 0);
+              const roi = BigInt(p.roi || 0);
+              totalEarnings += indexed > 0n ? indexed : (vol * roi) / 10000n;
+            }
+            for (const d of delegations) {
+              const indexed = BigInt(d.totalEarnings || 0);
+              const traded = BigInt(d.totalAmountTraded || 0);
+              const roi = d.pattern?.roi ? BigInt(d.pattern.roi) : 0n;
+              totalEarnings += indexed > 0n ? indexed : (traded * roi) / 10000n;
+            }
 
             // If Envio has 0 delegations, supplement with RPC count
             let activeDelegationCount = delegations.length;
