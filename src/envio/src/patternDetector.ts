@@ -196,7 +196,7 @@ export class PatternDetector {
 
       // Find buy-after-dip and sell-after-recovery pairs
       let dipBuys = 0;
-      let recoveryS ells = 0;
+      let recoverySells = 0;
       let totalDipPercent = 0;
       let totalRecoveryPercent = 0;
 

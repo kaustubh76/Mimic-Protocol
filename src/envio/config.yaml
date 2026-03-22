@@ -27,7 +27,3 @@ networks:
           - event: "TradeExecuted(uint256 indexed delegationId, uint256 indexed patternTokenId, address indexed executor, address token, uint256 amount, bool success, uint256 timestamp)"
 
 rollback_on_reorg: true
-
-field_selection:
-  transaction_fields:
-    - "hash"

@@ -33,6 +33,15 @@ export class PatternDecoder {
     }
   }
 
+  static encode(patternType: string, parameters: any[]): string {
+    try {
+      const encoded = JSON.stringify({ type: patternType, params: parameters.map(p => p.toString()) });
+      return "0x" + Buffer.from(encoded).toString("hex");
+    } catch {
+      return "0x";
+    }
+  }
+
   static toJSON(decoded: DecodedPattern): string {
     try {
       return decoded.data ? "decoded" : "empty";
