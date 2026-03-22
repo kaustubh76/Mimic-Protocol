@@ -42,10 +42,10 @@ export function usePortfolioStats(delegations: Delegation[]): PortfolioStats {
 
       try {
         // Query Envio for delegation stats
-        const delegationIds = delegations.map(d => d.delegationId.toString());
+        const delegationIds = delegations.map(d => Number(d.delegationId));
 
         const query = `
-          query GetPortfolioStats($ids: [BigInt!]!) {
+          query GetPortfolioStats($ids: [numeric!]!) {
             Delegation(where: {delegationId: {_in: $ids}}) {
               delegationId
               totalAmountTraded
@@ -83,10 +83,20 @@ export function usePortfolioStats(delegations: Delegation[]): PortfolioStats {
             let roiCount = 0;
 
             for (const d of envDelegations) {
-              totalVolume += BigInt(d.totalAmountTraded || 0);
-              totalEarnings += BigInt(d.totalEarnings || 0);
+              const traded = BigInt(d.totalAmountTraded || 0);
+              const indexedEarnings = BigInt(d.totalEarnings || 0);
+              const patternRoi = d.pattern?.roi ? BigInt(d.pattern.roi) : 0n;
+
+              totalVolume += traded;
               totalExecutions += d.totalExecutions || 0;
               successfulExecutions += d.successfulExecutions || 0;
+
+              // Use indexed earnings if available, otherwise compute from volume × ROI
+              if (indexedEarnings > 0n) {
+                totalEarnings += indexedEarnings;
+              } else if (traded > 0n && patternRoi > 0n) {
+                totalEarnings += (traded * patternRoi) / 10000n;
+              }
 
               if (d.pattern?.roi) {
                 roiSum += Number(BigInt(d.pattern.roi));

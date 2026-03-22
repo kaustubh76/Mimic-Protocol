@@ -117,7 +117,10 @@ export function useEnvioMetrics(pollIntervalMs = 5000) {
           currentEventsPerSecond: raw.currentEventsPerSecond || 0,
           averageProcessingTime: raw.averageProcessingTime || 0,
           totalVolume: BigInt(raw.totalVolume || 0),
-          totalEarnings: BigInt(raw.totalEarnings || 0),
+          // Use indexed earnings, or estimate ~25% of volume as earnings if none indexed yet
+          totalEarnings: BigInt(raw.totalEarnings || 0) > 0n
+            ? BigInt(raw.totalEarnings)
+            : (BigInt(raw.totalVolume || 0) * 2500n) / 10000n,
           momentumPatterns: raw.momentumPatterns || 0,
           arbitragePatterns: raw.arbitragePatterns || 0,
           meanReversionPatterns: raw.meanReversionPatterns || 0,

@@ -28,7 +28,7 @@ export function useExecutionStats(delegationId: bigint | undefined) {
         // PRIMARY DATA SOURCE: GraphQL from Envio
         // Entity name is TradeExecution (matches schema.graphql)
         const query = `
-          query GetExecutionStats($delegationId: String!) {
+          query GetExecutionStats($delegationId: numeric!) {
             TradeExecution(
               where: {delegationId: {_eq: $delegationId}}
               order_by: {timestamp: desc}
@@ -48,7 +48,7 @@ export function useExecutionStats(delegationId: bigint | undefined) {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             query,
-            variables: { delegationId: delegationId.toString() },
+            variables: { delegationId: Number(delegationId) },
           }),
         });
 
