@@ -10,7 +10,7 @@ networks:
       - name: BehavioralNFT
         address:
           - "0x6943e7D39F3799d0b8fa9D6aD6B63861a15a8d26"
-        handler: src/EventHandlers.ts
+        handler: EventHandlers.ts
         events:
           - event: "PatternMinted(uint256 indexed tokenId, address indexed creator, string patternType, bytes patternData, uint256 timestamp)"
           - event: "PatternPerformanceUpdated(uint256 indexed tokenId, uint256 winRate, uint256 totalVolume, int256 roi)"
@@ -19,7 +19,7 @@ networks:
       - name: DelegationRouter
         address:
           - "0xd5499e0d781b123724dF253776Aa1EB09780AfBf"
-        handler: src/EventHandlers.ts
+        handler: EventHandlers.ts
         events:
           - event: "DelegationCreated(uint256 indexed delegationId, address indexed delegator, uint256 indexed patternTokenId, uint256 percentageAllocation, address smartAccountAddress, uint256 timestamp)"
           - event: "DelegationRevoked(uint256 indexed delegationId, address indexed delegator, uint256 indexed patternTokenId, uint256 timestamp)"
