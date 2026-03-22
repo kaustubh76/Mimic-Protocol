@@ -1,5 +1,2 @@
 packages:
   - 'generated'
-
-ignoredBuiltDependencies:
-  - esbuild
