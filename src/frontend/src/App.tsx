@@ -395,9 +395,24 @@ export function App() {
       <footer className="border-t border-white/5 mt-20">
         <div className="max-w-7xl mx-auto px-6 py-8">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-            <p className="text-sm text-muted">
-              Built for Monad Hackathon 2025 · Mirror Protocol
-            </p>
+            <div className="flex flex-col items-center md:items-start gap-1">
+              <p className="text-sm text-muted">
+                Mirror Protocol · Monad Hackathon 2025
+              </p>
+              <div className="flex items-center gap-3 text-xs text-muted">
+                <a href="https://github.com/kaustubh76/Mimic-Protocol" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">
+                  GitHub
+                </a>
+                <span>·</span>
+                <a href="https://indexer.dev.hyperindex.xyz/b1106ec/v1/graphql" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">
+                  GraphQL API
+                </a>
+                <span>·</span>
+                <a href="https://explorer.testnet.monad.xyz/address/0x6943e7D39F3799d0b8fa9D6aD6B63861a15a8d26" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">
+                  Contracts
+                </a>
+              </div>
+            </div>
             <div className="flex flex-wrap items-center gap-3">
               <span className="px-3 py-1 rounded-full text-xs font-semibold bg-gradient-primary">
                 Powered by Envio
