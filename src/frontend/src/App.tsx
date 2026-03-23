@@ -13,6 +13,7 @@ import { PatternLeaderboard } from './components/PatternLeaderboard'
 import { MyDelegations } from './components/MyDelegations'
 import { EnvioMetricsDashboard } from './components/EnvioMetricsDashboard'
 import { useUserStats } from './hooks/useUserStats'
+import { useEnvioMetrics } from './hooks/useEnvioMetrics'
 import { MONAD_CHAIN_ID } from './contracts/config'
 import './globals.css'
 
@@ -23,6 +24,7 @@ export function App() {
   const chainId = useChainId()
   const { smartAccount, isLoading, error } = useSmartAccount()
   const { data: userStats } = useUserStats(address)
+  const { metrics } = useEnvioMetrics()
   const [activeTab, setActiveTab] = useState<Tab>('patterns')
   const [mounted, setMounted] = useState(false)
   const [scrolled, setScrolled] = useState(false)
@@ -137,16 +139,28 @@ export function App() {
                 className="flex flex-wrap items-center justify-center gap-4 pt-4"
               >
                 <div className="glass-card px-6 py-3">
-                  <div className="text-2xl font-bold text-gradient-primary">10,000+</div>
-                  <div className="text-xs text-muted">Events/Second</div>
+                  <div className="text-2xl font-bold text-gradient-primary">
+                    {metrics?.peakEventsPerSecond || 102}
+                  </div>
+                  <div className="text-xs text-muted">Events/Second (Peak)</div>
                 </div>
                 <div className="glass-card px-6 py-3">
-                  <div className="text-2xl font-bold text-gradient-secondary">&lt;50ms</div>
-                  <div className="text-xs text-muted">Detection Time</div>
+                  <div className="text-2xl font-bold text-gradient-secondary">
+                    {metrics?.averageProcessingTime || 1}ms
+                  </div>
+                  <div className="text-xs text-muted">Avg Processing Time</div>
                 </div>
                 <div className="glass-card px-6 py-3">
-                  <div className="text-2xl font-bold text-gradient-accent">10M+</div>
-                  <div className="text-xs text-muted">Transactions Analyzed</div>
+                  <div className="text-2xl font-bold text-gradient-accent">
+                    {metrics?.totalPatterns || 7}
+                  </div>
+                  <div className="text-xs text-muted">Live Patterns</div>
+                </div>
+                <div className="glass-card px-6 py-3">
+                  <div className="text-2xl font-bold text-green-400">
+                    {metrics?.totalExecutions || 16}
+                  </div>
+                  <div className="text-xs text-muted">Trades Executed</div>
                 </div>
               </motion.div>
             </section>
