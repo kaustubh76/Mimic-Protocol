@@ -98,49 +98,49 @@ STEP 4: Automated Execution
 └─────────────────────────────────────────────────────────────────────┘
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  HACKATHON BOUNTY TARGETS ($4,000+ Total)
+  TECHNICAL DIFFERENTIATORS
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-🏆 BOUNTY 1: Most Innovative Delegations ($500)
+INNOVATIVE DELEGATION ARCHITECTURE
    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   ✅ First-ever NFT-based delegation model
-   ✅ Multi-layer delegation chains (User→SA→NFT→Execution)
-   ✅ Granular permission controls
-   ✅ Conditional execution based on real-time metrics
-   ✅ Complete lifecycle management (create/update/revoke)
-   ✅ 100% test coverage, production-ready
+   - First-ever NFT-based delegation model
+   - Multi-layer delegation chains (User->SA->NFT->Execution)
+   - Granular permission controls
+   - Conditional execution based on real-time metrics
+   - Complete lifecycle management (create/update/revoke)
+   - 100% test coverage, production-ready
 
-   WHY WE WIN: "Trading styles become tradeable products. Your 65%
-   win-rate strategy becomes an NFT that others delegate to with
-   custom permissions, creating behavioral liquidity markets."
+   Trading styles become tradeable products. Your 65% win-rate
+   strategy becomes an NFT that others delegate to with custom
+   permissions, creating behavioral liquidity markets.
 
-🏆 BOUNTY 2: Best Use of Envio ($2,000) 💰
+ENVIO HYPERSYNC INTEGRATION
    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   ✅ Envio is ESSENTIAL (not optional)
-   ✅ 50x faster than alternatives (47ms vs 2-3s)
-   ✅ 10,000+ events/second processing
-   ✅ Live metrics dashboard throughout
-   ✅ 10M+ events processed showcase
-   ✅ "Only possible with Envio" messaging
+   - Envio is ESSENTIAL (not optional)
+   - 50x faster than alternatives (47ms vs 2-3s)
+   - 10,000+ events/second processing
+   - Live metrics dashboard throughout
+   - 10M+ events processed, cross-chain ready
+   - Scalable via Envio hosted service
 
-   WHY WE WIN: "Mirror Protocol's 47ms pattern detection is only
-   possible with Envio. Traditional indexers at 2-3s are 50x too
-   slow for actionable trading signals. Envio isn't just faster—
-   it's the ONLY indexer fast enough to make this viable."
+   Mirror Protocol's 47ms pattern detection is only possible
+   with Envio. Traditional indexers at 2-3s are 50x too slow
+   for actionable trading signals. Envio is the only indexer
+   fast enough to make behavioral liquidity viable.
 
-🏆 BOUNTY 3: Best On-chain Automation ($1,500-3,000)
+ON-CHAIN AUTOMATION INFRASTRUCTURE
    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   ✅ Real-world use case (trading automation)
-   ✅ Smart Account-based execution (ERC-4337)
-   ✅ Conditional safety checks via Envio
-   ✅ Permission-based automation
-   ✅ MetaMask Delegation Toolkit integration
-   ✅ Complete automation infrastructure
+   - Real-world use case (trading automation)
+   - Smart Account-based execution (ERC-4337)
+   - Conditional safety checks via Envio
+   - Permission-based automation
+   - MetaMask Delegation Toolkit integration
+   - Complete automation infrastructure
 
-   WHY WE WIN: "Users delegate trading execution to proven patterns
-   with conditional safety. When 'Momentum Master' trades, delegators
-   auto-replicate—but only if winRate>60%, ROI>15%, and spending
-   limits aren't exceeded. True permission-based automation."
+   Users delegate trading execution to proven patterns with
+   conditional safety. When 'Momentum Master' trades, delegators
+   auto-replicate -- but only if winRate>60%, ROI>15%, and
+   spending limits aren't exceeded.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   PERFORMANCE METRICS (Production Ready)
@@ -222,7 +222,7 @@ http://localhost:5173
    • Documentation:      ~15,000 words (35+ files)
    • Total Code:         ~5,000+ lines production code
 
-🚀 STATUS: ✅ PRODUCTION READY - READY FOR DEMO
+STATUS: PRODUCTION READY
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   VALUE PROPOSITIONS
@@ -254,17 +254,17 @@ FOR THE ECOSYSTEM:
 └─────────────────────────────────────────────────────────────────────┘
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  DEMO FLOW (4 Minutes)
+  FEATURE WALKTHROUGH
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-0:00 │ Landing page + Envio metrics (47ms highlight)
-0:30 │ Connect MetaMask + Create Smart Account
-1:00 │ Browse patterns (real-time performance)
-1:30 │ Create simple delegation (50% allocation)
-2:00 │ Create advanced delegation (conditions + limits)
-2:45 │ Manage delegations (update/revoke)
-3:30 │ Show performance metrics & results
-4:00 │ Closing: "Only possible with Envio"
+  1. Landing page + live Envio metrics
+  2. Connect MetaMask + Create Smart Account
+  3. Browse patterns (real-time performance)
+  4. Create simple delegation (50% allocation)
+  5. Create advanced delegation (conditions + limits)
+  6. Manage delegations (update/revoke)
+  7. Review performance metrics & results
+  8. End-to-end flow complete
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   KEY RESOURCES
@@ -291,8 +291,8 @@ FOR THE ECOSYSTEM:
 ║                                                                            ║
 ║         "Mirror Protocol - Your Trading Style is Now a Product"           ║
 ║                                                                            ║
-║                    🪞 Built for Monad Hackathon 2025 ✨                   ║
+║              Built on Monad with Envio HyperSync                          ║
 ║                                                                            ║
-║                  Targeting 3 Bounties • $4,000+ Potential                 ║
+║           Scalable Behavioral Liquidity Infrastructure                    ║
 ║                                                                            ║
 ╚═══════════════════════════════════════════════════════════════════════════╝

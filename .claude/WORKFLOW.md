@@ -2,7 +2,7 @@
 
 ## 🎯 Overview
 
-This guide explains the structured development workflow for Mirror Protocol. Following this workflow ensures high-quality, validated, and hackathon-ready code.
+This guide explains the structured development workflow for Mirror Protocol. Following this workflow ensures high-quality, validated, and production-ready code.
 
 ## 📋 Quick Reference
 
@@ -14,7 +14,7 @@ This guide explains the structured development workflow for Mirror Protocol. Fol
 | `/validate-plan` | Review plan quality | After creating plan |
 | `/implement <component>` | Guided implementation | After plan approval |
 | `/validate-code` | Code review & security audit | After implementation |
-| `/review-demo` | Demo optimization | Before hackathon submission |
+| `/review-demo` | Demo optimization | Before release or presentation |
 
 ### Workflow Phases
 ```
@@ -32,7 +32,7 @@ Every work session should start with:
 
 This gives you:
 - Current project state
-- Bounty alignment
+- Goal alignment
 - Blockers to address
 - Priority tasks
 
@@ -89,7 +89,7 @@ You: /validate-plan
 
 Claude: [Reviews plan against standards]
 - Completeness: 9/10 ✅
-- Bounty Alignment: 27/30 ✅
+- Goal Alignment: 27/30 ✅
 - Technical Quality: 25/30 🟡
 - Overall: 85/100 (A) - Minor revisions suggested
 ```
@@ -258,16 +258,16 @@ Claude: [Comprehensive demo review]
 **What Gets Reviewed**:
 - Demo flow and timing
 - Metrics visibility
-- Bounty alignment
+- Goal alignment
 - Technical depth
 - User experience
-- Story/narrative
+- Narrative clarity
 - Memorability
 
 **Optimization Focus**:
-1. First 30 seconds (hook judges)
+1. First 30 seconds (make a strong first impression)
 2. Envio superiority (prove it's essential)
-3. Metrics display (numbers convince)
+3. Metrics display (numbers demonstrate value)
 4. Smooth execution (no bugs)
 
 ## 🎯 Example: Complete Feature Development
@@ -368,7 +368,7 @@ You: /review-demo
 Response:
 - Overall: 93/100 (A+)
 - Demo ready ✅
-- Win probability: 85% (Envio bounty)
+- Confidence: 85% (strong Envio integration)
 ```
 
 ## 📊 Quality Gates
@@ -388,7 +388,7 @@ Don't skip these checkpoints:
 - Performance targets not met
 
 ### Gate 4: Demo Ready
-❌ **Block** submission if demo score < 80
+❌ **Block** release if demo score < 80
 
 ## 🚨 Emergency Protocols
 
@@ -436,13 +436,13 @@ Planning when fresh leads to better decisions.
 Catching issues in validation is 10x faster than debugging later.
 
 ### 3. Metrics Tell the Story
-Numbers convince judges more than words.
+Numbers demonstrate value more than words.
 
 ### 4. Security Can't Be Added Later
 Design for security from the start.
 
 ### 5. Demo First, Features Second
-If it's not in the demo, it doesn't exist to judges.
+If it's not in the demo, it doesn't exist to users.
 
 ### 6. Document While Fresh
 Document immediately after implementation, not later.
@@ -464,7 +464,7 @@ Track these throughout development:
 - [ ] Zero critical security issues
 - [ ] All integration tests passing
 
-### Bounty Alignment
+### Goal Alignment
 - [ ] Envio demonstrably essential
 - [ ] Novel delegation approach
 - [ ] Automation value clear
@@ -497,7 +497,7 @@ Plan → Validate → Implement → Validate → Test
 
 Never skip back to implementation without validation if major changes needed.
 
-## ✅ Final Pre-Submission Checklist
+## ✅ Final Pre-Release Checklist
 
 ```markdown
 ### Code Quality
@@ -517,7 +517,6 @@ Never skip back to implementation without validation if major changes needed.
 ### Demo
 - [ ] Demo rehearsed
 - [ ] Demo scoring > 85
-- [ ] Backup recording ready
 - [ ] All metrics real (not mocked)
 - [ ] Under 5 minutes
 
@@ -533,14 +532,10 @@ Never skip back to implementation without validation if major changes needed.
 - [ ] Code documented
 - [ ] Architecture diagram included
 - [ ] Demo script ready
-- [ ] Judge Q&A prep done
 
-### Submission
+### Release
 - [ ] GitHub repo public
-- [ ] Video uploaded
-- [ ] Submission form complete
 - [ ] All links working
-- [ ] Contact info correct
 ```
 
 ## 🎯 Remember
@@ -551,7 +546,7 @@ Never skip back to implementation without validation if major changes needed.
 - Iteration achieves good
 - Don't waste time chasing perfect
 
-**Now go win those bounties! 🚀**
+**Now go ship it!**
 
 ---
 

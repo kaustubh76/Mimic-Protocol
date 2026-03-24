@@ -2,25 +2,27 @@
 
 ## Core Development Philosophy
 
-### 🎯 Three-Phase Workflow
+### Three-Phase Workflow
 Every feature/task MUST go through:
-1. **PLAN** → Architectural design and approach
-2. **VALIDATE** → Review plan against requirements
-3. **IMPLEMENT** → Actual coding with validation checkpoints
+1. **PLAN** — Architectural design and approach
+2. **VALIDATE** — Review plan against requirements
+3. **IMPLEMENT** — Actual coding with validation checkpoints
 
-### 🚨 Critical Requirements (NEVER SKIP)
+### Critical Requirements (NEVER SKIP)
 
 #### 1. Envio-First Thinking
 - Every feature must demonstrate WHY Envio is essential
 - Always include performance metrics (latency, throughput)
-- Show comparative advantages over traditional solutions
+- Show comparative advantages over traditional indexing solutions
 - Implement real-time monitoring and metrics display
+- Design for horizontal scale from the start
 
-#### 2. Hackathon Alignment
-Before ANY implementation, verify alignment with bounties:
-- ✅ Most Innovative Use of Delegations ($500)
-- ✅ Best use of Envio ($2,000)
-- ✅ Best On-chain Automation ($1,500-3,000)
+#### 2. Scalability Focus
+Before ANY implementation, verify:
+- Does this leverage Envio HyperSync effectively?
+- Can this handle 10x current event volume without architecture changes?
+- Is the data model optimized for the query patterns we need?
+- Are we using Envio's hosted service capabilities fully?
 
 #### 3. Technical Stack Compliance
 - Monad Testnet: Chain ID 10143
@@ -35,8 +37,8 @@ Before ANY implementation, verify alignment with bounties:
 **User Request**: [Original request]
 **Interpreted Goal**: [What we understand]
 **Success Criteria**: [How we measure completion]
-**Bounty Alignment**: [Which bounties this targets]
 **Envio Requirement**: [Why Envio is essential here]
+**Scale Consideration**: [How this scales to production]
 ```
 
 ### Step 2: Architectural Planning
@@ -51,7 +53,7 @@ Before ANY implementation, verify alignment with bounties:
 - Security vulnerabilities
 - Performance bottlenecks
 - Integration complexity
-- Timeline feasibility
+- Scalability limits
 
 ### Step 4: Implementation Breakdown
 - Break into < 200 LOC chunks
@@ -148,61 +150,62 @@ test/              # Comprehensive tests
 
 ## Do's and Don'ts
 
-### ✅ DO
+### DO
 - Start with WHY (especially for Envio)
 - Show metrics constantly
 - Think cross-chain from day 1
-- Optimize for demo impact
+- Design for scale
 - Document performance wins
 - Plan before coding
 - Validate at every step
 
-### ❌ DON'T
+### DON'T
 - Skip planning phase
-- Add generic features
+- Add generic features that don't leverage Envio
 - Hide Envio behind abstractions
 - Forget gas optimization
 - Ignore security
 - Code without tests
 - Deploy without validation
-- Mention "AI agents" as primary feature
 
 ## Priority Framework
 
-### P0 (Critical - Demo Blockers)
+### P0 (Critical — Core Infrastructure)
 - Envio HyperCore integration
 - Pattern detection < 50ms
 - MetaMask delegations working
 - Monad deployment successful
 
-### P1 (Important - Differentiators)
+### P1 (Important — Scale & Differentiation)
 - Cross-chain aggregation
 - Multi-layer delegations
 - Real-time metrics dashboard
 - Performance benchmarks
+- Horizontal scaling support
 
-### P2 (Nice to Have - Polish)
+### P2 (Nice to Have — Polish)
 - Advanced UI features
 - Additional pattern types
 - Social features
 - Extended documentation
 
-### P3 (Future - Post-Hackathon)
+### P3 (Future — Production Roadmap)
 - Mainnet deployment
-- Additional chains
+- Additional chains (Ethereum, Arbitrum, Base)
 - Advanced analytics
 - Mobile app
+- SDK for third-party integrations
 
 ## Communication Standards
 
 ### Status Updates Format
 ```
-🎯 Current: [What we're working on]
-✅ Completed: [What's done]
-🔄 In Progress: [Active tasks]
-⏳ Next: [Up next]
-🚧 Blockers: [Issues]
-📊 Metrics: [Performance data]
+Current: [What we're working on]
+Completed: [What's done]
+In Progress: [Active tasks]
+Next: [Up next]
+Blockers: [Issues]
+Metrics: [Performance data]
 ```
 
 ### Documentation Standards
@@ -245,22 +248,22 @@ test/              # Comprehensive tests
 ## Success Metrics
 
 ### Technical Excellence
-- Sub-50ms pattern detection ✓
-- 10,000+ events/second ✓
-- Cross-chain aggregation ✓
-- Gas-optimized contracts ✓
+- Sub-50ms pattern detection
+- 10,000+ events/second capability
+- Cross-chain aggregation
+- Gas-optimized contracts
 
-### Hackathon Readiness
-- Demo flow smooth ✓
-- Metrics dashboard impressive ✓
-- Story compelling ✓
-- Code production-ready ✓
+### Scalability
+- Multi-chain ready architecture
+- Horizontal scaling support
+- Production-grade error handling
+- Automated deployment pipeline
 
-### Innovation Score
-- Novel delegation structure ✓
-- Unique Envio usage ✓
-- Practical automation value ✓
-- Scalable architecture ✓
+### Innovation
+- Novel delegation structure (NFT-based)
+- Unique Envio usage (behavioral indexing)
+- Practical automation value
+- Scalable architecture
 
 ---
 

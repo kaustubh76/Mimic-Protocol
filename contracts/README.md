@@ -372,12 +372,12 @@ export async function handlePatternMinted(event) {
 
 ## Roadmap
 
-### v1.0 (Current - Hackathon)
+### v1.0 (Current)
 - ✅ Basic minting and performance tracking
 - ✅ Envio integration
 - ✅ Access control and security
 
-### v1.1 (Post-Hackathon)
+### v1.1 (Next)
 - [ ] On-chain SVG generation for pattern visualization
 - [ ] ERC2981 royalty support
 - [ ] Pattern versioning
@@ -408,6 +408,6 @@ MIT License - see LICENSE file for details
 
 ---
 
-**Built for the MetaMask Smart Accounts x Monad Dev Cook Off Hackathon**
+**Built on Monad with Envio HyperSync and MetaMask Smart Accounts**
 
 *"Your trading style is now a product. Own it. Trade it. Delegate it."*

@@ -2,7 +2,7 @@
 
 ## Executive Summary
 
-**Mirror Protocol** is a behavioral liquidity infrastructure that transforms on-chain trading patterns into executable, delegatable NFTs. Built for the Monad blockchain and powered by Envio HyperSync, it enables traders to monetize their successful strategies by minting them as NFTs that others can delegate to for automated pattern replication.
+**Mirror Protocol** is a behavioral liquidity infrastructure that transforms on-chain trading patterns into executable, delegatable NFTs. Built on the Monad blockchain and powered by Envio HyperSync, it enables traders to monetize their successful strategies by minting them as NFTs that others can delegate to for automated pattern replication.
 
 **Tagline:** *"Your Trading Style is Now a Product"*
 
@@ -319,145 +319,125 @@ EOA (User)
 5. **Monitor**: Track delegation performance
 6. **Manage**: Update allocation or revoke anytime
 
-### Demo Flow (4 minutes)
+### Feature Walkthrough
 
 ```
-0:00 - Landing page with Envio metrics
-0:30 - Connect MetaMask & create Smart Account
-1:00 - Browse patterns (show 47ms detection)
-1:30 - Create simple delegation (50% allocation)
-2:00 - Create advanced delegation (with conditions)
-2:45 - Manage delegations (update, revoke)
-3:30 - Show performance metrics & earnings
-4:00 - Closing: "Only possible with Envio"
+1. Landing page with live Envio metrics
+2. Connect MetaMask & create Smart Account
+3. Browse patterns (sub-50ms detection)
+4. Create simple delegation (50% allocation)
+5. Create advanced delegation (with conditions)
+6. Manage delegations (update, revoke)
+7. Review performance metrics & earnings
+8. End-to-end flow complete
 ```
 
 ---
 
-## 🏆 Hackathon Bounty Alignment
+## Technical Differentiators
 
-### Bounty 1: Most Innovative Use of Delegations ($500)
+### Innovative Delegation Architecture
 
-**Why Mirror Protocol Wins:**
-
-✅ **First-ever NFT-based delegation model**
+**First-ever NFT-based delegation model**
 - Patterns are ownable, tradable assets
 - Delegation targets are NFTs, not addresses
 - Creates behavioral liquidity markets
 
-✅ **Multi-layer delegation chains**
+**Multi-layer delegation chains**
 - User → Smart Account → Pattern NFT → Execution
 - Permission inheritance & scoping
 - Composable delegation architecture
 
-✅ **Granular permission controls**
+**Granular permission controls**
 - Spending limits (per-tx, per-day)
 - Token whitelists
 - Time-based expiration
 - Conditional requirements
 
-✅ **Conditional delegations**
+**Conditional delegations**
 - Execute only when metrics meet thresholds
 - Real-time validation via Envio
 - Safety-first automation
 
-✅ **Complete lifecycle management**
+**Complete lifecycle management**
 - Create, update, revoke, monitor
 - Inline editing of allocations
 - Real-time status tracking
 
-✅ **Production-ready implementation**
+**Production-ready implementation**
 - 67/67 tests passing (100% coverage)
 - Deployed to Monad testnet
 - Full frontend integration
 - Comprehensive documentation
 
-**Innovation Statement:**
-> "Mirror Protocol transforms trading styles into tradeable products. Your 65% win-rate momentum strategy becomes an NFT that others delegate to with custom permission scopes, creating the first behavioral liquidity market."
+> Mirror Protocol transforms trading styles into tradeable products. Your 65% win-rate momentum strategy becomes an NFT that others delegate to with custom permission scopes, creating the first behavioral liquidity market.
 
 ---
 
-### Bounty 2: Best Use of Envio ($2,000)
+### Envio HyperSync as Core Infrastructure
 
-**Why Mirror Protocol Wins:**
-
-✅ **Envio is ESSENTIAL, not optional**
+**Envio is essential, not optional**
 - Pattern detection requires <50ms latency
 - Traditional indexers (2-3s) are too slow for actionable signals
 - Mirror Protocol cannot exist without Envio
 
-✅ **Demonstrably 50x faster**
+**Demonstrably 50x faster**
 - **Envio**: 47ms average latency
 - **Traditional**: 2,000-3,000ms latency
 - **Performance gap**: 50x speed advantage
-- Live metrics dashboard proves superiority
+- Live metrics dashboard proves performance
 
-✅ **Real-time behavioral analysis**
+**Real-time behavioral analysis**
 - 10,000+ events/second processing
 - Sub-second pattern detection
 - Immediate delegation validation
 - Conditional execution checks in <50ms
 
-✅ **Comprehensive event indexing**
+**Comprehensive event indexing**
 - 18 event types across 3 contracts
 - Full delegation lifecycle tracking
 - Performance metrics aggregation
 - Creator analytics & leaderboards
 
-✅ **10M+ events processed showcase**
-- Historical transaction analysis
-- Cross-chain pattern aggregation
-- High-throughput demonstration
-- Scalability proof
+**Scalability proven at scale**
+- 10M+ historical events processed
+- Cross-chain pattern aggregation ready
+- High-throughput architecture
+- Horizontal scaling via Envio hosted service
 
-✅ **"Only possible with Envio" messaging**
-- Landing page highlights Envio
-- Real-time metrics visible throughout
-- Constant speed comparisons
-- Envio branding integrated
-
-**Envio Necessity Statement:**
-> "Mirror Protocol's 47ms pattern detection is only possible with Envio HyperSync. Traditional indexers at 2-3 seconds are 50x too slow for actionable trading signals. Envio isn't just faster—it's the only indexer fast enough to make behavioral liquidity viable."
+> Mirror Protocol's 47ms pattern detection is only possible with Envio HyperSync. Traditional indexers at 2-3 seconds are 50x too slow for actionable trading signals. Envio isn't just faster — it's the only indexer fast enough to make behavioral liquidity viable.
 
 ---
 
-### Bounty 3: Best On-chain Automation ($1,500-3,000)
+### On-chain Automation Infrastructure
 
-**Why Mirror Protocol Wins:**
-
-✅ **Real-world use case**
+**Real-world use case**
 - Automated trading pattern replication
 - Solves actual problem (copy-trading)
 - Clear value proposition
 
-✅ **Smart Account-based execution**
+**Smart Account-based execution**
 - ERC-4337 account abstraction
 - MetaMask Delegation Toolkit
 - Permission-based automation
 
-✅ **Conditional safety checks**
+**Conditional safety checks**
 - Only execute when pattern performs well
 - Real-time metric validation via Envio
 - Spending limits & token restrictions
 - Automatic expiration
 
-✅ **Complete automation infrastructure**
+**Complete automation infrastructure**
 - Pattern detection → Minting → Delegation → Execution
 - Fully automated lifecycle
 - No manual intervention required
 
-✅ **Permission-based control**
+**Permission-based control**
 - Granular permission scopes
 - User maintains control
 - Can update/revoke anytime
 
-✅ **MetaMask integration**
-- Official Delegation Toolkit
-- Smart Account creation
-- Gasless potential
-
-**Automation Value Statement:**
-> "Users delegate trading execution to proven patterns with conditional safety. When the 'Momentum Master' pattern executes, all delegators automatically replicate the trade proportionally—but only if win rate > 60%, ROI > 15%, and spending limits aren't exceeded. True permission-based trading automation."
+> Users delegate trading execution to proven patterns with conditional safety. When the 'Momentum Master' pattern executes, all delegators automatically replicate the trade proportionally — but only if win rate > 60%, ROI > 15%, and spending limits aren't exceeded. True permission-based trading automation.
 
 ---
 
@@ -647,7 +627,7 @@ cd src/frontend && npm test    # Frontend tests (if any)
 
 ## 🏅 Project Status
 
-**Overall Status**: ✅ **PRODUCTION READY - READY FOR DEMO**
+**Overall Status**: ✅ **PRODUCTION READY**
 
 ### Completed Components ✅
 - Smart contracts deployed & tested (100% coverage)
@@ -668,16 +648,11 @@ cd src/frontend && npm test    # Frontend tests (if any)
 
 ---
 
-## 👥 Team
+## Team
 
-**Mirror Protocol** - Built during Monad Hackathon 2025
+**Mirror Protocol** — Built on Monad with Envio HyperSync
 
 **Development**: Built with Claude Code (AI-assisted development)
-
-**Targeting**: 3 bounties worth $4,000+
-- Most Innovative Delegations: $500
-- Best Use of Envio: $2,000
-- Best On-chain Automation: $1,500-3,000
 
 ---
 
@@ -695,6 +670,6 @@ Transform successful trading patterns into delegatable NFTs with sub-50ms detect
 
 ---
 
-**Last Updated**: January 11, 2025
+**Last Updated**: March 2026
 **Version**: 1.0.0
 **Status**: Production Ready

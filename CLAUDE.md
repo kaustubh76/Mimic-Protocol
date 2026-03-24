@@ -1,41 +1,35 @@
----
-
-## **claude.md - Claude Context File**
-
-```markdown
 # Claude Context - Mirror Protocol Development Guide
 
 ## Project Overview
-You are working on Mirror Protocol, an Envio-powered behavioral liquidity infrastructure for the Monad blockchain. This project is being built for a hackathon targeting three specific bounties: Innovative Delegations ($500), Best use of Envio ($2,000), and On-chain Automation ($1,500-3,000).
+Mirror Protocol is an Envio-powered behavioral liquidity infrastructure built on the Monad blockchain. It transforms on-chain trading behavior into executable, delegatable infrastructure using Envio HyperSync for real-time indexing and pattern detection.
 
 ## Core Concept
-Mirror Protocol transforms on-chain trading behavior into executable, delegatable infrastructure. Users' trading patterns are detected by Envio HyperSync, minted as NFTs, and can be delegated to via MetaMask Smart Accounts for automated execution.
+Users' trading patterns are detected by Envio HyperSync, minted as NFTs, and can be delegated to via MetaMask Smart Accounts for automated execution. The protocol demonstrates how Envio's indexing infrastructure enables a new class of real-time, data-driven DeFi applications.
 
-## Critical Requirements
+## Why Envio is Essential
 
-### 1. ENVIO MUST BE CENTRAL
-- Every feature should showcase why Envio is ESSENTIAL, not optional
-- Emphasize sub-50ms pattern detection (50x faster than alternatives)
-- Show 10,000+ events/second processing
-- Demonstrate cross-chain behavioral aggregation
-- Display real-time metrics proving Envio's superiority
+### Performance Advantages
+- **Sub-50ms pattern detection** — HyperSync enables near-instant behavioral analysis
+- **High-throughput event processing** — 10,000+ events/second capability
+- **Cross-chain data aggregation** — unified behavioral view across multiple chains
+- **Real-time metrics** — live dashboards powered by Envio GraphQL
 
-### 2. MetaMask Smart Accounts Integration
-- Use Delegation Toolkit for all delegations
-- Implement multi-layer delegation system
-- Show gasless transactions
-- Deploy smart accounts programmatically
+### Scalability Story
+- HyperSync replaces RPC polling with efficient batch syncing
+- Event-driven architecture scales horizontally with Envio's infrastructure
+- GraphQL layer provides flexible, performant queries for any frontend
+- Hosted service deployment eliminates indexer DevOps overhead
 
-### 3. Monad Testnet Deployment
-- All contracts must deploy to Monad testnet
-- Chain ID: 10143
-- RPC: https://testnet.monad.xyz/rpc
+### What Envio Unlocks (Not Possible Without It)
+1. **Real-time pattern detection** — behavioral analysis requires low-latency access to historical + live events
+2. **Cross-chain behavioral aggregation** — HyperSync's multi-chain support enables unified pattern analysis
+3. **Scalable event processing** — traditional RPCs cannot sustain the throughput needed for pattern detection at scale
+4. **Production-grade indexing** — hosted service with automatic redeployment, no infrastructure management
 
 ## Technical Architecture
 
 ### Envio HyperCore (PRIMARY FOCUS)
 ```javascript
-// This is the heart of the system
 class EnvioHyperCore {
   - Real-time event streaming via HyperSync
   - Pattern detection in <50ms
@@ -71,52 +65,57 @@ class EnvioHyperCore {
 - `hardhat.config.js` - Monad network configuration
 - `package.json` - Dependencies and scripts
 
-## Demo Requirements
+## Envio Integration Best Practices
 
-### Must Show
-1. **Envio Speed**: Pattern detected in <50ms with visual timer
-2. **Data Scale**: Process 10M+ transactions in seconds
-3. **Cross-Chain**: Aggregate behavior from 3 chains simultaneously
-4. **Delegations**: Multi-layer delegation via MetaMask
-5. **Automation**: Patterns executing automatically
-
-### Metrics to Display
-```
-Events Processed: 10,847,293
-Average Latency: 47ms
-Peak Throughput: 12,384 events/sec
-Cross-Chain Queries: 1,847
-Patterns Detected: 3,924
-```
-
-## Code Patterns to Follow
-
-### Envio Query Pattern
+### Always Show Performance Metrics
 ```javascript
-// ALWAYS show performance metrics
 const startTime = Date.now();
 const result = await envio.query(params);
 const queryTime = Date.now() - startTime;
 console.log(`Query completed in ${queryTime}ms`);
 ```
 
-### Pattern Detection Pattern
+### Leverage HyperSync for Batch Operations
 ```javascript
-// Emphasize speed advantage
-if (detectionTime < 50) {
-  console.log("SUB-50MS DETECTION - Only possible with Envio!");
-}
+// Use HyperSync for efficient historical data access
+const events = await hyperSync.getEvents({
+  fromBlock: startBlock,
+  toBlock: 'latest',
+  contracts: [patternDetector, delegationRouter],
+  batchSize: 10000
+});
 ```
 
 ### Delegation Pattern
 ```javascript
-// Use MetaMask SDK properly
 const delegation = await DelegationFramework.create({
   delegator: userAccount,
   delegate: patternNFT,
   permissions: specificPermissions
 });
 ```
+
+## Scaling Considerations
+
+### Current Scale
+- 8 event types indexed across 2 contracts
+- 10 GraphQL entities
+- <50ms query latency
+- 102 events/second peak throughput
+
+### Path to Production Scale
+1. **Multi-chain expansion** — add Ethereum, Arbitrum, Base via HyperSync multi-chain config
+2. **Event volume** — HyperSync handles millions of events; increase batch sizes as volume grows
+3. **Query optimization** — use Envio's built-in caching, add composite indexes for complex queries
+4. **Horizontal scaling** — Envio hosted service scales automatically; add read replicas for high-traffic frontends
+
+### Performance Targets
+| Metric | Current | Target |
+|--------|---------|--------|
+| Query latency | <50ms | <20ms |
+| Event throughput | 102 eps | 10,000+ eps |
+| Chains supported | 1 (Monad) | 5+ |
+| Concurrent queries | ~10 | 1,000+ |
 
 ## Common Issues & Solutions
 
@@ -146,35 +145,12 @@ const delegation = await DelegationFramework.create({
 5. Test delegation flow
 6. Confirm automation executes
 
-## Demo Script Key Points
-1. Start with problem statement
-2. Show Envio metrics dashboard immediately
-3. Demonstrate 47ms pattern detection
-4. Show cross-chain capability
-5. Execute delegation flow
-6. Display earnings/results
-7. End with "Only possible with Envio"
-
-## Success Criteria
-- Envio is demonstrably essential (not replaceable)
-- Delegations are innovative (multi-layer NFT-based)
-- Automation provides real value
-- Demo is smooth and impressive
-- Metrics prove superiority
-
-## Key Messages
-- "50x faster than traditional indexers"
-- "Processing 10,000 events per second"
-- "Cross-chain behavioral aggregation"
-- "Your trading style is now a product"
-- "Only possible with Envio"
-
 ## DO NOT
-- Don't mention AI agents as primary feature
-- Don't oversimplify for "consumers"
-- Don't add features just to check boxes
-- Don't use generic indexing (must be Envio-specific)
-- Don't forget to show metrics constantly
+- Don't hide Envio behind abstractions — make it visible
+- Don't use generic indexing when Envio-specific features are available
+- Don't forget to show metrics in every data-facing component
+- Don't skip performance benchmarking
+- Don't add features that don't leverage Envio's strengths
 
 ## Resources
 - Envio Docs: https://docs.envio.dev
@@ -183,56 +159,11 @@ const delegation = await DelegationFramework.create({
 - HyperSync API: https://hypersync.envio.dev
 
 ## Current Status
-- ✅ Envio HyperCore implemented
-- ✅ Pattern detection working
-- ✅ Basic delegation structure
-- 🔄 Smart contract deployment
-- 🔄 Frontend development
-- ⏳ Demo preparation
-
-## Next Priority Tasks
-1. Deploy smart contracts to Monad
-2. Connect Envio to deployed contracts
-3. Test end-to-end delegation flow
-4. Build metrics dashboard
-5. Prepare demo video
-
----
+- Envio HyperCore implemented
+- Pattern detection working
+- Delegation structure complete
+- Smart contracts deployed to Monad testnet
+- Frontend live on Vercel
+- Envio hosted service deployed
 
 Remember: ENVIO IS THE STAR. Every feature should highlight why Mirror Protocol cannot exist without Envio's unique capabilities.
-```
-
----
-
-## **How to Use These Files**
-
-### **For Development:**
-1. Place `README.md` in your project root
-2. Share with team members and judges
-3. Update status section as you progress
-
-### **For Claude:**
-1. Save `claude.md` in project root
-2. When starting a new conversation with Claude about this project:
-   - Copy and paste the `claude.md` content first
-   - Then ask your specific questions
-   - Claude will maintain context about your project
-
-### **Example Claude Usage:**
-```
-You: [Paste claude.md content]
-
-You: I need help implementing the delegation router contract. It should integrate with MetaMask Smart Accounts and support multi-layer delegations.
-
-Claude: [Will provide solution considering all project context]
-```
-
-### **Keep Updated:**
-- Update README.md status section daily
-- Add new metrics to claude.md as you achieve them
-- Document any architectural changes
-
-These files will ensure:
-1. **Judges** understand your project immediately
-2. **Claude** maintains perfect context
-3. **You** stay focused on winning priorities

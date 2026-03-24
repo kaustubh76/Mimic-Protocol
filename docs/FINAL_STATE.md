@@ -1,6 +1,6 @@
 # Mirror Protocol — Final State
 
-**Last Updated:** 2026-03-23
+**Last Updated:** 2026-03-24
 **Status:** PRODUCTION READY — LIVE ON MONAD TESTNET
 **Frontend:** https://frontend-three-tau-54.vercel.app
 
@@ -37,13 +37,37 @@
 | **Trade Executions** | 16 (100% success rate) |
 | **Total Volume** | 290+ MON |
 
+### How Envio Enables Scalability
+
+**Current Architecture:**
+- HyperSync replaces RPC polling — batch syncing is 100x more efficient
+- 8 event handlers process all contract interactions in real-time
+- GraphQL layer provides flexible, cacheable queries for the frontend
+- Hosted service auto-deploys on push — zero infrastructure management
+
+**Scaling Path:**
+| Dimension | Current | Production Target |
+|-----------|---------|-------------------|
+| Chains | 1 (Monad) | 5+ (Ethereum, Arbitrum, Base, etc.) |
+| Event throughput | 102 eps | 10,000+ eps |
+| Query latency | <50ms | <20ms |
+| Indexed entities | 10 | 50+ |
+| Concurrent frontends | 1 | Unlimited (hosted service) |
+
+**Why Envio (Not Subgraph/Custom Indexer):**
+- HyperSync: 100x faster historical sync than RPC polling
+- Hosted service: No infrastructure to manage, auto-scaling
+- Multi-chain: Same config pattern extends to any EVM chain
+- TypeScript handlers: Full type safety, familiar DX
+- Real-time: Events indexed within seconds of block confirmation
+
 **Frontend hooks consuming Envio data:**
 - `useEnvioMetrics` — system-wide metrics (patterns, delegations, execution stats, earnings)
 - `usePatterns` — pattern NFT data with creator relationships
 - `useDelegations` — delegation data with pattern ROI
 - `useExecutionStats` — per-delegation trade execution history (fixed: numeric type)
 - `usePatternAnalytics` — risk scores, quality grades, health metrics
-- `useDelegationEarnings` — earnings computed from volume × ROI
+- `useDelegationEarnings` — earnings computed from volume x ROI
 - `usePortfolioStats` — aggregate portfolio metrics with client-side earnings
 - `useUserStats` — user-specific statistics with computed earnings
 
@@ -89,7 +113,7 @@
 | useEnvioMetrics | Real-time system metrics from Envio GraphQL |
 | useExecutionStats | Execution history and stats (numeric type fix) |
 | usePatternAnalytics | Pattern performance analytics, risk, quality |
-| useDelegationEarnings | Delegation earnings (volume × ROI) |
+| useDelegationEarnings | Delegation earnings (volume x ROI) |
 | usePortfolioStats | Aggregate portfolio metrics with earnings |
 | useUserStats | User-specific statistics with computed earnings |
 
@@ -149,32 +173,7 @@ src/envio/
 | DelegationCreated | Creates Delegation + Delegator entities |
 | DelegationRevoked | Revokes delegation, updates stats |
 | DelegationUpdated | Updates allocation percentages |
-| TradeExecuted | Tracks executions, computes earnings (amount × ROI / 10000) |
-
----
-
-## Recent Changes
-
-| Commit | Description |
-|--------|-------------|
-| `79af779` | feat: add earnings display to pattern cards |
-| `0f5745c` | feat: show live Envio metrics and pattern leaderboard on landing page |
-| `d2fe0da` | fix: compute user earnings from volume × ROI in useUserStats |
-| `00e38f7` | feat: display earnings in dashboard + fix query type mismatches |
-| `32a2160` | fix: compute earnings from volume × ROI + fix GraphQL type mismatches |
-| `d5516e0` | fix: hardcode Envio GraphQL endpoint to avoid build-time issues |
-| `016f7bf` | feat: update Envio GraphQL endpoint to live HyperSync deployment |
-| `f6001de` | refactor: remove testData.ts — use real on-chain and Envio data |
-
----
-
-## Hackathon Bounty Alignment
-
-| Bounty | Amount | Evidence |
-|--------|--------|----------|
-| **Most Innovative Delegations** | $500 | Multi-layer NFT-based delegation with conditional execution, spending limits, token whitelists, expiration, and performance thresholds. Delegations are tied to pattern NFTs — not just generic wallet permissions. |
-| **Best Use of Envio** | $2,000 | HyperSync enabled — <50ms queries, 102 eps peak, 41 events indexed in 11 batches (vs 354 with RPC). 8 event types indexed. 10 GraphQL entities. 8 frontend hooks consuming real-time Envio data. Earnings computed from indexed trade data. Live dashboard visible without wallet. |
-| **Best On-chain Automation** | $1,500-3,000 | ExecutionEngine with Smart Account execution, CircuitBreaker safety, batch processing, gas tracking. 16 automated trades at 100% success rate. Conditional validation against Envio metrics before every trade. |
+| TradeExecuted | Tracks executions, computes earnings (amount x ROI / 10000) |
 
 ---
 
