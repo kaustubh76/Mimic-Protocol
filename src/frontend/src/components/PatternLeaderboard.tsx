@@ -1,6 +1,8 @@
+import { motion } from 'framer-motion';
 import { usePatterns } from '../hooks/usePatterns';
 import { usePatternLeaderboard } from '../hooks/usePatternAnalytics';
 import { formatEther } from 'viem';
+import { EmptyState } from './EmptyState';
 
 export function PatternLeaderboard() {
   const { patterns, isLoading } = usePatterns();
@@ -29,10 +31,11 @@ export function PatternLeaderboard() {
           <span>🏆</span>
           <span>Top Performing Patterns</span>
         </h3>
-        <div className="text-center py-8 text-muted">
-          <div className="text-4xl mb-2">📊</div>
-          <p>No patterns available yet</p>
-        </div>
+        <EmptyState
+          icon="📊"
+          title="No Patterns Yet"
+          description="Patterns will appear here once they are minted on-chain"
+        />
       </div>
     );
   }
@@ -49,29 +52,31 @@ export function PatternLeaderboard() {
         </div>
       </div>
 
-      <div className="space-y-3">
+      <ol className="space-y-3" aria-label="Top performing patterns">
         {leaderboard.map(({ pattern, score }, index) => {
           const winRate = Number(pattern.winRate) / 100;
           const roi = Number(pattern.roi) / 100;
           const volume = formatEther(pattern.totalVolume || BigInt(0));
-
-          // Medal emojis for top 3
           const medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `#${index + 1}`;
 
           return (
-            <div
+            <motion.li
               key={pattern.id}
-              className="glass-card p-4 hover:bg-white/5 transition-all cursor-pointer group"
+              className="glass-card p-4 hover:bg-white/5 transition-colors group list-none"
+              whileHover={{ x: 4 }}
+              initial={{ opacity: 0, x: -12 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: index * 0.05, duration: 0.3 }}
             >
               <div className="flex items-center gap-4">
                 {/* Rank */}
-                <div className="text-2xl font-bold w-12 text-center">
+                <div className="text-2xl font-bold w-12 text-center flex-shrink-0">
                   {medal}
                 </div>
 
                 {/* Pattern Info */}
-                <div className="flex-1 space-y-2">
-                  <div className="flex items-center justify-between">
+                <div className="flex-1 min-w-0 space-y-2">
+                  <div className="flex items-center justify-between flex-wrap gap-2">
                     <div className="flex items-center gap-2">
                       <span className="font-bold">Pattern #{pattern.id}</span>
                       <span className={`pattern-badge pattern-badge--${pattern.patternType} text-xs`}>
@@ -84,7 +89,7 @@ export function PatternLeaderboard() {
                   </div>
 
                   {/* Quick Stats */}
-                  <div className="flex items-center gap-4 text-xs">
+                  <div className="flex items-center gap-4 text-xs flex-wrap">
                     <div className="flex items-center gap-1">
                       <span className="text-muted">Win:</span>
                       <span className="font-bold text-success">{winRate}%</span>
@@ -103,14 +108,14 @@ export function PatternLeaderboard() {
                 </div>
 
                 {/* View Arrow */}
-                <div className="text-muted group-hover:text-primary transition-colors">
+                <div className="text-muted group-hover:text-primary transition-colors flex-shrink-0">
                   →
                 </div>
               </div>
-            </div>
+            </motion.li>
           );
         })}
-      </div>
+      </ol>
 
       {leaderboard.length >= 10 && (
         <div className="mt-4 text-center">

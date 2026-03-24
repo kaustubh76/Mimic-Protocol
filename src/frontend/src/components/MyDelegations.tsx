@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
 import { useDelegations, type Delegation } from '../hooks/useDelegations';
 import { useAccount } from 'wagmi';
 import { useRevokeDelegation } from '../hooks/useRevokeDelegation';
@@ -6,6 +7,7 @@ import { UpdateDelegationModal } from './UpdateDelegationModal';
 import { DelegationExecutionStats } from './DelegationExecutionStats';
 import { ExecutionIndicator } from './ExecutionStats';
 import { DelegationEarningsDisplay } from './DelegationEarningsDisplay';
+import { EmptyState } from './EmptyState';
 import { usePortfolioStats } from '../hooks/usePortfolioStats';
 import { formatEther } from 'viem';
 
@@ -57,15 +59,11 @@ export function MyDelegations() {
     return (
       <div className="space-y-6">
         <h2 className="text-3xl font-bold">My Delegations</h2>
-        <div className="glass-card p-12 text-center space-y-6">
-          <div className="text-6xl">👛</div>
-          <div className="space-y-2">
-            <h3 className="text-xl font-bold">Wallet Not Connected</h3>
-            <p className="text-secondary">
-              Please connect your wallet to view your delegations
-            </p>
-          </div>
-        </div>
+        <EmptyState
+          icon="👛"
+          title="Wallet Not Connected"
+          description="Please connect your wallet to view your delegations"
+        />
       </div>
     );
   }
@@ -83,7 +81,7 @@ export function MyDelegations() {
                 <div className="loading-skeleton h-6 w-48"></div>
                 <div className="loading-skeleton h-6 w-20"></div>
               </div>
-              <div className="grid grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div className="loading-skeleton h-12 w-full"></div>
                 <div className="loading-skeleton h-12 w-full"></div>
                 <div className="loading-skeleton h-12 w-full"></div>
@@ -107,20 +105,12 @@ export function MyDelegations() {
     return (
       <div className="space-y-6">
         <h2 className="text-3xl font-bold">My Delegations</h2>
-
-        <div className="glass-card p-12 text-center space-y-6">
-          <div className="text-6xl">❌</div>
-          <div className="space-y-2">
-            <h3 className="text-xl font-bold text-error">Error Loading Delegations</h3>
-            <p className="text-secondary">{error.message}</p>
-          </div>
-          <button
-            className="btn btn--primary"
-            onClick={() => window.location.reload()}
-          >
-            <span>🔄 Retry</span>
-          </button>
-        </div>
+        <EmptyState
+          icon="❌"
+          title="Error Loading Delegations"
+          description={error.message}
+          action={{ label: '🔄 Retry', onClick: () => window.location.reload() }}
+        />
       </div>
     );
   }
@@ -129,25 +119,11 @@ export function MyDelegations() {
     return (
       <div className="space-y-6">
         <h2 className="text-3xl font-bold">My Delegations</h2>
-
-        <div className="glass-card p-12 text-center space-y-6">
-          <div className="text-6xl">📭</div>
-          <div className="space-y-2">
-            <h3 className="text-xl font-bold">No Active Delegations</h3>
-            <p className="text-secondary">
-              You haven't delegated to any trading patterns yet
-            </p>
-          </div>
-          <button
-            className="btn btn--primary"
-            onClick={() => {
-              const patternsTab = document.querySelector('[data-tab="patterns"]') as HTMLButtonElement;
-              if (patternsTab) patternsTab.click();
-            }}
-          >
-            <span>🔍 Browse Patterns</span>
-          </button>
-        </div>
+        <EmptyState
+          icon="📭"
+          title="No Active Delegations"
+          description="You haven't delegated to any trading patterns yet. Browse patterns to get started!"
+        />
       </div>
     );
   }
@@ -182,14 +158,20 @@ export function MyDelegations() {
       </div>
 
       {/* Delegations List */}
-      <div className="space-y-4 stagger-animation">
-        {delegations.map((delegation) => {
+      <div className="space-y-4">
+        {delegations.map((delegation, index) => {
           const allocation = Number(delegation.percentageAllocation) / 100;
           const createdDate = new Date(Number(delegation.createdAt) * 1000);
           const isRecent = Date.now() - createdDate.getTime() < 60000; // Less than 1 minute
 
           return (
-            <div key={delegation.id} className="glass-card glass-card-hover p-6">
+            <motion.div
+              key={delegation.id}
+              className="glass-card glass-card-hover p-6"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: Math.min(index * 0.06, 0.3), duration: 0.3 }}
+            >
               {/* Header */}
               <div className="flex items-start justify-between mb-6">
                 <div className="flex-1">
@@ -224,7 +206,7 @@ export function MyDelegations() {
               </div>
 
               {/* Stats Grid */}
-              <div className="grid grid-cols-3 gap-4 mb-6">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
                 <div className="glass-card p-4 text-center">
                   <div className="text-2xl font-bold text-gradient-primary mb-1">
                     {allocation}%
@@ -254,13 +236,12 @@ export function MyDelegations() {
                   <span className="font-bold text-gradient-primary">{allocation}%</span>
                 </div>
                 <div className="h-2 bg-white/5 rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-gradient-primary rounded-full transition-all duration-1000"
-                    style={{
-                      width: `${Math.min(allocation, 100)}%`,
-                      animation: 'slideRight 1s ease-out'
-                    }}
-                  ></div>
+                  <motion.div
+                    className="h-full bg-gradient-primary rounded-full"
+                    initial={{ width: 0 }}
+                    animate={{ width: `${Math.min(allocation, 100)}%` }}
+                    transition={{ duration: 1, ease: 'easeOut' }}
+                  />
                 </div>
               </div>
 
@@ -314,7 +295,7 @@ export function MyDelegations() {
                   This delegation has been revoked and is no longer active
                 </div>
               )}
-            </div>
+            </motion.div>
           );
         })}
       </div>
@@ -323,7 +304,7 @@ export function MyDelegations() {
       <div className="glass-card p-6">
         <h3 className="font-bold mb-4 text-lg">Portfolio Summary</h3>
 
-        <div className="grid grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {/* Active Delegations */}
           <div className="text-center">
             <div className="text-3xl font-bold text-gradient-primary mb-1">
@@ -376,12 +357,16 @@ export function MyDelegations() {
       </div>
 
       {/* Update Delegation Modal */}
-      <UpdateDelegationModal
-        isOpen={isUpdateModalOpen}
-        onClose={handleUpdateModalClose}
-        delegation={selectedDelegation}
-        onSuccess={handleUpdateSuccess}
-      />
+      <AnimatePresence>
+        {isUpdateModalOpen && (
+          <UpdateDelegationModal
+            isOpen={isUpdateModalOpen}
+            onClose={handleUpdateModalClose}
+            delegation={selectedDelegation}
+            onSuccess={handleUpdateSuccess}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 }

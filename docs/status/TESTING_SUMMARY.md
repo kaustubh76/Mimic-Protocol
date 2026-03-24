@@ -123,7 +123,7 @@ forge script script/CompleteFlowMinimal.s.sol --rpc-url https://rpc.ankr.com/mon
 export RPC="https://rpc.ankr.com/monad_testnet"
 
 # Verify pattern was created
-cast call 0x3ceBC8049BdAC66BfbAECC94Cce756122ed25DAc "totalPatterns()(uint256)" --rpc-url $RPC
+cast call 0x6943e7D39F3799d0b8fa9D6aD6B63861a15a8d26 "totalPatterns()(uint256)" --rpc-url $RPC
 # Output: 3 ✅
 
 # Verify delegation was created

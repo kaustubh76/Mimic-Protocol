@@ -1,7 +1,9 @@
 # Frontend Critical Fixes Applied
 
-**Date:** 2025-10-18
+**Date:** 2025-10-18 (historical record)
 **Status:** ✅ ALL CRITICAL FIXES COMPLETE
+
+> **Note (2026-03-22):** Further updates were applied after this document was written. Contract addresses were updated again to final deployment values. See [docs/FINAL_STATE.md](../FINAL_STATE.md) for current state.
 
 ---
 

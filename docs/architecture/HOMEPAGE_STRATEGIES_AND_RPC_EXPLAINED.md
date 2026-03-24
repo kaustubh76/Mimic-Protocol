@@ -17,7 +17,7 @@ The strategies/patterns are **fetched from the blockchain first**, but have **ha
 ```typescript
 // Tries to fetch from blockchain FIRST
 const totalPatterns = await publicClient.readContract({
-  address: CONTRACTS.BEHAVIORAL_NFT,  // 0x3ceBC8049BdAC66BfbAECC94Cce756122ed25DAc
+  address: CONTRACTS.BEHAVIORAL_NFT,  // 0x6943e7D39F3799d0b8fa9D6aD6B63861a15a8d26
   abi: ABIS.BEHAVIORAL_NFT,
   functionName: 'totalPatterns',
 });
@@ -92,7 +92,7 @@ Let me verify:
 
 ```bash
 # Check total patterns in BehavioralNFT contract
-cast call 0x3ceBC8049BdAC66BfbAECC94Cce756122ed25DAc \
+cast call 0x6943e7D39F3799d0b8fa9D6aD6B63861a15a8d26 \
   "totalPatterns()(uint256)" \
   --rpc-url "https://monad-testnet.g.alchemy.com/v2/pFkOAygOyJ72KbT_I-LM0"
 ```
@@ -146,7 +146,7 @@ cast balance 0xFc46DA4cbAbDca9f903863De571E03A39D9079aD
 Result: 2991775367995565543 wei (2.99 MONAD) ✅
 
 # Contract calls - WORKING
-cast call 0x3ceBC8049BdAC66BfbAECC94Cce756122ed25DAc "totalPatterns()"
+cast call 0x6943e7D39F3799d0b8fa9D6aD6B63861a15a8d26 "totalPatterns()"
 Result: Works fine ✅
 ```
 
@@ -221,7 +221,7 @@ npx hardhat run scripts/deploy.js --network monadTestnet
 ### **Option 4: Fix Existing Contracts**
 
 **You already have working contracts!**
-- ✅ BehavioralNFT: `0x3ceBC8049BdAC66BfbAECC94Cce756122ed25DAc`
+- ✅ BehavioralNFT: `0x6943e7D39F3799d0b8fa9D6aD6B63861a15a8d26`
 - ✅ DelegationRouter: `0xd5499e0d781b123724dF253776Aa1EB09780AfBf`
 - ✅ 4 delegations created
 
@@ -258,7 +258,7 @@ You need to run the pattern minting scripts:
 forge script script/Mint5MoreStrategies.s.sol --broadcast --legacy
 
 # Option B: Mint manually via PatternDetector
-cast send 0x8768e4E5c8c3325292A201f824FAb86ADae398d0 \
+cast send 0x28BEC7E4d25D385BBf5FD4d2CF5163c513662CaE \
   "validateAndMintPattern((address,string,bytes,uint256,uint256,uint256,int256,uint256))" \
   --private-key $PRIVATE_KEY
 ```
@@ -267,7 +267,7 @@ cast send 0x8768e4E5c8c3325292A201f824FAb86ADae398d0 \
 
 ```bash
 # Should return > 0
-cast call 0x3ceBC8049BdAC66BfbAECC94Cce756122ed25DAc \
+cast call 0x6943e7D39F3799d0b8fa9D6aD6B63861a15a8d26 \
   "totalPatterns()(uint256)"
 ```
 
@@ -308,7 +308,7 @@ Once patterns exist:
 
 ```bash
 # 1. Connect to PatternDetector
-DETECTOR="0x8768e4E5c8c3325292A201f824FAb86ADae398d0"
+DETECTOR="0x28BEC7E4d25D385BBf5FD4d2CF5163c513662CaE"
 
 # 2. Mint a pattern (adjust params as needed)
 cast send $DETECTOR "mintPatternForDemo(string,uint256,uint256)" \
@@ -373,7 +373,7 @@ cast send $DETECTOR "mintPatternForDemo(string,uint256,uint256)" \
 
 2. **Verify Patterns Exist**
    ```bash
-   cast call 0x3ceBC8049BdAC66BfbAECC94Cce756122ed25DAc "totalPatterns()"
+   cast call 0x6943e7D39F3799d0b8fa9D6aD6B63861a15a8d26 "totalPatterns()"
    ```
 
 3. **Refresh Frontend**

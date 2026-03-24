@@ -26,11 +26,11 @@ The only limitation is **actual trade execution requires real DEX integration** 
 
 | Contract | Address | Status |
 |----------|---------|--------|
-| BehavioralNFT | `0x3ceBC8049BdAC66BfbAECC94Cce756122ed25DAc` | ✅ Live |
+| BehavioralNFT | `0x6943e7D39F3799d0b8fa9D6aD6B63861a15a8d26` | ✅ Live |
 | DelegationRouter | `0xd5499e0d781b123724dF253776Aa1EB09780AfBf` | ✅ Live |
-| CircuitBreaker | `0x56C145f5567f8DB77533c825cf4205F1427c5517` | ✅ Live |
-| ExecutionEngine | `0x28BEC7E4d25D385BBf5FD4d2CF5163c513662CaE` | ✅ Live |
-| MockDEX (Test) | `0x3B083d82062ebbD1dDcdD2DB793da949329953b5` | ✅ Live |
+| PatternDetector | `0x28BEC7E4d25D385BBf5FD4d2CF5163c513662CaE` | ✅ Live |
+| ExecutionEngine | `0x4364457325CeB1Af9f0BDD72C0927eD30CB69eD8` | ✅ Live |
+| MockDEX (Test) | `0x8108e615e7858f246f820eae0844c983ea5e9a12` | ✅ Live |
 
 ### RPC Endpoints
 - Primary: `https://rpc.ankr.com/monad_testnet`
@@ -269,11 +269,11 @@ curl -X POST http://localhost:8080/v1/graphql \
 #### 2. On-Chain Verification (2 min)
 ```bash
 # Show contracts deployed
-cast code 0x3ceBC8049BdAC66BfbAECC94Cce756122ed25DAc --rpc-url $RPC
+cast code 0x6943e7D39F3799d0b8fa9D6aD6B63861a15a8d26 --rpc-url $RPC
 cast code 0xd5499e0d781b123724dF253776Aa1EB09780AfBf --rpc-url $RPC
 
 # Show 6 patterns exist
-cast call 0x3ceBC8049BdAC66BfbAECC94Cce756122ed25DAc \
+cast call 0x6943e7D39F3799d0b8fa9D6aD6B63861a15a8d26 \
   "totalPatterns()(uint256)" --rpc-url $RPC
 # Returns: 6
 

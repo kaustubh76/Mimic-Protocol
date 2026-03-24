@@ -1,7 +1,9 @@
 import { useState } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
 import { usePatterns, Pattern } from '../hooks/usePatterns';
 import { CreateDelegationModal } from './CreateDelegationModal';
 import { EnhancedPatternCard } from './EnhancedPatternCard';
+import { EmptyState } from './EmptyState';
 
 export function PatternBrowser() {
   const { patterns, isLoading, error, usingTestData, isSyncing, refetch } = usePatterns();
@@ -30,14 +32,33 @@ export function PatternBrowser() {
           <h2 className="text-3xl font-bold">Available Trading Patterns</h2>
         </div>
 
-        {/* Loading Skeletons */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {/* Loading Skeletons — match card structure */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {[1, 2, 3, 4, 5, 6].map((i) => (
-            <div key={i} className="glass-card p-6 space-y-4">
-              <div className="loading-skeleton h-6 w-3/4"></div>
-              <div className="loading-skeleton h-20 w-full"></div>
-              <div className="loading-skeleton h-10 w-full"></div>
-            </div>
+            <motion.div
+              key={i}
+              className="glass-card p-6 space-y-4"
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.1, duration: 0.3 }}
+            >
+              {/* Badge + title */}
+              <div className="flex items-center gap-2">
+                <div className="loading-skeleton h-6 w-24 rounded-full"></div>
+                <div className="loading-skeleton h-5 w-16 rounded-full"></div>
+              </div>
+              <div className="loading-skeleton h-6 w-40"></div>
+              {/* Stats grid */}
+              <div className="grid grid-cols-3 gap-3">
+                <div className="loading-skeleton h-12 w-full"></div>
+                <div className="loading-skeleton h-12 w-full"></div>
+                <div className="loading-skeleton h-12 w-full"></div>
+              </div>
+              {/* Progress bar */}
+              <div className="loading-skeleton h-2 w-full rounded-full"></div>
+              {/* Button */}
+              <div className="loading-skeleton h-10 w-full rounded-lg"></div>
+            </motion.div>
           ))}
         </div>
 
@@ -55,20 +76,12 @@ export function PatternBrowser() {
     return (
       <div className="space-y-6">
         <h2 className="text-3xl font-bold">Available Trading Patterns</h2>
-
-        <div className="glass-card p-12 text-center space-y-6">
-          <div className="text-6xl">❌</div>
-          <div className="space-y-2">
-            <h3 className="text-xl font-bold text-error">Error Loading Patterns</h3>
-            <p className="text-secondary">{error.message}</p>
-          </div>
-          <button
-            className="btn btn--primary"
-            onClick={() => refetch()}
-          >
-            <span>🔄 Retry</span>
-          </button>
-        </div>
+        <EmptyState
+          icon="❌"
+          title="Error Loading Patterns"
+          description={error.message}
+          action={{ label: '🔄 Retry', onClick: () => refetch() }}
+        />
       </div>
     );
   }
@@ -77,16 +90,11 @@ export function PatternBrowser() {
     return (
       <div className="space-y-6">
         <h2 className="text-3xl font-bold">Available Trading Patterns</h2>
-
-        <div className="glass-card p-12 text-center space-y-6">
-          <div className="text-6xl">🔍</div>
-          <div className="space-y-2">
-            <h3 className="text-xl font-bold">No Patterns Found</h3>
-            <p className="text-secondary">
-              Trading patterns will appear here once they are minted on-chain
-            </p>
-          </div>
-        </div>
+        <EmptyState
+          icon="🔍"
+          title="No Patterns Found"
+          description="Trading patterns will appear here once they are minted on-chain"
+        />
       </div>
     );
   }
@@ -127,25 +135,33 @@ export function PatternBrowser() {
       </div>
 
       {/* Pattern Grid - Now with Enhanced Cards */}
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 stagger-animation">
-        {patterns.map((pattern) => (
-          <EnhancedPatternCard
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {patterns.map((pattern, index) => (
+          <motion.div
             key={pattern.id}
-            pattern={pattern}
-            onDelegateClick={handleDelegateClick}
-          />
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: Math.min(index * 0.05, 0.3), duration: 0.3 }}
+          >
+            <EnhancedPatternCard
+              pattern={pattern}
+              onDelegateClick={handleDelegateClick}
+            />
+          </motion.div>
         ))}
       </div>
 
       {/* Delegation Modal */}
-      {selectedPattern && (
-        <CreateDelegationModal
-          pattern={selectedPattern}
-          isOpen={isModalOpen}
-          onClose={handleModalClose}
-          onSuccess={handleDelegationSuccess}
-        />
-      )}
+      <AnimatePresence>
+        {selectedPattern && isModalOpen && (
+          <CreateDelegationModal
+            pattern={selectedPattern}
+            isOpen={isModalOpen}
+            onClose={handleModalClose}
+            onSuccess={handleDelegationSuccess}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 }

@@ -22,7 +22,7 @@ All contract addresses are **consistent across all files**:
 
 #### **BehavioralNFT Contract**
 ```
-Address: 0x3ceBC8049BdAC66BfbAECC94Cce756122ed25DAc
+Address: 0x6943e7D39F3799d0b8fa9D6aD6B63861a15a8d26
 ```
 
 **Found in:**
@@ -51,7 +51,7 @@ Address: 0xd5499e0d781b123724dF253776Aa1EB09780AfBf
 
 #### **Other Contracts**
 ```
-PatternDetector:   0x8768e4E5c8c3325292A201f824FAb86ADae398d0
+PatternDetector:   0x28BEC7E4d25D385BBf5FD4d2CF5163c513662CaE
 ExecutionEngine:   0x28BEC7E4d25D385BBf5FD4d2CF5163c513662CaE
 ```
 

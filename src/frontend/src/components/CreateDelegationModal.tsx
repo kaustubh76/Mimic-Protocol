@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAccount } from 'wagmi';
+import { motion } from 'framer-motion';
 import { useCreateDelegation } from '../hooks/useCreateDelegation';
 import { Pattern } from '../hooks/usePatterns';
 import { formatEther } from 'viem';
@@ -22,13 +23,14 @@ export function CreateDelegationModal({
 
   const [allocationPercent, setAllocationPercent] = useState<string>('50');
   const [showSuccess, setShowSuccess] = useState(false);
-  const [countdown, setCountdown] = useState(3);
+  const [countdown, setCountdown] = useState(5);
+  const [validationError, setValidationError] = useState<string | null>(null);
 
   // Handle successful delegation
   useEffect(() => {
     if (isConfirmed && !showSuccess) {
       setShowSuccess(true);
-      setCountdown(3);
+      setCountdown(5);
     }
   }, [isConfirmed, showSuccess]);
 
@@ -47,7 +49,7 @@ export function CreateDelegationModal({
     if (isPending) return; // Don't close during transaction
     setAllocationPercent('50');
     setShowSuccess(false);
-    setCountdown(3);
+    setCountdown(5);
     onClose();
   };
 
@@ -55,15 +57,16 @@ export function CreateDelegationModal({
     e.preventDefault();
 
     if (!address) {
-      alert('Please connect your wallet');
+      setValidationError('Please connect your wallet');
       return;
     }
 
     const percent = parseFloat(allocationPercent);
     if (isNaN(percent) || percent <= 0 || percent > 100) {
-      alert('Please enter a valid allocation between 0.01% and 100%');
+      setValidationError('Please enter a valid allocation between 0.01% and 100%');
       return;
     }
+    setValidationError(null);
 
     // Convert percentage to basis points (1% = 100 basis points)
     const basisPoints = BigInt(Math.floor(percent * 100));
@@ -75,15 +78,29 @@ export function CreateDelegationModal({
     });
   };
 
-  if (!isOpen) return null;
-
   const winRate = Number(pattern.winRate) / 100;
   const volume = formatEther(pattern.totalVolume);
   const roi = Number(pattern.roi) / 100;
 
+  if (!isOpen) return null;
+
   return (
-    <div className="modal-overlay" onClick={handleClose}>
-      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+    <motion.div
+      className="modal-overlay"
+      onClick={handleClose}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.2 }}
+    >
+      <motion.div
+        className="modal-content"
+        onClick={(e) => e.stopPropagation()}
+        initial={{ opacity: 0, y: 40, scale: 0.95 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        exit={{ opacity: 0, y: 20, scale: 0.98 }}
+        transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+      >
         {showSuccess ? (
           /* Success State */
           <div className="success-state">
@@ -190,10 +207,10 @@ export function CreateDelegationModal({
                       max="100"
                       step="0.01"
                       value={allocationPercent}
-                      onChange={(e) => setAllocationPercent(e.target.value)}
+                      onChange={(e) => { setAllocationPercent(e.target.value); setValidationError(null); }}
                       disabled={isPending}
                       required
-                      className="w-full"
+                      className={`w-full ${validationError ? 'border-red-500/50 focus:border-red-500' : ''}`}
                     />
                     <span className="input-suffix">%</span>
                   </div>
@@ -202,7 +219,7 @@ export function CreateDelegationModal({
                   <div className="preset-buttons">
                     <button
                       type="button"
-                      className={`btn-preset ${allocationPercent === '25' ? 'border-primary text-primary' : ''}`}
+                      className={`btn-preset ${allocationPercent === '25' ? 'bg-purple-500/20 border-purple-500/50 text-white' : ''}`}
                       onClick={() => setAllocationPercent('25')}
                       disabled={isPending}
                     >
@@ -210,7 +227,7 @@ export function CreateDelegationModal({
                     </button>
                     <button
                       type="button"
-                      className={`btn-preset ${allocationPercent === '50' ? 'border-primary text-primary' : ''}`}
+                      className={`btn-preset ${allocationPercent === '50' ? 'bg-purple-500/20 border-purple-500/50 text-white' : ''}`}
                       onClick={() => setAllocationPercent('50')}
                       disabled={isPending}
                     >
@@ -218,7 +235,7 @@ export function CreateDelegationModal({
                     </button>
                     <button
                       type="button"
-                      className={`btn-preset ${allocationPercent === '75' ? 'border-primary text-primary' : ''}`}
+                      className={`btn-preset ${allocationPercent === '75' ? 'bg-purple-500/20 border-purple-500/50 text-white' : ''}`}
                       onClick={() => setAllocationPercent('75')}
                       disabled={isPending}
                     >
@@ -226,13 +243,16 @@ export function CreateDelegationModal({
                     </button>
                     <button
                       type="button"
-                      className={`btn-preset ${allocationPercent === '100' ? 'border-primary text-primary' : ''}`}
+                      className={`btn-preset ${allocationPercent === '100' ? 'bg-purple-500/20 border-purple-500/50 text-white' : ''}`}
                       onClick={() => setAllocationPercent('100')}
                       disabled={isPending}
                     >
                       100%
                     </button>
                   </div>
+                  {validationError && (
+                    <p className="text-xs text-red-400 mt-1">{validationError}</p>
+                  )}
                 </div>
 
                 {/* Account Info */}
@@ -315,7 +335,7 @@ export function CreateDelegationModal({
             </div>
           </>
         )}
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }

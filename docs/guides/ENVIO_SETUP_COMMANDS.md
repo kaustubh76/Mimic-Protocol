@@ -274,7 +274,7 @@ Hasura console: http://localhost:8080
 **Then in another terminal, verify contracts are deployed:**
 ```bash
 # Check BehavioralNFT
-cast call 0x3ceBC8049BdAC66BfbAECC94Cce756122ed25DAc \
+cast call 0x6943e7D39F3799d0b8fa9D6aD6B63861a15a8d26 \
   "name()(string)" \
   --rpc-url https://testnet.monad.xyz/rpc
 

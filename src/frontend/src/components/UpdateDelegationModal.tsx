@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import { useUpdateDelegation } from '../hooks/useUpdateDelegation';
 import type { Delegation } from '../hooks/useDelegations';
 
@@ -17,7 +18,8 @@ export function UpdateDelegationModal({
 }: UpdateDelegationModalProps) {
   const [percentage, setPercentage] = useState<string>('');
   const [showSuccess, setShowSuccess] = useState(false);
-  const [countdown, setCountdown] = useState(3);
+  const [countdown, setCountdown] = useState(5);
+  const [validationError, setValidationError] = useState<string | null>(null);
 
   const {
     updateDelegation,
@@ -34,7 +36,7 @@ export function UpdateDelegationModal({
     if (delegation && isOpen) {
       setPercentage((Number(delegation.percentageAllocation) / 100).toString());
       setShowSuccess(false);
-      setCountdown(3);
+      setCountdown(5);
       reset();
     }
   }, [delegation, isOpen]);
@@ -43,7 +45,7 @@ export function UpdateDelegationModal({
   useEffect(() => {
     if (isConfirmed) {
       setShowSuccess(true);
-      setCountdown(3);
+      setCountdown(5);
     }
   }, [isConfirmed]);
 
@@ -61,7 +63,7 @@ export function UpdateDelegationModal({
   const handleClose = () => {
     setPercentage('');
     setShowSuccess(false);
-    setCountdown(3);
+    setCountdown(5);
     reset();
     onClose();
   };
@@ -73,9 +75,10 @@ export function UpdateDelegationModal({
 
     const percentageNum = parseFloat(percentage);
     if (isNaN(percentageNum) || percentageNum <= 0 || percentageNum > 100) {
-      alert('Please enter a valid percentage between 0.01 and 100');
+      setValidationError('Please enter a valid percentage between 0.01 and 100');
       return;
     }
+    setValidationError(null);
 
     try {
       await updateDelegation({
@@ -94,8 +97,22 @@ export function UpdateDelegationModal({
   if (!isOpen || !delegation) return null;
 
   return (
-    <div className="modal-overlay" onClick={handleClose}>
-      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+    <motion.div
+      className="modal-overlay"
+      onClick={handleClose}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.2 }}
+    >
+      <motion.div
+        className="modal-content"
+        onClick={(e) => e.stopPropagation()}
+        initial={{ opacity: 0, y: 40, scale: 0.95 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        exit={{ opacity: 0, y: 20, scale: 0.98 }}
+        transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+      >
         {showSuccess ? (
           /* Success State */
           <div className="success-state">
@@ -159,47 +176,30 @@ export function UpdateDelegationModal({
                       min="0.01"
                       max="100"
                       value={percentage}
-                      onChange={(e) => setPercentage(e.target.value)}
+                      onChange={(e) => { setPercentage(e.target.value); setValidationError(null); }}
                       placeholder="Enter percentage (0.01 - 100)"
                       required
                       disabled={isWriting || isConfirming}
+                      className={validationError ? 'border-red-500/50 focus:border-red-500' : ''}
                     />
                     <span className="input-suffix">%</span>
                   </div>
                   <div className="preset-buttons">
-                    <button
-                      type="button"
-                      className="btn-preset"
-                      onClick={() => setPresetPercentage(10)}
-                      disabled={isWriting || isConfirming}
-                    >
-                      10%
-                    </button>
-                    <button
-                      type="button"
-                      className="btn-preset"
-                      onClick={() => setPresetPercentage(25)}
-                      disabled={isWriting || isConfirming}
-                    >
-                      25%
-                    </button>
-                    <button
-                      type="button"
-                      className="btn-preset"
-                      onClick={() => setPresetPercentage(50)}
-                      disabled={isWriting || isConfirming}
-                    >
-                      50%
-                    </button>
-                    <button
-                      type="button"
-                      className="btn-preset"
-                      onClick={() => setPresetPercentage(100)}
-                      disabled={isWriting || isConfirming}
-                    >
-                      100%
-                    </button>
+                    {[10, 25, 50, 100].map((val) => (
+                      <button
+                        key={val}
+                        type="button"
+                        className={`btn-preset ${percentage === val.toString() ? 'bg-purple-500/20 border-purple-500/50 text-white' : ''}`}
+                        onClick={() => setPresetPercentage(val)}
+                        disabled={isWriting || isConfirming}
+                      >
+                        {val}%
+                      </button>
+                    ))}
                   </div>
+                  {validationError && (
+                    <p className="text-xs text-red-400 mt-1">{validationError}</p>
+                  )}
                 </div>
 
                 {/* Transaction Status */}
@@ -262,7 +262,7 @@ export function UpdateDelegationModal({
             </form>
           </>
         )}
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }

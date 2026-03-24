@@ -332,9 +332,9 @@ That's why Envio is essential to Mirror Protocol."
 | **Dev Server** | http://localhost:3002/ |
 | **Chain ID** | 10143 |
 | **RPC** | https://testnet.monad.xyz/rpc |
-| **BehavioralNFT** | 0x3ceBC8049BdAC66BfbAECC94Cce756122ed25DAc |
+| **BehavioralNFT** | 0x6943e7D39F3799d0b8fa9D6aD6B63861a15a8d26 |
 | **DelegationRouter** | 0x56C145f5567f8DB77533c825cf4205F1427c5517 |
-| **PatternDetector** | 0x8768e4E5c8c3325292A201f824FAb86ADae398d0 |
+| **PatternDetector** | 0x28BEC7E4d25D385BBf5FD4d2CF5163c513662CaE |
 
 ---
 
