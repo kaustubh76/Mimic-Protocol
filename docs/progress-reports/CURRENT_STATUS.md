@@ -23,7 +23,7 @@ Mirror Protocol is a behavioral liquidity infrastructure built for Monad testnet
 - **Frontend:** 12 components, 12 hooks, deployed on Vercel
 - **Write Operations:** useCreateDelegation, useRevokeDelegation, useUpdateDelegation
 - **Smart Accounts:** MetaMask Delegation Toolkit via useSmartAccount
-- **Envio HyperSync:** LIVE at `https://indexer.dev.hyperindex.xyz/b1106ec/v1/graphql`
+- **Envio HyperSync:** LIVE at `https://indexer.dev.hyperindex.xyz/b383f5b/v1/graphql`
 - **Real Data:** testData.ts removed — all data from on-chain + Envio sources
 
 ---
@@ -136,7 +136,7 @@ Mimic Protocol/
 | Config | Complete | config.yaml with 8 event types |
 | GraphQL Schema | Complete | Pattern, Delegation, Execution entities |
 | Event Handlers | Complete | All handlers implemented |
-| Cloud Deployment | LIVE | `https://indexer.dev.hyperindex.xyz/b1106ec/v1/graphql` |
+| Cloud Deployment | LIVE | `https://indexer.dev.hyperindex.xyz/b383f5b/v1/graphql` |
 | Vercel Proxy | Active | `/api/envio/` avoids CORS |
 | Frontend Integration | Active | 6 hooks consuming Envio data |
 
@@ -194,7 +194,7 @@ All previously identified issues have been resolved:
 ## Useful Links
 
 - **Monad Testnet Explorer:** https://explorer.testnet.monad.xyz
-- **Envio GraphQL:** https://indexer.dev.hyperindex.xyz/b1106ec/v1/graphql
+- **Envio GraphQL:** https://indexer.dev.hyperindex.xyz/b383f5b/v1/graphql
 - **Envio Docs:** https://docs.envio.dev
 - **MetaMask Delegation Toolkit:** https://docs.metamask.io/delegation-toolkit/
 

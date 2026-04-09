@@ -2,7 +2,7 @@
 
 **Last Updated:** 2026-03-24
 **Status:** PRODUCTION READY — LIVE ON MONAD TESTNET
-**Frontend:** https://frontend-three-tau-54.vercel.app
+**Frontend:** https://mirror-protocol-nine.vercel.app
 
 ---
 
@@ -26,7 +26,7 @@
 
 | Property | Value |
 |----------|-------|
-| **GraphQL Endpoint** | `https://indexer.dev.hyperindex.xyz/b1106ec/v1/graphql` |
+| **GraphQL Endpoint** | `https://indexer.dev.hyperindex.xyz/b383f5b/v1/graphql` |
 | **HyperSync** | ENABLED (monad-testnet.hypersync.xyz) |
 | **Deploy Branch** | `envio-deploy` (indexer root: `src/envio`) |
 | **Events Indexed** | 8 event types across 2 contracts |
@@ -75,7 +75,7 @@
 
 ## Frontend: FULLY FUNCTIONAL
 
-**Deployment:** Vercel — https://frontend-three-tau-54.vercel.app
+**Deployment:** Vercel — https://mirror-protocol-nine.vercel.app
 **Stack:** React 18 + Vite + TypeScript + Tailwind CSS 4 + Wagmi 2 + Viem 2
 
 ### Key UI Features

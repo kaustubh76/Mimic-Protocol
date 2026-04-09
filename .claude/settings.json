@@ -1,0 +1,27 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pip3 list:*)",
+      "Bash(npx @envio-dev/hosted --help)",
+      "Bash(rm -rf node_modules)",
+      "Bash(rm -f package-lock.json)",
+      "Bash(PRIVATE_KEY=\"0xd15ba7076d9bc4d05135c6d9c22e20af053ba2b0d66f0b944ce5d66a8b3c8141\" forge script script/SeedEnvioData.s.sol --rpc-url https://testnet-rpc.monad.xyz --broadcast -vvv)",
+      "Bash(PRIVATE_KEY=\"0xd15ba7076d9bc4d05135c6d9c22e20af053ba2b0d66f0b944ce5d66a8b3c8141\" forge script script/SeedEnvioData.s.sol --rpc-url https://testnet-rpc.monad.xyz --broadcast)",
+      "Bash(PRIVATE_KEY=\"0xd15ba7076d9bc4d05135c6d9c22e20af053ba2b0d66f0b944ce5d66a8b3c8141\" forge script script/SeedStep1_DisableCooldown.s.sol --rpc-url https://testnet-rpc.monad.xyz --broadcast)",
+      "Bash(PRIVATE_KEY=\"0xd15ba7076d9bc4d05135c6d9c22e20af053ba2b0d66f0b944ce5d66a8b3c8141\" forge script script/SeedStep1_DisableCooldown.s.sol --rpc-url https://testnet-rpc.monad.xyz --broadcast --slow)",
+      "Bash(PRIVATE_KEY=\"0xd15ba7076d9bc4d05135c6d9c22e20af053ba2b0d66f0b944ce5d66a8b3c8141\" forge script script/SeedStep1_DisableCooldown.s.sol --rpc-url https://monad-testnet.g.alchemy.com/v2/pFkOAygOyJ72KbT_I-LM0 --broadcast --slow --gas-estimate-multiplier 200)",
+      "Bash(PRIVATE_KEY=\"0xd15ba7076d9bc4d05135c6d9c22e20af053ba2b0d66f0b944ce5d66a8b3c8141\" forge script script/SeedStep2_MintAndDelegate.s.sol --rpc-url https://monad-testnet.g.alchemy.com/v2/pFkOAygOyJ72KbT_I-LM0 --broadcast --slow --gas-estimate-multiplier 200)",
+      "Bash(PRIVATE_KEY=\"0xd15ba7076d9bc4d05135c6d9c22e20af053ba2b0d66f0b944ce5d66a8b3c8141\" forge script script/SeedStep2_MintAndDelegate.s.sol --rpc-url https://testnet-rpc.monad.xyz --broadcast --slow --gas-estimate-multiplier 200)",
+      "Bash(PRIVATE_KEY=\"0xd15ba7076d9bc4d05135c6d9c22e20af053ba2b0d66f0b944ce5d66a8b3c8141\" forge script script/SeedStep3_Delegations.s.sol --rpc-url https://monad-testnet.g.alchemy.com/v2/pFkOAygOyJ72KbT_I-LM0 --broadcast --slow --gas-estimate-multiplier 200)",
+      "Bash(grep -E \"\\\\.ts$|^d\")",
+      "Bash(wc -l \"/Users/apple/Desktop/Mimic Protocol/src/frontend/src/components/\"*.tsx)",
+      "Bash(grep -v \"^$\")",
+      "Bash(xargs basename:*)",
+      "Bash(grep -E \"\\\\.\\(tsx|ts\\)$\")",
+      "Bash(grep -E \"\\\\.\\(ts\\)$\")"
+    ],
+    "additionalDirectories": [
+      "/tmp"
+    ]
+  }
+}

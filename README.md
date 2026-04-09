@@ -17,8 +17,8 @@ Mirror Protocol turns successful trading patterns into ownable ERC-721 NFTs. Oth
 
 | Resource | URL |
 |----------|-----|
-| **Frontend** | https://frontend-three-tau-54.vercel.app |
-| **Envio GraphQL** | https://indexer.dev.hyperindex.xyz/b1106ec/v1/graphql |
+| **Frontend** | https://mirror-protocol-nine.vercel.app |
+| **Envio GraphQL** | https://indexer.dev.hyperindex.xyz/b383f5b/v1/graphql |
 | **Chain** | Monad Testnet (Chain ID 10143) |
 
 ```bash
@@ -89,7 +89,7 @@ Five contracts form the on-chain protocol, connected through interfaces:
 │  PatternDetector                                                         │
 │  ├── Validates trading patterns against thresholds:                      │
 │  │   minTrades=10, minWinRate=60%, minVolume=1 ETH, minConfidence=70%   │
-│  ├── Rate limits: 1hr cooldown, max 5 active patterns per user          │
+│  ├── Rate limits: 1hr cooldown, max 5 activn e patterns per user          │
 │  └── Calls ──▶ BehavioralNFT.mintPattern()                              │
 │                     │                                                    │
 │                     ▼                                                    │
@@ -319,7 +319,7 @@ Shows how the frontend queries Envio with fallback strategies.
 │                                                                       │
 │  ┌──────────────────────────────────────────────────────────────┐     │
 │  │  Envio GraphQL Endpoint                                      │     │
-│  │  https://indexer.dev.hyperindex.xyz/b1106ec/v1/graphql      │     │
+│  │  https://indexer.dev.hyperindex.xyz/b383f5b/v1/graphql      │     │
 │  │                                                              │     │
 │  │  Query latency: <50ms (avg 1ms processing)                  │     │
 │  │  Entities: Pattern, Creator, Delegation, Delegator,         │     │
