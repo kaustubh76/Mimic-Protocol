@@ -33,8 +33,7 @@
   "dependencies": {
     "envio": "2.32.6",
     "@envio-dev/hypersync-client": "^0.5.0",
-    "@metamask/delegation-framework": "^1.0.0",
-    "@metamask/sdk": "^0.26.0",
+"@metamask/sdk": "^0.26.0",
     "@openzeppelin/contracts": "^5.0.0",
     "axios": "^1.6.0",
     "dotenv": "^16.3.1",
