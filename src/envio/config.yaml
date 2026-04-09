@@ -4,7 +4,7 @@ description: Real-time behavioral pattern indexing for Mirror Protocol
 
 networks:
   - id: 10143
-    start_block: 19213700
+    start_block: 19216400
     hypersync_config:
       url: https://monad-testnet.hypersync.xyz
     contracts:
