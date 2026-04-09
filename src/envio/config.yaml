@@ -1,5 +1,6 @@
 name: mirror-protocol-indexer
 description: Real-time behavioral pattern indexing for Mirror Protocol
+# Redeploy: 2026-04-09T03:35 - HyperSync reconnect
 
 networks:
   - id: 10143
