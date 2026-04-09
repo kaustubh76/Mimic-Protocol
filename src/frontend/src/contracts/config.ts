@@ -31,4 +31,4 @@ export const ABIS = {
 export const MONAD_RPC_URL = 'https://monad-testnet.g.alchemy.com/v2/pFkOAygOyJ72KbT_I-LM0';
 
 // Envio GraphQL endpoint
-export const ENVIO_GRAPHQL_URL = 'https://indexer.dev.hyperindex.xyz/b1106ec/v1/graphql';
+export const ENVIO_GRAPHQL_URL = 'https://indexer.dev.hyperindex.xyz/b383f5b/v1/graphql';
