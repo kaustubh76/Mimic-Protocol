@@ -1,10 +1,10 @@
 name: mirror-protocol-indexer
 description: Real-time behavioral pattern indexing for Mirror Protocol
-# Redeploy: 2026-04-09T14:00 - Fix EventSource error, retrigger fresh sync
+# Redeploy: 2026-04-09T12:00 - Fix start_block to catch deployment events
 
 networks:
   - id: 10143
-    start_block: 19216400
+    start_block: 19213700
     hypersync_config:
       url: https://monad-testnet.hypersync.xyz
     contracts:
