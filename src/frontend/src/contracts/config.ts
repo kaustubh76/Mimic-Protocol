@@ -28,7 +28,9 @@ export const ABIS = {
   EXECUTION_ENGINE: extractAbi(ExecutionEngineABI),
 };
 
-export const MONAD_RPC_URL = 'https://monad-testnet.g.alchemy.com/v2/pFkOAygOyJ72KbT_I-LM0';
+export const MONAD_RPC_URL = import.meta.env.VITE_MONAD_RPC_URL || 'https://monad-testnet.g.alchemy.com/v2/pFkOAygOyJ72KbT_I-LM0';
 
 // Envio GraphQL endpoint
-export const ENVIO_GRAPHQL_URL = 'https://indexer.dev.hyperindex.xyz/b383f5b/v1/graphql';
+export const ENVIO_GRAPHQL_URL = import.meta.env.VITE_ENVIO_GRAPHQL_URL || 'https://indexer.dev.hyperindex.xyz/b383f5b/v1/graphql';
+
+console.log('[Mirror] Envio:', ENVIO_GRAPHQL_URL, '| RPC:', MONAD_RPC_URL.substring(0, 50) + '...');

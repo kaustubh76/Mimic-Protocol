@@ -13,6 +13,7 @@ import { PatternLeaderboard } from './components/PatternLeaderboard'
 import { MyDelegations } from './components/MyDelegations'
 import { EnvioMetricsDashboard } from './components/EnvioMetricsDashboard'
 import { useUserStats } from './hooks/useUserStats'
+import { ENVIO_GRAPHQL_URL } from './contracts/config'
 import { useEnvioMetrics } from './hooks/useEnvioMetrics'
 import { MONAD_CHAIN_ID } from './contracts/config'
 import './globals.css'
@@ -404,7 +405,7 @@ export function App() {
                   GitHub
                 </a>
                 <span>·</span>
-                <a href="https://indexer.dev.hyperindex.xyz/b1106ec/v1/graphql" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">
+                <a href={ENVIO_GRAPHQL_URL} target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">
                   GraphQL API
                 </a>
                 <span>·</span>
