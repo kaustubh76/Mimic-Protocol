@@ -593,6 +593,15 @@ DelegationRouter.TradeExecuted.handler(async ({ event, context }) => {
     txHash,
   });
 
+  // Get pattern first to calculate earnings from ROI
+  const pattern = await context.Pattern.get(patternTokenId.toString());
+  const patternRoi = pattern ? pattern.roi : 0n;
+
+  // Calculate earnings for successful trades: amount * roi / 10000
+  const tradeEarnings = success && patternRoi > 0n
+    ? (amount * patternRoi) / 10000n
+    : 0n;
+
   // Update Delegation entity
   const delegation = await context.Delegation.get(delegationId.toString());
   if (delegation) {
@@ -606,6 +615,7 @@ DelegationRouter.TradeExecuted.handler(async ({ event, context }) => {
       successfulExecutions: newSuccessful,
       failedExecutions: newFailed,
       totalAmountTraded: success ? delegation.totalAmountTraded + amount : delegation.totalAmountTraded,
+      totalEarnings: delegation.totalEarnings + tradeEarnings,
       lastExecutionAt: ts,
       lastUpdatedAt: ts,
       successRate: Math.floor((newSuccessful / newTotalExecutions) * 10000),
@@ -613,12 +623,12 @@ DelegationRouter.TradeExecuted.handler(async ({ event, context }) => {
   }
 
   // Update Pattern entity
-  const pattern = await context.Pattern.get(patternTokenId.toString());
   if (pattern) {
     context.Pattern.set({
       ...pattern,
       successfulExecutions: pattern.successfulExecutions + (success ? 1 : 0),
       failedExecutions: pattern.failedExecutions + (success ? 0 : 1),
+      totalEarnings: pattern.totalEarnings + tradeEarnings,
       lastUpdatedAt: ts,
     });
   }
@@ -632,6 +642,7 @@ DelegationRouter.TradeExecuted.handler(async ({ event, context }) => {
         totalExecutions: delegatorEntity.totalExecutions + 1,
         successfulExecutions: delegatorEntity.successfulExecutions + (success ? 1 : 0),
         failedExecutions: delegatorEntity.failedExecutions + (success ? 0 : 1),
+        totalEarnings: delegatorEntity.totalEarnings + tradeEarnings,
       });
     }
   }
@@ -648,10 +659,11 @@ DelegationRouter.TradeExecuted.handler(async ({ event, context }) => {
       successfulExecutions: systemMetrics.successfulExecutions + (success ? 1 : 0),
       failedExecutions: systemMetrics.failedExecutions + (success ? 0 : 1),
       totalVolume: success ? systemMetrics.totalVolume + amount : systemMetrics.totalVolume,
+      totalEarnings: systemMetrics.totalEarnings + tradeEarnings,
       eventsProcessed: systemMetrics.eventsProcessed + 1n,
       lastUpdatedAt: ts,
     });
   }
 
-  context.log.info(`Trade executed on Delegation #${delegationId}: success=${success}, amount=${amount}`);
+  context.log.info(`Trade executed on Delegation #${delegationId}: success=${success}, amount=${amount}, earnings=${tradeEarnings}`);
 });
