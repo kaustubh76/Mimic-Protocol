@@ -1,0 +1,11 @@
+{
+  "buildCommand": "cd src/frontend && npm install && npx vite build",
+  "outputDirectory": "src/frontend/dist",
+  "installCommand": "npm install --prefix src/frontend",
+  "rewrites": [
+    {
+      "source": "/api/envio/:path*",
+      "destination": "https://indexer.dev.hyperindex.xyz/b383f5b/v1/:path*"
+    }
+  ]
+}
