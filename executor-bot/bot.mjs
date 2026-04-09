@@ -50,7 +50,7 @@ const MONAD_CHAIN = {
 };
 
 const GRAPHQL_ENDPOINT =
-  ENV.ENVIO_GRAPHQL_URL || 'https://indexer.dev.hyperindex.xyz/b1106ec/v1/graphql';
+  ENV.ENVIO_GRAPHQL_URL || 'https://indexer.dev.hyperindex.xyz/b383f5b/v1/graphql';
 
 const CONTRACTS = {
   EXECUTION_ENGINE: (ENV.EXECUTION_ENGINE_ADDRESS || '0x4364457325CeB1Af9f0BDD72C0927eD30CB69eD8'),
@@ -59,6 +59,44 @@ const CONTRACTS = {
   MOCK_DEX: (ENV.MOCK_DEX_ADDRESS || '0x8108e615e7858f246f820eae0844c983ea5e9a12'),
   TEST_TOKEN: (ENV.TEST_TOKEN_ADDRESS || '0x21C06C325F7b308cF1B52568B462747944B3Fde6'),
 };
+
+// ─── Delegation Conditions Cache ────────────────────────────────────────────
+const conditionsCache = new Map();
+
+const DELEGATION_ROUTER_CONDITIONS_ABI = [{
+  name: 'getDelegationConditions',
+  type: 'function',
+  inputs: [{ name: 'delegationId', type: 'uint256' }],
+  outputs: [
+    { name: 'minWinRate', type: 'uint256' },
+    { name: 'minROI', type: 'int256' },
+    { name: 'minVolume', type: 'uint256' },
+    { name: 'isActive', type: 'bool' },
+  ],
+  stateMutability: 'view',
+}];
+
+async function getDelegationConditions(delegationId, publicClient) {
+  const key = delegationId.toString();
+  if (conditionsCache.has(key)) return conditionsCache.get(key);
+
+  try {
+    const [minWinRate, minROI, minVolume, isActive] = await publicClient.readContract({
+      address: CONTRACTS.DELEGATION_ROUTER,
+      abi: DELEGATION_ROUTER_CONDITIONS_ABI,
+      functionName: 'getDelegationConditions',
+      args: [delegationId],
+    });
+    const conditions = { minWinRate, minROI, minVolume, isActive };
+    conditionsCache.set(key, conditions);
+    return conditions;
+  } catch {
+    // Default: no conditions (simple delegation)
+    const defaults = { minWinRate: 0n, minROI: 0n, minVolume: 0n, isActive: true };
+    conditionsCache.set(key, defaults);
+    return defaults;
+  }
+}
 
 const EXECUTION_ENGINE_ABI = [
   {
@@ -113,25 +151,6 @@ const EXECUTION_ENGINE_ABI = [
   },
 ];
 
-const BEHAVIORAL_NFT_ABI = [
-  {
-    name: 'patterns',
-    type: 'function',
-    inputs: [{ name: 'tokenId', type: 'uint256' }],
-    outputs: [
-      { name: 'creator', type: 'address' },
-      { name: 'patternType', type: 'string' },
-      { name: 'patternData', type: 'bytes' },
-      { name: 'createdAt', type: 'uint256' },
-      { name: 'winRate', type: 'uint256' },
-      { name: 'totalVolume', type: 'uint256' },
-      { name: 'roi', type: 'uint256' },
-      { name: 'isActive', type: 'bool' },
-    ],
-    stateMutability: 'view',
-  },
-];
-
 // ─── Envio Queries ───────────────────────────────────────────────────────────
 
 async function fetchActiveDelegations() {
@@ -147,11 +166,16 @@ async function fetchActiveDelegations() {
         successRate
         totalExecutions
         totalAmountTraded
+        pattern {
+          tokenId winRate roi totalVolume isActive patternType
+          delegationCount successfulExecutions failedExecutions
+        }
       }
     }
   `;
 
   try {
+    const startMs = Date.now();
     const res = await fetch(GRAPHQL_ENDPOINT, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -159,9 +183,12 @@ async function fetchActiveDelegations() {
     });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
-    return data.data?.Delegation || [];
+    const latency = Date.now() - startMs;
+    const delegations = data.data?.Delegation || [];
+    console.log(`  [ENVIO→QUERY] Fetched ${delegations.length} delegations with pattern data (${latency}ms)`);
+    return delegations;
   } catch (err) {
-    console.warn('⏳ Envio GraphQL unavailable, falling back to chain...');
+    console.warn('  [ENVIO→OFFLINE] GraphQL unavailable — skipping cycle');
     return null; // signal fallback
   }
 }
@@ -200,36 +227,44 @@ async function processExecution(delegation, walletClient, publicClient, executor
   // Skip if already executed this run
   if (executedThisRun.has(delegation.id)) return;
 
-  // Get pattern metrics from chain
-  let patternMetrics;
-  try {
-    const raw = await publicClient.readContract({
-      address: CONTRACTS.BEHAVIORAL_NFT,
-      abi: BEHAVIORAL_NFT_ABI,
-      functionName: 'patterns',
-      args: [patternId],
-    });
-    patternMetrics = {
-      winRate: raw[4],
-      roi: raw[6],
-      totalVolume: raw[5],
-      isActive: raw[7],
-    };
-  } catch {
-    // Pattern not on-chain yet; use defaults
-    patternMetrics = { winRate: 7500n, roi: 1000n, totalVolume: 0n, isActive: true };
+  // Get pattern metrics from Envio (joined in GraphQL query — zero chain reads)
+  const envioPattern = delegation.pattern;
+  if (!envioPattern) {
+    console.log(`  [ENVIO→SKIP] Delegation #${delegationId}: pattern not yet indexed`);
+    return;
   }
+
+  const patternMetrics = {
+    winRate: BigInt(envioPattern.winRate || '0'),
+    roi: BigInt(envioPattern.roi || '0'),
+    totalVolume: BigInt(envioPattern.totalVolume || '0'),
+    isActive: envioPattern.isActive,
+  };
 
   if (!patternMetrics.isActive) {
-    console.log(`  ⚠️  Pattern #${patternId} inactive — skipping delegation ${delegationId}`);
+    console.log(`  [ENVIO→SKIP] Delegation #${delegationId}: pattern #${patternId} inactive`);
     return;
   }
 
-  // Only execute if win rate ≥ 70% (7000 bps)
-  if (patternMetrics.winRate < 7000n) {
-    console.log(`  ⏭️  Pattern #${patternId} winRate ${patternMetrics.winRate} < 7000 bps — skipping`);
+  // Validate against per-delegation conditions (from chain, cached after first call)
+  const conditions = await getDelegationConditions(delegationId, publicClient);
+
+  if (conditions.minWinRate > 0n && patternMetrics.winRate < conditions.minWinRate) {
+    console.log(`  [ENVIO→SKIP] Delegation #${delegationId}: winRate ${patternMetrics.winRate} < min ${conditions.minWinRate}`);
     return;
   }
+  if (conditions.minROI !== 0n && patternMetrics.roi < conditions.minROI) {
+    console.log(`  [ENVIO→SKIP] Delegation #${delegationId}: ROI ${patternMetrics.roi} < min ${conditions.minROI}`);
+    return;
+  }
+  if (conditions.minVolume > 0n && patternMetrics.totalVolume < conditions.minVolume) {
+    console.log(`  [ENVIO→SKIP] Delegation #${delegationId}: volume ${patternMetrics.totalVolume} < min ${conditions.minVolume}`);
+    return;
+  }
+
+  console.log(`  [ENVIO→DECIDE] Delegation #${delegationId}: pattern #${patternId} (${envioPattern.patternType})`);
+  console.log(`    Envio metrics: winRate=${patternMetrics.winRate} roi=${patternMetrics.roi} volume=${patternMetrics.totalVolume}`);
+  console.log(`    Conditions: minWR=${conditions.minWinRate} minROI=${conditions.minROI} → EXECUTING`);
 
   const tradeAmount = parseEther('0.001'); // Small test amount
 
@@ -253,8 +288,8 @@ async function processExecution(delegation, walletClient, publicClient, executor
     lastUpdated: BigInt(Math.floor(Date.now() / 1000)),
   };
 
-  console.log(`  🚀 Executing trade: Delegation #${delegationId} (Pattern #${patternId})`);
-  console.log(`     Win Rate: ${Number(patternMetrics.winRate) / 100}%  ROI: ${Number(patternMetrics.roi) / 100}%`);
+  console.log(`  [EXECUTE→CHAIN] Delegation #${delegationId} | Pattern #${patternId}`);
+  console.log(`    WinRate: ${Number(patternMetrics.winRate) / 100}% | ROI: ${Number(patternMetrics.roi) / 100}%`);
 
   const startMs = Date.now();
   try {
@@ -267,18 +302,19 @@ async function processExecution(delegation, walletClient, publicClient, executor
     });
 
     const latency = Date.now() - startMs;
-    console.log(`  ✅ Trade submitted: ${hash} (${latency}ms)`);
+    console.log(`  [EXECUTE→CHAIN] Trade tx: ${hash} (${latency}ms)`);
     executedThisRun.add(delegation.id);
 
     // Wait for receipt
     const receipt = await publicClient.waitForTransactionReceipt({ hash, timeout: 30000 });
-    console.log(`  📝 Confirmed in block ${receipt.blockNumber} (status: ${receipt.status})`);
+    console.log(`  [CHAIN→ENVIO] Confirmed block ${receipt.blockNumber} (${receipt.status}) — TradeExecuted event will be indexed`);
   } catch (err) {
     console.log(`  ❌ Execution failed: ${err.shortMessage || err.message}`);
   }
 }
 
 async function runBotCycle(walletClient, publicClient, executorAddress) {
+  executedThisRun.clear(); // Reset per-cycle dedup
   console.log(`\n${'─'.repeat(52)}`);
   console.log(`[${new Date().toISOString()}] Bot cycle starting...`);
 
@@ -315,7 +351,7 @@ async function runBotCycle(walletClient, publicClient, executorAddress) {
 // ─── Main ────────────────────────────────────────────────────────────────────
 
 async function main() {
-  const POLL_INTERVAL_MS = 15000; // Check every 15s
+  const POLL_INTERVAL_MS = 5000; // Check every 5s — Envio's sub-50ms queries make this efficient
 
   console.log('');
   console.log('══════════════════════════════════════════════════════');

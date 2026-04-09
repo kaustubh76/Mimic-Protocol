@@ -16,6 +16,7 @@
     "frontend": "cd src/frontend && npm run dev",
     "frontend:build": "cd src/frontend && npm run build",
     "bot": "node executor-bot/bot.mjs",
+    "pattern-service": "node executor-bot/pattern-service.mjs",
     "lint": "forge fmt --check",
     "format": "forge fmt"
   },
