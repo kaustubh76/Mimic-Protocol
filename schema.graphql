@@ -54,6 +54,18 @@ type Pattern @entity {
   "Return on investment in basis points (can be negative)"
   roi: BigInt!
 
+  "Pattern performance trend (improving/declining/stable)"
+  trendDirection: String!
+
+  "Quality grade based on combined metrics (A+/A/B/C/D/F)"
+  qualityGrade: String!
+
+  "Consecutive positive performance updates"
+  consecutiveImprovements: Int!
+
+  "Consecutive negative performance updates"
+  consecutiveDeclines: Int!
+
   "Pattern activity status"
   isActive: Boolean! @index
 
@@ -95,9 +107,6 @@ type Pattern @entity {
 
   "Delegation history for this pattern"
   delegations: [Delegation!]! @derivedFrom(field: "pattern")
-
-  "Execution history"
-  executions: [Execution!]! @derivedFrom(field: "pattern")
 }
 
 """
@@ -421,37 +430,8 @@ type Delegator @entity {
 }
 
 """
-Execution entity (placeholder for future ExecutionEngine integration)
-Tracks automated pattern executions
-"""
-type Execution @entity {
-  "Unique execution ID"
-  id: ID!
-
-  "Pattern being executed"
-  pattern: Pattern!
-
-  "Execution timestamp"
-  timestamp: BigInt! @index
-
-  "Execution success status"
-  success: Boolean! @index
-
-  "Transaction hash"
-  txHash: Bytes!
-
-  "Gas used"
-  gasUsed: BigInt!
-
-  "Profit/loss from execution"
-  profitLoss: BigInt!
-
-  "Error message (if failed)"
-  error: String
-}
-
-"""
 TradeExecution entity tracking individual trade executions
+Populated by DelegationRouter.TradeExecuted handler
 """
 type TradeExecution @entity {
   "Unique execution ID: {delegationId}-{timestamp}-{blockNumber}"
