@@ -1,5 +1,5 @@
 {
-  "buildCommand": "cd src/frontend && npm install && npx vite build",
+  "buildCommand": "cd src/frontend && npx vite build",
   "outputDirectory": "src/frontend/dist",
   "installCommand": "npm install --legacy-peer-deps --prefix src/frontend",
   "rewrites": [
