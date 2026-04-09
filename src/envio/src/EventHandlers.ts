@@ -93,6 +93,10 @@ BehavioralNFT.PatternMinted.handler(async ({ event, context }) => {
     winRate: 0n,
     totalVolume: 0n,
     roi: 0n,
+    trendDirection: "stable",
+    qualityGrade: "C",
+    consecutiveImprovements: 0,
+    consecutiveDeclines: 0,
     isActive: true,
     deactivationReason: undefined,
     deactivatedAt: undefined,
@@ -221,12 +225,44 @@ BehavioralNFT.PatternPerformanceUpdated.handler(async ({ event, context }) => {
   const volumeDelta = totalVolume - pattern.totalVolume;
   const roiDelta = roi - pattern.roi;
 
-  // Update pattern
+  // Compute trend direction from consecutive improvements/declines
+  const winRateImproved = winRate > pattern.winRate;
+  const roiImproved = roi > pattern.roi;
+  let newConsecutiveImp = pattern.consecutiveImprovements;
+  let newConsecutiveDec = pattern.consecutiveDeclines;
+  let trendDirection = pattern.trendDirection;
+
+  if (winRateImproved || roiImproved) {
+    newConsecutiveImp++;
+    newConsecutiveDec = 0;
+    trendDirection = newConsecutiveImp >= 3 ? "improving" : "stable";
+  } else if (winRate < pattern.winRate || roi < pattern.roi) {
+    newConsecutiveDec++;
+    newConsecutiveImp = 0;
+    trendDirection = newConsecutiveDec >= 3 ? "declining" : "stable";
+  }
+  // If exactly equal on both metrics, keep current trend
+
+  // Compute quality grade from combined metrics
+  const wr = Number(winRate);
+  const r = Number(roi);
+  const qualityGrade =
+    (wr >= 9000 && r >= 2000) ? "A+" :
+    (wr >= 8000 && r >= 1500) ? "A" :
+    (wr >= 7000 && r >= 1000) ? "B" :
+    (wr >= 6000 && r >= 500)  ? "C" :
+    (wr >= 5000)              ? "D" : "F";
+
+  // Update pattern with metrics + derived analytics
   context.Pattern.set({
     ...pattern,
     winRate,
     totalVolume,
     roi,
+    trendDirection,
+    qualityGrade,
+    consecutiveImprovements: newConsecutiveImp,
+    consecutiveDeclines: newConsecutiveDec,
     lastUpdatedAt: blockTimestamp,
   });
 

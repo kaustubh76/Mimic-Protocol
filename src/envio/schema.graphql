@@ -54,6 +54,18 @@ type Pattern @entity {
   "Return on investment in basis points (can be negative)"
   roi: BigInt!
 
+  "Pattern performance trend (improving/declining/stable)"
+  trendDirection: String!
+
+  "Quality grade based on combined metrics (A+/A/B/C/D/F)"
+  qualityGrade: String!
+
+  "Consecutive positive performance updates"
+  consecutiveImprovements: Int!
+
+  "Consecutive negative performance updates"
+  consecutiveDeclines: Int!
+
   "Pattern activity status"
   isActive: Boolean! @index
 
