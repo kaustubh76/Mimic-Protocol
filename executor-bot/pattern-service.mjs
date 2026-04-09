@@ -48,7 +48,7 @@ const MONAD_CHAIN = {
 };
 
 const GRAPHQL_ENDPOINT =
-  ENV.ENVIO_GRAPHQL_URL || 'https://indexer.dev.hyperindex.xyz/b383f5b/v1/graphql';
+  ENV.ENVIO_GRAPHQL_URL || 'https://indexer.dev.hyperindex.xyz/4cda827/v1/graphql';
 
 const PATTERN_DETECTOR_ADDRESS =
   ENV.PATTERN_DETECTOR_ADDRESS || '0x28BEC7E4d25D385BBf5FD4d2CF5163c513662CaE';

@@ -20,7 +20,7 @@ import { useEnvioMetrics } from './hooks/useEnvioMetrics'
 import { MONAD_CHAIN_ID } from './contracts/config'
 import './globals.css'
 
-type Tab = 'patterns' | 'delegations' | 'account'
+type Tab = 'patterns' | 'delegations' | 'live' | 'account'
 
 export function App() {
   const { address, isConnected } = useAccount()
@@ -71,6 +71,22 @@ export function App() {
                 </p>
               </div>
             </div>
+
+            {/* Navigation Links */}
+            <nav className={`hidden md:flex items-center gap-6 text-sm ${mounted ? 'animate-fade-in' : 'opacity-0'}`} style={{ animationDelay: '50ms' }}>
+              <a href="https://github.com/kaustubh76/Mimic-Protocol" target="_blank" rel="noopener noreferrer" className="text-muted hover:text-white transition-colors">
+                GitHub
+              </a>
+              <a href={ENVIO_GRAPHQL_URL} target="_blank" rel="noopener noreferrer" className="text-muted hover:text-white transition-colors">
+                GraphQL API
+              </a>
+              <a href="https://docs.envio.dev" target="_blank" rel="noopener noreferrer" className="text-muted hover:text-white transition-colors">
+                Envio Docs
+              </a>
+              <a href="https://explorer.testnet.monad.xyz" target="_blank" rel="noopener noreferrer" className="text-muted hover:text-white transition-colors">
+                Explorer
+              </a>
+            </nav>
 
             {/* Wallet Connection */}
             <div className={mounted ? 'animate-fade-in' : 'opacity-0'} style={{ animationDelay: '100ms' }}>
@@ -271,6 +287,7 @@ export function App() {
               {([
                 { id: 'patterns' as Tab, label: 'Browse Patterns' },
                 { id: 'delegations' as Tab, label: 'My Delegations' },
+                { id: 'live' as Tab, label: 'Live Trading' },
                 { id: 'account' as Tab, label: 'Smart Account' },
               ]).map((tab) => (
                 <button
@@ -315,6 +332,23 @@ export function App() {
                 )}
 
                 {activeTab === 'delegations' && <MyDelegations />}
+
+                {activeTab === 'live' && (
+                  <div className="space-y-6">
+                    <div>
+                      <h2 className="text-2xl font-bold mb-1">Live Trading Activity</h2>
+                      <p className="text-sm text-muted">Real-time execution feed and data flow powered by Envio HyperSync</p>
+                    </div>
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+                      <EnvioDataFlow
+                        queryLatency={metrics?.averageQueryLatency || 7}
+                        eventsPerSecond={metrics?.peakEventsPerSecond || 0}
+                        isLive={metrics?.isLive}
+                      />
+                      <LiveExecutionFeed />
+                    </div>
+                  </div>
+                )}
 
                 {activeTab === 'account' && (
                   <div className="space-y-6">
@@ -409,36 +443,101 @@ export function App() {
 
       {/* Footer */}
       <footer className="border-t border-white/5 mt-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-            <div className="flex flex-col items-center md:items-start gap-1">
-              <p className="text-sm text-muted">
-                Mirror Protocol · Monad Hackathon 2025
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10">
+          {/* Main Footer Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mb-8">
+            {/* Brand Column */}
+            <div className="space-y-3">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-lg bg-gradient-primary flex items-center justify-center text-xl">
+                  🔄
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-gradient-primary">Mirror Protocol</h3>
+                </div>
+              </div>
+              <p className="text-sm text-muted leading-relaxed">
+                Behavioral liquidity infrastructure on Monad. Transform on-chain trading patterns into executable, delegatable NFTs with sub-50ms detection.
               </p>
-              <div className="flex items-center gap-3 text-xs text-muted">
-                <a href="https://github.com/kaustubh76/Mimic-Protocol" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">
-                  GitHub
+              <div className="flex items-center gap-3 pt-1">
+                <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-gradient-primary">
+                  Envio HyperSync
+                </span>
+                <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-gradient-secondary">
+                  MetaMask Toolkit
+                </span>
+                <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-gradient-accent">
+                  Monad Testnet
+                </span>
+              </div>
+            </div>
+
+            {/* Resources Column */}
+            <div className="space-y-3">
+              <h4 className="text-sm font-bold text-white uppercase tracking-wider">Resources</h4>
+              <div className="grid grid-cols-2 gap-2">
+                <a href="https://github.com/kaustubh76/Mimic-Protocol" target="_blank" rel="noopener noreferrer" className="text-sm text-muted hover:text-white transition-colors">
+                  GitHub Repo
                 </a>
-                <span>·</span>
-                <a href={ENVIO_GRAPHQL_URL} target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">
+                <a href={ENVIO_GRAPHQL_URL} target="_blank" rel="noopener noreferrer" className="text-sm text-muted hover:text-white transition-colors">
                   GraphQL API
                 </a>
-                <span>·</span>
-                <a href="https://explorer.testnet.monad.xyz/address/0x6943e7D39F3799d0b8fa9D6aD6B63861a15a8d26" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">
-                  Contracts
+                <a href="https://explorer.testnet.monad.xyz/address/0x6943e7D39F3799d0b8fa9D6aD6B63861a15a8d26" target="_blank" rel="noopener noreferrer" className="text-sm text-muted hover:text-white transition-colors">
+                  Contract Explorer
+                </a>
+                <a href="https://docs.envio.dev" target="_blank" rel="noopener noreferrer" className="text-sm text-muted hover:text-white transition-colors">
+                  Envio Docs
+                </a>
+                <a href="https://docs.metamask.io/delegation-toolkit/" target="_blank" rel="noopener noreferrer" className="text-sm text-muted hover:text-white transition-colors">
+                  MetaMask Docs
+                </a>
+                <a href="https://testnet.monad.xyz" target="_blank" rel="noopener noreferrer" className="text-sm text-muted hover:text-white transition-colors">
+                  Monad Testnet
                 </a>
               </div>
             </div>
-            <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3">
-              <span className="px-3 py-1 rounded-full text-xs font-semibold bg-gradient-primary">
-                Powered by Envio
+
+            {/* Smart Contracts Column */}
+            <div className="space-y-3">
+              <h4 className="text-sm font-bold text-white uppercase tracking-wider">Smart Contracts</h4>
+              <div className="space-y-2">
+                {[
+                  { name: 'BehavioralNFT', addr: '0x6943e7D39F3799d0b8fa9D6aD6B63861a15a8d26' },
+                  { name: 'DelegationRouter', addr: '0xd5499e0d781b123724dF253776Aa1EB09780AfBf' },
+                  { name: 'PatternDetector', addr: '0x28BEC7E4d25D385BBf5FD4d2CF5163c513662CaE' },
+                  { name: 'ExecutionEngine', addr: '0x4364457325CeB1Af9f0BDD72C0927eD30CB69eD8' },
+                ].map(c => (
+                  <a
+                    key={c.name}
+                    href={`https://explorer.testnet.monad.xyz/address/${c.addr}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-between text-xs group"
+                  >
+                    <span className="text-muted group-hover:text-white transition-colors">{c.name}</span>
+                    <code className="text-muted/60 group-hover:text-purple-400 transition-colors font-mono">
+                      {c.addr.slice(0, 6)}...{c.addr.slice(-4)}
+                    </code>
+                  </a>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Bottom Bar */}
+          <div className="pt-6 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-3">
+            <p className="text-xs text-muted">
+              Mirror Protocol &copy; 2025 &middot; Built on Monad Testnet (Chain ID {MONAD_CHAIN_ID})
+            </p>
+            <div className="flex items-center gap-4 text-xs text-muted">
+              <span className="flex items-center gap-1.5">
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                </span>
+                Envio Indexer Live
               </span>
-              <span className="px-3 py-1 rounded-full text-xs font-semibold bg-gradient-secondary">
-                MetaMask Toolkit
-              </span>
-              <span className="px-3 py-1 rounded-full text-xs font-semibold bg-gradient-accent">
-                Deployed on Monad
-              </span>
+              <span>Monad Testnet</span>
             </div>
           </div>
         </div>

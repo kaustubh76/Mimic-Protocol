@@ -26,7 +26,7 @@
 
 | Property | Value |
 |----------|-------|
-| **GraphQL Endpoint** | `https://indexer.dev.hyperindex.xyz/b383f5b/v1/graphql` |
+| **GraphQL Endpoint** | `https://indexer.dev.hyperindex.xyz/4cda827/v1/graphql` |
 | **HyperSync** | ENABLED (monad-testnet.hypersync.xyz) |
 | **Deploy Branch** | `envio-deploy` (indexer root: `src/envio`) |
 | **Events Indexed** | 8 event types across 2 contracts |

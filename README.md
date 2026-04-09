@@ -18,7 +18,7 @@ Mirror Protocol turns successful trading patterns into ownable ERC-721 NFTs. Oth
 | Resource | URL |
 |----------|-----|
 | **Frontend** | https://mirror-protocol-nine.vercel.app |
-| **Envio GraphQL** | https://indexer.dev.hyperindex.xyz/b383f5b/v1/graphql |
+| **Envio GraphQL** | https://indexer.dev.hyperindex.xyz/4cda827/v1/graphql |
 | **Chain** | Monad Testnet (Chain ID 10143) |
 
 ```bash
@@ -319,7 +319,7 @@ Shows how the frontend queries Envio with fallback strategies.
 │                                                                       │
 │  ┌──────────────────────────────────────────────────────────────┐     │
 │  │  Envio GraphQL Endpoint                                      │     │
-│  │  https://indexer.dev.hyperindex.xyz/b383f5b/v1/graphql      │     │
+│  │  https://indexer.dev.hyperindex.xyz/4cda827/v1/graphql      │     │
 │  │                                                              │     │
 │  │  Query latency: <50ms (avg 1ms processing)                  │     │
 │  │  Entities: Pattern, Creator, Delegation, Delegator,         │     │

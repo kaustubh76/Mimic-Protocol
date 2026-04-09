@@ -9,7 +9,7 @@
 
 Envio HyperSync indexer is **fully deployed and live** on Monad testnet. All event handlers, schema definitions, and contract configurations are complete. The frontend consumes Envio data in real-time through 6 dedicated hooks via the centralized `ENVIO_GRAPHQL_URL`.
 
-**Live Endpoint:** `https://indexer.dev.hyperindex.xyz/b383f5b/v1/graphql`
+**Live Endpoint:** `https://indexer.dev.hyperindex.xyz/4cda827/v1/graphql`
 **Vercel Proxy:** `/api/envio/` (avoids CORS issues)
 
 ---
@@ -148,7 +148,7 @@ pnpm envio codegen
 
 **Status:** DEPLOYED & LIVE
 
-**Endpoint:** `https://indexer.dev.hyperindex.xyz/b383f5b/v1/graphql`
+**Endpoint:** `https://indexer.dev.hyperindex.xyz/4cda827/v1/graphql`
 
 The Envio indexer is deployed on HyperSync and actively processing events from Monad testnet. All 8 event types across both contracts are being indexed in real-time.
 
@@ -160,7 +160,7 @@ The Envio indexer is deployed on HyperSync and actively processing events from M
 
 **Configuration:** `src/frontend/src/contracts/config.ts`
 ```typescript
-export const ENVIO_GRAPHQL_URL = 'https://indexer.dev.hyperindex.xyz/b383f5b/v1/graphql';
+export const ENVIO_GRAPHQL_URL = 'https://indexer.dev.hyperindex.xyz/4cda827/v1/graphql';
 ```
 
 **Vercel Proxy:** The frontend uses a Vercel rewrite at `/api/envio/` to proxy requests to the HyperSync endpoint, avoiding CORS issues in production.
@@ -188,7 +188,7 @@ The `ENVIO_GRAPHQL_URL` is centralized in `config.ts` and used consistently acro
 | GraphQL Schema | Complete | All entities defined, indexed for <50ms |
 | Event Handlers | Complete | 8 event handlers across 7 handler files |
 | Codegen | Complete | 287/287 modules compiled |
-| Cloud Deployment | LIVE | `https://indexer.dev.hyperindex.xyz/b383f5b/v1/graphql` |
+| Cloud Deployment | LIVE | `https://indexer.dev.hyperindex.xyz/4cda827/v1/graphql` |
 | Vercel Proxy | Active | `/api/envio/` → HyperSync endpoint |
 | Frontend Integration | Active | 6 hooks consuming real-time Envio data |
 

@@ -1,11 +1,11 @@
 {
   "buildCommand": "npx vite build",
   "outputDirectory": "dist",
-  "installCommand": "npm install",
+  "installCommand": "pnpm install",
   "rewrites": [
     {
       "source": "/api/envio/:path*",
-      "destination": "https://indexer.dev.hyperindex.xyz/b383f5b/v1/:path*"
+      "destination": "https://indexer.dev.hyperindex.xyz/4cda827/v1/:path*"
     }
   ]
 }

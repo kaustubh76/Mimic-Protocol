@@ -21,7 +21,7 @@ Output goes to `src/frontend/dist/`.
 
 | Variable | Value | Purpose |
 |----------|-------|---------|
-| `VITE_ENVIO_GRAPHQL_URL` | `https://indexer.dev.hyperindex.xyz/b383f5b/v1/graphql` | Envio HyperSync endpoint |
+| `VITE_ENVIO_GRAPHQL_URL` | `https://indexer.dev.hyperindex.xyz/4cda827/v1/graphql` | Envio HyperSync endpoint |
 
 This is also hardcoded in `src/frontend/src/contracts/config.ts` as a fallback.
 
@@ -40,7 +40,7 @@ In `vercel.json` (or Vercel project settings):
   "rewrites": [
     {
       "source": "/api/envio/:path*",
-      "destination": "https://indexer.dev.hyperindex.xyz/b383f5b/v1/:path*"
+      "destination": "https://indexer.dev.hyperindex.xyz/4cda827/v1/:path*"
     }
   ]
 }

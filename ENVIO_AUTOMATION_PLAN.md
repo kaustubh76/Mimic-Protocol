@@ -200,7 +200,7 @@ const GRAPHQL_ENDPOINT =
 **To (use the current live endpoint):**
 ```javascript
 const GRAPHQL_ENDPOINT =
-  ENV.ENVIO_GRAPHQL_URL || 'https://indexer.dev.hyperindex.xyz/b383f5b/v1/graphql';
+  ENV.ENVIO_GRAPHQL_URL || 'https://indexer.dev.hyperindex.xyz/4cda827/v1/graphql';
 ```
 
 ---
