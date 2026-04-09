@@ -81,7 +81,7 @@ export function EnhancedPatternCard({ pattern, onDelegateClick }: EnhancedPatter
                 </div>
               )}
             </div>
-            <h3 className="text-xl font-bold">Pattern #{pattern.id}</h3>
+            <h3 className="text-lg font-bold">Pattern #{pattern.id}</h3>
           </div>
         </div>
 
@@ -113,24 +113,24 @@ export function EnhancedPatternCard({ pattern, onDelegateClick }: EnhancedPatter
       )}
 
       {/* Core Stats Grid */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 my-4">
+      <div className="grid grid-cols-2 gap-3 my-4">
         <div className="stat-inline flex-col items-start">
           <span className="stat-label">Win Rate</span>
-          <span className="stat-value text-lg">{winRate}%</span>
+          <span className="stat-value text-sm sm:text-base">{winRate}%</span>
         </div>
         <div className="stat-inline flex-col items-start">
           <span className="stat-label">Volume</span>
-          <span className="stat-value text-lg">{parseFloat(volume).toFixed(0)}</span>
+          <span className="stat-value text-sm sm:text-base">{parseFloat(volume).toFixed(0)}</span>
         </div>
         <div className="stat-inline flex-col items-start">
           <span className="stat-label">ROI</span>
-          <span className={`stat-value text-lg ${roi >= 0 ? 'text-success' : 'text-error'}`}>
+          <span className={`stat-value text-sm sm:text-base ${roi >= 0 ? 'text-success' : 'text-error'}`}>
             {roi > 0 ? '+' : ''}{roi}%
           </span>
         </div>
         <div className="stat-inline flex-col items-start">
           <span className="stat-label">Earnings</span>
-          <span className="stat-value text-lg text-green-400">
+          <span className="stat-value text-sm sm:text-base text-green-400">
             {roi > 0 && pattern.totalVolume > 0n
               ? `+${(parseFloat(volume) * roi / 100).toFixed(1)}`
               : '0'}
@@ -252,9 +252,9 @@ export function EnhancedPatternCard({ pattern, onDelegateClick }: EnhancedPatter
 
       {/* Creator Info */}
       <div className="glass-card p-3 space-y-2 mb-4">
-        <div className="flex items-center justify-between text-xs">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 text-xs">
           <span className="text-muted">Creator</span>
-          <code className="hash-code-small">
+          <code className="hash-code-small truncate">
             {isOwner ? (
               <span className="text-gradient-primary font-bold">You</span>
             ) : (
@@ -262,7 +262,7 @@ export function EnhancedPatternCard({ pattern, onDelegateClick }: EnhancedPatter
             )}
           </code>
         </div>
-        <div className="flex items-center justify-between text-xs">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 text-xs">
           <span className="text-muted">Token ID</span>
           <span className="font-bold text-gradient-secondary">#{pattern.id}</span>
         </div>
@@ -299,7 +299,7 @@ export function EnhancedPatternCard({ pattern, onDelegateClick }: EnhancedPatter
       )}
 
       {/* Envio Badge */}
-      <div className="mt-3 text-center">
+      <div className="mt-2 pt-2 border-t border-white/5 text-center">
         <div className="inline-flex items-center gap-1 text-xs text-muted">
           <span>⚡</span>
           <span>Real-time analytics via Envio</span>

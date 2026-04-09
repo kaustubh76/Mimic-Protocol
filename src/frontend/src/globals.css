@@ -385,10 +385,16 @@
     position: relative;
     overflow: hidden;
     transition: all var(--duration-normal) var(--ease-out-expo);
-    padding: var(--spacing-xl);
+    padding: var(--spacing-lg);
     display: flex;
     flex-direction: column;
     gap: var(--spacing-md);
+  }
+
+  @media (min-width: 640px) {
+    .pattern-card {
+      padding: var(--spacing-xl);
+    }
   }
 
   .pattern-card::before {
@@ -524,7 +530,7 @@
   }
 
   .stat-value {
-    font-size: 2.5rem;
+    font-size: 1.75rem;
     font-weight: 800;
     background: var(--gradient-primary);
     -webkit-background-clip: text;
@@ -546,7 +552,7 @@
   }
 
   .stat-label {
-    font-size: 0.875rem;
+    font-size: 0.75rem;
     color: var(--color-text-secondary);
     font-weight: 600;
     text-transform: uppercase;
@@ -561,6 +567,8 @@
     background: rgba(255, 255, 255, 0.02);
     border-radius: var(--radius-md);
     border: 1px solid rgba(255, 255, 255, 0.05);
+    min-width: 0;
+    overflow: hidden;
   }
 
   .stat-inline .stat-label {
@@ -979,6 +987,23 @@
 }
 
 /* ============================================
+   RESPONSIVE UTILITIES
+   ============================================ */
+.flex-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+@media (min-width: 640px) {
+  .flex-stack {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+/* ============================================
    RESPONSIVE DESIGN
    ============================================ */
 @media (max-width: 768px) {
@@ -1009,7 +1034,7 @@
   }
 
   .stat-value {
-    font-size: 2rem;
+    font-size: 1.5rem;
   }
 }
 
@@ -1017,6 +1042,10 @@
   .modal-content {
     margin: var(--spacing-sm);
     border-radius: var(--radius-md);
+  }
+
+  .preset-buttons {
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 

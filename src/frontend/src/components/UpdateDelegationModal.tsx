@@ -145,17 +145,17 @@ export function UpdateDelegationModal({
               <div className="modal-body">
                 {/* Delegation Info */}
                 <div className="glass-card p-4 mb-6">
-                  <div className="flex items-center justify-between mb-2">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 mb-2">
                     <span className="text-sm text-muted">Pattern</span>
                     <span className="font-bold">{delegation.patternName}</span>
                   </div>
-                  <div className="flex items-center justify-between mb-2">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 mb-2">
                     <span className="text-sm text-muted">Current Allocation</span>
                     <span className="font-bold text-gradient-primary">
                       {Number(delegation.percentageAllocation) / 100}%
                     </span>
                   </div>
-                  <div className="flex items-center justify-between">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
                     <span className="text-sm text-muted">Pattern #</span>
                     <span className="font-bold">{Number(delegation.patternTokenId)}</span>
                   </div>

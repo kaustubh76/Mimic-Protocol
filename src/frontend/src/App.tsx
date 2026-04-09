@@ -12,6 +12,8 @@ import { PatternBrowser } from './components/PatternBrowser'
 import { PatternLeaderboard } from './components/PatternLeaderboard'
 import { MyDelegations } from './components/MyDelegations'
 import { EnvioMetricsDashboard } from './components/EnvioMetricsDashboard'
+import { LiveExecutionFeed } from './components/LiveExecutionFeed'
+import { EnvioDataFlow } from './components/EnvioDataFlow'
 import { useUserStats } from './hooks/useUserStats'
 import { ENVIO_GRAPHQL_URL } from './contracts/config'
 import { useEnvioMetrics } from './hooks/useEnvioMetrics'
@@ -53,8 +55,8 @@ export function App() {
       <header className={`sticky top-0 z-50 backdrop-blur-xl border-b transition-all duration-300 ${
         scrolled ? 'border-white/10 shadow-lg shadow-black/20' : 'border-white/5'
       }`}>
-        <div className="max-w-7xl mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4">
+          <div className="flex items-center justify-between flex-wrap gap-3">
             {/* Brand Section */}
             <div className={`flex items-center gap-4 ${mounted ? 'animate-slide-up' : 'opacity-0'}`}>
               <div className="w-12 h-12 rounded-xl bg-gradient-primary flex items-center justify-center text-2xl shadow-glow">
@@ -81,7 +83,7 @@ export function App() {
       {/* Chain Warning Banner */}
       {isConnected && !isCorrectChain && (
         <div className="bg-gradient-accent border-b border-yellow-500/20 animate-slide-up">
-          <div className="max-w-7xl mx-auto px-6 py-3">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3">
             <div className="flex items-center justify-center gap-2 text-sm">
               <span className="text-xl">⚠️</span>
               <span className="font-semibold">
@@ -93,11 +95,11 @@ export function App() {
       )}
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-6 py-8">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
         {!isConnected ? (
           /* Hero Section - Not Connected */
           <motion.div
-            className="space-y-16"
+            className="space-y-8 sm:space-y-12"
             initial="hidden"
             animate="visible"
             variants={{
@@ -137,27 +139,27 @@ export function App() {
 
               <motion.div
                 variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}
-                className="flex flex-wrap items-center justify-center gap-4 pt-4"
+                className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 max-w-2xl mx-auto pt-4"
               >
-                <div className="glass-card px-6 py-3">
+                <div className="glass-card px-4 sm:px-6 py-3">
                   <div className="text-2xl font-bold text-gradient-primary">
                     {metrics?.peakEventsPerSecond || 102}
                   </div>
                   <div className="text-xs text-muted">Events/Second (Peak)</div>
                 </div>
-                <div className="glass-card px-6 py-3">
+                <div className="glass-card px-4 sm:px-6 py-3">
                   <div className="text-2xl font-bold text-gradient-secondary">
                     {metrics?.averageProcessingTime || 1}ms
                   </div>
                   <div className="text-xs text-muted">Avg Processing Time</div>
                 </div>
-                <div className="glass-card px-6 py-3">
+                <div className="glass-card px-4 sm:px-6 py-3">
                   <div className="text-2xl font-bold text-gradient-accent">
                     {metrics?.totalPatterns || 7}
                   </div>
                   <div className="text-xs text-muted">Live Patterns</div>
                 </div>
-                <div className="glass-card px-6 py-3">
+                <div className="glass-card px-4 sm:px-6 py-3">
                   <div className="text-2xl font-bold text-green-400">
                     {metrics?.totalExecutions || 16}
                   </div>
@@ -167,7 +169,7 @@ export function App() {
             </section>
 
             {/* Feature Grid */}
-            <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
               {[
                 { icon: '⚡', gradient: 'bg-gradient-primary', title: 'Real-time Detection', desc: "Envio HyperSync indexes trading patterns in sub-50ms, 50x faster than alternatives" },
                 { icon: '🎨', gradient: 'bg-gradient-secondary', title: 'NFT-based Patterns', desc: "Successful trading patterns become tradeable ERC-721 NFTs with performance metrics" },
@@ -178,7 +180,7 @@ export function App() {
                   key={feature.title}
                   variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}
                   transition={{ delay: i * 0.08 }}
-                  className="glass-card glass-card-hover p-6 space-y-3"
+                  className="glass-card glass-card-hover p-4 sm:p-6 space-y-3"
                 >
                   <div className={`w-12 h-12 rounded-lg ${feature.gradient} flex items-center justify-center text-2xl`}>
                     {feature.icon}
@@ -194,6 +196,19 @@ export function App() {
               variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}
             >
               <EnvioMetricsDashboard />
+            </motion.section>
+
+            {/* Envio Data Flow + Live Execution Feed */}
+            <motion.section
+              variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}
+              className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6"
+            >
+              <EnvioDataFlow
+                queryLatency={metrics?.averageQueryLatency || 7}
+                eventsPerSecond={metrics?.peakEventsPerSecond || 0}
+                isLive={metrics?.isLive}
+              />
+              <LiveExecutionFeed />
             </motion.section>
 
             {/* Live Pattern Leaderboard — show real indexed data */}
@@ -225,7 +240,7 @@ export function App() {
           <div className="space-y-8">
             {/* Stats Dashboard */}
             {userStats && (
-              <section className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 {[
                   { value: userStats.patternsCreated, label: 'Patterns Created' },
                   { value: userStats.activeDelegations, label: 'Active Delegations' },
@@ -252,7 +267,7 @@ export function App() {
             </section>
 
             {/* Tab Navigation */}
-            <nav className="glass-card p-2 inline-flex gap-2 animate-slide-up">
+            <nav className="glass-card p-1.5 sm:p-2 flex sm:inline-flex gap-1 sm:gap-2 overflow-x-auto w-full sm:w-auto animate-slide-up">
               {([
                 { id: 'patterns' as Tab, label: 'Browse Patterns' },
                 { id: 'delegations' as Tab, label: 'My Delegations' },
@@ -261,7 +276,7 @@ export function App() {
                 <button
                   key={tab.id}
                   onClick={() => handleTabChange(tab.id)}
-                  className="relative px-6 py-3 rounded-lg font-semibold transition-colors"
+                  className="relative px-3 sm:px-6 py-2 sm:py-3 rounded-lg font-semibold text-sm sm:text-base transition-colors"
                   style={{ color: activeTab === tab.id ? '#fff' : undefined }}
                 >
                   {activeTab === tab.id && (
@@ -303,7 +318,7 @@ export function App() {
 
                 {activeTab === 'account' && (
                   <div className="space-y-6">
-                    <div className="glass-card p-8">
+                    <div className="glass-card p-4 sm:p-8">
                       <h2 className="text-2xl font-bold mb-6">Smart Account Status</h2>
 
                       {isLoading && (
@@ -334,18 +349,18 @@ export function App() {
                           animate={{ opacity: 1, scale: 1 }}
                           transition={{ duration: 0.3 }}
                         >
-                          <div className="glass-card p-6 border-green-500/20 bg-green-500/5">
+                          <div className="glass-card p-4 sm:p-6 border-green-500/20 bg-green-500/5">
                             <div className="flex items-center gap-3 mb-4">
-                              <span className="text-3xl">✅</span>
-                              <h3 className="text-xl font-bold text-success">Smart Account Active!</h3>
+                              <span className="text-2xl">✅</span>
+                              <h3 className="text-lg font-bold text-success">Smart Account Active!</h3>
                             </div>
 
                             <div className="space-y-3">
-                              <div className="flex items-center justify-between p-3 rounded-lg bg-white/5">
+                              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 p-3 rounded-lg bg-white/5">
                                 <span className="text-sm text-muted">Smart Account</span>
                                 <code className="hash-code text-xs">{smartAccount.address}</code>
                               </div>
-                              <div className="flex items-center justify-between p-3 rounded-lg bg-white/5">
+                              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 p-3 rounded-lg bg-white/5">
                                 <span className="text-sm text-muted">Owner (EOA)</span>
                                 <code className="hash-code text-xs">{address}</code>
                               </div>
@@ -353,15 +368,15 @@ export function App() {
                           </div>
 
                           {userStats && (
-                            <div className="grid md:grid-cols-2 gap-4">
-                              <div className="glass-card p-6 text-center">
-                                <div className="text-4xl font-bold text-gradient-primary mb-2">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                              <div className="glass-card p-4 sm:p-6 text-center">
+                                <div className="text-2xl font-bold text-gradient-primary mb-2">
                                   {userStats.patternsCreated}
                                 </div>
                                 <div className="text-sm text-muted">Patterns Created</div>
                               </div>
-                              <div className="glass-card p-6 text-center">
-                                <div className="text-4xl font-bold text-gradient-secondary mb-2">
+                              <div className="glass-card p-4 sm:p-6 text-center">
+                                <div className="text-2xl font-bold text-gradient-secondary mb-2">
                                   {userStats.activeDelegations}
                                 </div>
                                 <div className="text-sm text-muted">Active Delegations</div>
@@ -369,7 +384,7 @@ export function App() {
                             </div>
                           )}
 
-                          <div className="glass-card p-6 bg-blue-500/5 border-blue-500/20">
+                          <div className="glass-card p-4 sm:p-6 bg-blue-500/5 border-blue-500/20">
                             <p className="text-success font-semibold">
                               🎉 Your smart account is ready! You can now delegate to trading patterns.
                             </p>
@@ -394,7 +409,7 @@ export function App() {
 
       {/* Footer */}
       <footer className="border-t border-white/5 mt-20">
-        <div className="max-w-7xl mx-auto px-6 py-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <div className="flex flex-col items-center md:items-start gap-1">
               <p className="text-sm text-muted">
@@ -414,7 +429,7 @@ export function App() {
                 </a>
               </div>
             </div>
-            <div className="flex flex-wrap items-center gap-3">
+            <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3">
               <span className="px-3 py-1 rounded-full text-xs font-semibold bg-gradient-primary">
                 Powered by Envio
               </span>

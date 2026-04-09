@@ -42,7 +42,7 @@ export function WalletConnect() {
   if (isConnected && address) {
     return (
       <motion.div
-        className="flex items-center gap-2"
+        className="flex items-center gap-1 sm:gap-2 flex-wrap"
         initial={{ opacity: 0, x: 12 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.3 }}
@@ -67,7 +67,7 @@ export function WalletConnect() {
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
             <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
           </span>
-          <code className="text-sm font-semibold text-secondary group-hover:text-white transition-colors">
+          <code className="text-xs sm:text-sm font-semibold text-secondary group-hover:text-white transition-colors">
             {formatAddress(address)}
           </code>
           <AnimatePresence mode="wait">

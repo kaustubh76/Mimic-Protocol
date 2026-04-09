@@ -29,15 +29,15 @@ export function PatternBrowser() {
     return (
       <div className="space-y-6">
         <div className="flex items-center justify-between">
-          <h2 className="text-3xl font-bold">Available Trading Patterns</h2>
+          <h2 className="text-2xl font-bold">Available Trading Patterns</h2>
         </div>
 
         {/* Loading Skeletons — match card structure */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
           {[1, 2, 3, 4, 5, 6].map((i) => (
             <motion.div
               key={i}
-              className="glass-card p-6 space-y-4"
+              className="glass-card p-4 sm:p-6 space-y-4"
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.1, duration: 0.3 }}
@@ -49,7 +49,7 @@ export function PatternBrowser() {
               </div>
               <div className="loading-skeleton h-6 w-40"></div>
               {/* Stats grid */}
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-2 gap-3">
                 <div className="loading-skeleton h-12 w-full"></div>
                 <div className="loading-skeleton h-12 w-full"></div>
                 <div className="loading-skeleton h-12 w-full"></div>
@@ -63,7 +63,7 @@ export function PatternBrowser() {
         </div>
 
         <div className="text-center py-8">
-          <div className="inline-flex items-center gap-3 glass-card px-6 py-4">
+          <div className="inline-flex items-center gap-3 glass-card px-4 sm:px-6 py-4">
             <div className="spinner-small"></div>
             <span className="text-secondary">Loading patterns from blockchain...</span>
           </div>
@@ -75,7 +75,7 @@ export function PatternBrowser() {
   if (error) {
     return (
       <div className="space-y-6">
-        <h2 className="text-3xl font-bold">Available Trading Patterns</h2>
+        <h2 className="text-2xl font-bold">Available Trading Patterns</h2>
         <EmptyState
           icon="❌"
           title="Error Loading Patterns"
@@ -89,7 +89,7 @@ export function PatternBrowser() {
   if (patterns.length === 0) {
     return (
       <div className="space-y-6">
-        <h2 className="text-3xl font-bold">Available Trading Patterns</h2>
+        <h2 className="text-2xl font-bold">Available Trading Patterns</h2>
         <EmptyState
           icon="🔍"
           title="No Patterns Found"
@@ -102,9 +102,9 @@ export function PatternBrowser() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
-          <h2 className="text-3xl font-bold">Available Trading Patterns</h2>
+          <h2 className="text-2xl font-bold">Available Trading Patterns</h2>
           {usingTestData ? (
             <p className="text-sm text-warning mt-1 flex items-center gap-2">
               <span>⚠️</span>
@@ -135,7 +135,7 @@ export function PatternBrowser() {
       </div>
 
       {/* Pattern Grid - Now with Enhanced Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
         {patterns.map((pattern, index) => (
           <motion.div
             key={pattern.id}

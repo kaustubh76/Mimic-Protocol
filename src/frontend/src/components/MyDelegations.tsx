@@ -58,7 +58,7 @@ export function MyDelegations() {
   if (!isConnected) {
     return (
       <div className="space-y-6">
-        <h2 className="text-3xl font-bold">My Delegations</h2>
+        <h2 className="text-2xl font-bold">My Delegations</h2>
         <EmptyState
           icon="👛"
           title="Wallet Not Connected"
@@ -71,17 +71,17 @@ export function MyDelegations() {
   if (isLoading) {
     return (
       <div className="space-y-6">
-        <h2 className="text-3xl font-bold">My Delegations</h2>
+        <h2 className="text-2xl font-bold">My Delegations</h2>
 
         {/* Loading Skeletons */}
         <div className="space-y-4">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="glass-card p-6 space-y-4">
+            <div key={i} className="glass-card p-4 sm:p-6 space-y-4">
               <div className="flex items-center justify-between">
                 <div className="loading-skeleton h-6 w-48"></div>
                 <div className="loading-skeleton h-6 w-20"></div>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                 <div className="loading-skeleton h-12 w-full"></div>
                 <div className="loading-skeleton h-12 w-full"></div>
                 <div className="loading-skeleton h-12 w-full"></div>
@@ -92,7 +92,7 @@ export function MyDelegations() {
         </div>
 
         <div className="text-center py-8">
-          <div className="inline-flex items-center gap-3 glass-card px-6 py-4">
+          <div className="inline-flex items-center gap-3 glass-card px-4 sm:px-6 py-4">
             <div className="spinner-small"></div>
             <span className="text-secondary">Loading your delegations from blockchain...</span>
           </div>
@@ -104,7 +104,7 @@ export function MyDelegations() {
   if (error) {
     return (
       <div className="space-y-6">
-        <h2 className="text-3xl font-bold">My Delegations</h2>
+        <h2 className="text-2xl font-bold">My Delegations</h2>
         <EmptyState
           icon="❌"
           title="Error Loading Delegations"
@@ -118,7 +118,7 @@ export function MyDelegations() {
   if (delegations.length === 0) {
     return (
       <div className="space-y-6">
-        <h2 className="text-3xl font-bold">My Delegations</h2>
+        <h2 className="text-2xl font-bold">My Delegations</h2>
         <EmptyState
           icon="📭"
           title="No Active Delegations"
@@ -131,9 +131,9 @@ export function MyDelegations() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
-          <h2 className="text-3xl font-bold">My Delegations</h2>
+          <h2 className="text-2xl font-bold">My Delegations</h2>
           {usingTestData ? (
             <p className="text-sm text-warning mt-1 flex items-center gap-2">
               <span>📊</span>
@@ -167,7 +167,7 @@ export function MyDelegations() {
           return (
             <motion.div
               key={delegation.id}
-              className="glass-card glass-card-hover p-6"
+              className="glass-card glass-card-hover p-4 sm:p-6"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: Math.min(index * 0.06, 0.3), duration: 0.3 }}
@@ -176,7 +176,7 @@ export function MyDelegations() {
               <div className="flex items-start justify-between mb-6">
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-2">
-                    <h3 className="text-xl font-bold">
+                    <h3 className="text-lg font-bold">
                       {delegation.patternName}
                     </h3>
                     {isRecent && (
@@ -206,7 +206,7 @@ export function MyDelegations() {
               </div>
 
               {/* Stats Grid */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-6">
                 <div className="glass-card p-4 text-center">
                   <div className="text-2xl font-bold text-gradient-primary mb-1">
                     {allocation}%
@@ -231,7 +231,7 @@ export function MyDelegations() {
 
               {/* Progress Bar */}
               <div className="space-y-2 mb-6">
-                <div className="flex items-center justify-between text-xs">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 text-xs">
                   <span className="text-muted">Delegation Utilization</span>
                   <span className="font-bold text-gradient-primary">{allocation}%</span>
                 </div>
@@ -255,7 +255,7 @@ export function MyDelegations() {
 
               {/* Account Info */}
               <div className="glass-card p-4 mb-6">
-                <div className="flex items-center justify-between text-sm">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-sm">
                   <span className="text-muted">Smart Account</span>
                   <code className="hash-code-small">
                     {delegation.smartAccountAddress.slice(0, 6)}...{delegation.smartAccountAddress.slice(-4)}
@@ -264,7 +264,7 @@ export function MyDelegations() {
               </div>
 
               {/* Action Buttons */}
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <button
                   className="btn btn--secondary"
                   disabled={!delegation.isActive || isRevoking}
@@ -301,13 +301,13 @@ export function MyDelegations() {
       </div>
 
       {/* Portfolio Summary Dashboard */}
-      <div className="glass-card p-6">
+      <div className="glass-card p-4 sm:p-6">
         <h3 className="font-bold mb-4 text-lg">Portfolio Summary</h3>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {/* Active Delegations */}
           <div className="text-center">
-            <div className="text-3xl font-bold text-gradient-primary mb-1">
+            <div className="text-2xl font-bold text-gradient-primary mb-1">
               {delegations.filter(d => d.isActive).length}
             </div>
             <div className="text-xs text-muted">Active Delegations</div>
@@ -315,7 +315,7 @@ export function MyDelegations() {
 
           {/* Total Volume */}
           <div className="text-center">
-            <div className="text-3xl font-bold text-gradient-secondary mb-1">
+            <div className="text-2xl font-bold text-gradient-secondary mb-1">
               {portfolioStats.totalVolume > 0
                 ? parseFloat(formatEther(portfolioStats.totalVolume)).toFixed(2)
                 : '0.00'}
@@ -325,7 +325,7 @@ export function MyDelegations() {
 
           {/* Total Earnings */}
           <div className="text-center">
-            <div className="text-3xl font-bold text-gradient-accent mb-1">
+            <div className="text-2xl font-bold text-gradient-accent mb-1">
               {portfolioStats.totalEarnings > 0
                 ? parseFloat(formatEther(portfolioStats.totalEarnings)).toFixed(4)
                 : '0.00'}
@@ -335,7 +335,7 @@ export function MyDelegations() {
 
           {/* Total Executions */}
           <div className="text-center">
-            <div className="text-3xl font-bold text-gray-300 mb-1">
+            <div className="text-2xl font-bold text-gray-300 mb-1">
               {portfolioStats.totalExecutions}
             </div>
             <div className="text-xs text-muted">

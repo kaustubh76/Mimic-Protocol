@@ -10,8 +10,8 @@ export function PatternLeaderboard() {
 
   if (isLoading) {
     return (
-      <div className="glass-card p-6">
-        <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
+      <div className="glass-card p-4 sm:p-6">
+        <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
           <span>🏆</span>
           <span>Top Performing Patterns</span>
         </h3>
@@ -26,8 +26,8 @@ export function PatternLeaderboard() {
 
   if (leaderboard.length === 0) {
     return (
-      <div className="glass-card p-6">
-        <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
+      <div className="glass-card p-4 sm:p-6">
+        <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
           <span>🏆</span>
           <span>Top Performing Patterns</span>
         </h3>
@@ -41,9 +41,9 @@ export function PatternLeaderboard() {
   }
 
   return (
-    <div className="glass-card p-6">
+    <div className="glass-card p-4 sm:p-6">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-xl font-bold flex items-center gap-2">
+        <h3 className="text-lg font-bold flex items-center gap-2">
           <span>🏆</span>
           <span>Top Performing Patterns</span>
         </h3>
@@ -68,15 +68,15 @@ export function PatternLeaderboard() {
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: index * 0.05, duration: 0.3 }}
             >
-              <div className="flex items-center gap-4">
+              <div className="flex items-start gap-3 sm:gap-4">
                 {/* Rank */}
-                <div className="text-2xl font-bold w-12 text-center flex-shrink-0">
+                <div className="text-xl sm:text-2xl font-bold w-8 sm:w-12 text-center flex-shrink-0">
                   {medal}
                 </div>
 
                 {/* Pattern Info */}
                 <div className="flex-1 min-w-0 space-y-2">
-                  <div className="flex items-center justify-between flex-wrap gap-2">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-2">
                     <div className="flex items-center gap-2">
                       <span className="font-bold">Pattern #{pattern.id}</span>
                       <span className={`pattern-badge pattern-badge--${pattern.patternType} text-xs`}>
@@ -89,7 +89,7 @@ export function PatternLeaderboard() {
                   </div>
 
                   {/* Quick Stats */}
-                  <div className="flex items-center gap-4 text-xs flex-wrap">
+                  <div className="flex items-center gap-2 sm:gap-4 text-xs flex-wrap">
                     <div className="flex items-center gap-1">
                       <span className="text-muted">Win:</span>
                       <span className="font-bold text-success">{winRate}%</span>

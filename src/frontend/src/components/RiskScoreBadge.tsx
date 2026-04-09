@@ -151,9 +151,9 @@ interface HealthMetricsProps {
 
 export function HealthMetrics({ consecutiveLosses, maxDrawdown, sharpeRatio, consistency }: HealthMetricsProps) {
   return (
-    <div className="grid grid-cols-2 gap-2 text-xs">
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3 text-xs">
       {/* Consecutive Losses */}
-      <div className="glass-card p-2 space-y-1">
+      <div className="glass-card p-2 sm:p-3 space-y-1">
         <div className="text-muted">Consecutive Losses</div>
         <div className={`font-bold ${consecutiveLosses >= 5 ? 'text-error' : consecutiveLosses >= 3 ? 'text-warning' : 'text-success'}`}>
           {consecutiveLosses}
@@ -162,7 +162,7 @@ export function HealthMetrics({ consecutiveLosses, maxDrawdown, sharpeRatio, con
       </div>
 
       {/* Max Drawdown */}
-      <div className="glass-card p-2 space-y-1">
+      <div className="glass-card p-2 sm:p-3 space-y-1">
         <div className="text-muted">Max Drawdown</div>
         <div className={`font-bold ${maxDrawdown >= 30 ? 'text-error' : maxDrawdown >= 20 ? 'text-warning' : 'text-success'}`}>
           {maxDrawdown.toFixed(1)}%
@@ -170,7 +170,7 @@ export function HealthMetrics({ consecutiveLosses, maxDrawdown, sharpeRatio, con
       </div>
 
       {/* Sharpe Ratio */}
-      <div className="glass-card p-2 space-y-1">
+      <div className="glass-card p-2 sm:p-3 space-y-1">
         <div className="text-muted">Sharpe Ratio</div>
         <div className={`font-bold ${sharpeRatio >= 2 ? 'text-success' : sharpeRatio >= 1 ? 'text-warning' : 'text-error'}`}>
           {sharpeRatio.toFixed(2)}
@@ -178,7 +178,7 @@ export function HealthMetrics({ consecutiveLosses, maxDrawdown, sharpeRatio, con
       </div>
 
       {/* Consistency */}
-      <div className="glass-card p-2 space-y-1">
+      <div className="glass-card p-2 sm:p-3 space-y-1">
         <div className="text-muted">Consistency</div>
         <div className="font-bold text-gradient-primary">
           {(consistency * 100).toFixed(0)}%

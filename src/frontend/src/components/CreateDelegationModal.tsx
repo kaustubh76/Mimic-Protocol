@@ -108,7 +108,7 @@ export function CreateDelegationModal({
               <div className="success-icon">✅</div>
             </div>
 
-            <h2 className="text-3xl font-bold mb-3">Delegation Created!</h2>
+            <h2 className="text-2xl font-bold mb-3">Delegation Created!</h2>
             <p className="text-secondary mb-6">
               Your delegation to <span className="text-gradient-primary font-bold">{pattern.patternType.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}</span> has been created successfully.
             </p>
@@ -131,7 +131,7 @@ export function CreateDelegationModal({
               </div>
             )}
 
-            <div className="glass-card px-6 py-3 inline-block">
+            <div className="glass-card px-4 sm:px-6 py-3 inline-block">
               <p className="text-sm text-muted">
                 Closing in <span className="text-gradient-primary font-bold text-lg">{countdown}</span> seconds...
               </p>
@@ -159,31 +159,31 @@ export function CreateDelegationModal({
 
             <div className="modal-body">
               {/* Pattern Summary */}
-              <div className="glass-card p-6 mb-6 space-y-4">
+              <div className="glass-card p-4 sm:p-6 mb-6 space-y-4">
                 <div className="flex items-center gap-3">
                   <span className={`pattern-badge pattern-badge--${pattern.patternType}`}>
                     {pattern.patternType.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}
                   </span>
-                  <h3 className="text-xl font-bold">
+                  <h3 className="text-lg font-bold">
                     Pattern #{Number(pattern.tokenId)}
                   </h3>
                 </div>
 
-                <div className="grid grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
                   <div className="text-center">
-                    <div className="text-2xl font-bold text-gradient-primary mb-1">
+                    <div className="text-lg sm:text-xl font-bold text-gradient-primary mb-1">
                       {winRate}%
                     </div>
                     <div className="text-xs text-muted">Win Rate</div>
                   </div>
                   <div className="text-center">
-                    <div className="text-2xl font-bold text-gradient-secondary mb-1">
+                    <div className="text-lg sm:text-xl font-bold text-gradient-secondary mb-1">
                       {parseFloat(volume).toFixed(0)}
                     </div>
                     <div className="text-xs text-muted">Volume</div>
                   </div>
                   <div className="text-center">
-                    <div className={`text-2xl font-bold mb-1 ${roi >= 0 ? 'text-success' : 'text-error'}`}>
+                    <div className={`text-lg sm:text-xl font-bold mb-1 ${roi >= 0 ? 'text-success' : 'text-error'}`}>
                       {roi > 0 ? '+' : ''}{roi}%
                     </div>
                     <div className="text-xs text-muted">ROI</div>
@@ -257,13 +257,13 @@ export function CreateDelegationModal({
 
                 {/* Account Info */}
                 <div className="glass-card p-4 space-y-3">
-                  <div className="flex items-center justify-between text-sm">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-2 text-sm">
                     <span className="text-muted">Your Address</span>
                     <code className="hash-code-small">
                       {address ? `${address.slice(0, 6)}...${address.slice(-4)}` : 'Not connected'}
                     </code>
                   </div>
-                  <div className="flex items-center justify-between text-sm">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-2 text-sm">
                     <span className="text-muted">Smart Account</span>
                     <code className="hash-code-small">
                       {address ? `${address.slice(0, 6)}...${address.slice(-4)}` : 'Not connected'}

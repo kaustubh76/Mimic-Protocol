@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Pattern } from './usePatterns';
+import { ENVIO_GRAPHQL_URL } from '../contracts/config';
 
 // Mirror the types from our backend systems
 export interface RiskScore {
@@ -60,20 +61,23 @@ export function usePatternAnalytics(pattern: Pattern | null) {
       setError(null);
 
       try {
-        // Calculate risk score using PatternValidator logic
-        const riskScore = calculateRiskScore(pattern);
+        // Try to enrich pattern with Envio-computed analytics (trendDirection, qualityGrade)
+        const enriched = await tryFetchEnvioAnalytics(pattern);
 
-        // Calculate quality score
-        const qualityScore = calculateQualityScore(pattern);
+        // Calculate risk score using PatternValidator logic
+        const riskScore = calculateRiskScore(enriched);
+
+        // Calculate quality score (uses Envio qualityGrade if available)
+        const qualityScore = calculateQualityScore(enriched);
 
         // Calculate health metrics
-        const health = calculateHealthMetrics(pattern);
+        const health = calculateHealthMetrics(enriched);
 
-        // Determine trending status
-        const isTrending = checkIfTrending(pattern);
+        // Determine trending status (uses Envio trendDirection if available)
+        const isTrending = checkIfTrending(enriched);
 
         // Check circuit breaker (would query CircuitBreaker contract in production)
-        const circuitBreakerStatus = await checkCircuitBreaker(pattern);
+        const circuitBreakerStatus = await checkCircuitBreaker(enriched);
 
         setAnalytics({
           tokenId: pattern.tokenId,
@@ -81,7 +85,11 @@ export function usePatternAnalytics(pattern: Pattern | null) {
           qualityScore,
           health,
           isTrending,
-          trendingReason: isTrending ? 'High growth rate and strong performance' : undefined,
+          trendingReason: isTrending
+            ? (enriched.trendDirection === 'improving'
+              ? 'Envio: 3+ consecutive performance improvements'
+              : 'High growth rate and strong performance')
+            : undefined,
           delegatorCount: 0, // Would come from DelegationRouter contract
           circuitBreakerStatus,
         });
@@ -97,6 +105,40 @@ export function usePatternAnalytics(pattern: Pattern | null) {
   }, [pattern]);
 
   return { analytics, isLoading, error };
+}
+
+/**
+ * Try to fetch Envio-computed analytics (trendDirection, qualityGrade)
+ * Returns enriched pattern if available, original pattern as fallback
+ */
+async function tryFetchEnvioAnalytics(pattern: Pattern): Promise<Pattern> {
+  try {
+    const query = `
+      query GetPatternAnalytics($tokenId: numeric!) {
+        Pattern(where: {tokenId: {_eq: $tokenId}}) {
+          trendDirection
+          qualityGrade
+        }
+      }
+    `;
+    const res = await fetch(ENVIO_GRAPHQL_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query, variables: { tokenId: Number(pattern.tokenId) } }),
+    });
+    if (!res.ok) return pattern;
+    const data = await res.json();
+    if (data.errors) return pattern; // Fields don't exist yet on this deployment
+    const envioPattern = data.data?.Pattern?.[0];
+    if (!envioPattern) return pattern;
+    return {
+      ...pattern,
+      trendDirection: envioPattern.trendDirection || undefined,
+      qualityGrade: envioPattern.qualityGrade || undefined,
+    };
+  } catch {
+    return pattern; // Envio unavailable, use local computation
+  }
 }
 
 /**
@@ -157,6 +199,21 @@ function calculateRiskScore(pattern: Pattern): RiskScore {
  * Calculate quality score with grade (mirrors PatternValidator.ts logic)
  */
 function calculateQualityScore(pattern: Pattern): QualityScore {
+  // Prefer Envio-computed quality grade if available
+  if (pattern.qualityGrade) {
+    const envioGrade = pattern.qualityGrade as QualityScore['grade'];
+    const gradeScores: Record<string, number> = { 'A+': 98, 'A': 90, 'B': 80, 'C': 70, 'D': 60, 'F': 40 };
+    const score = gradeScores[envioGrade] || 50;
+    const strengths: string[] = [];
+    const weaknesses: string[] = [];
+    if (score >= 80) strengths.push('Envio-verified high performance');
+    if (score >= 90) strengths.push('Top-tier pattern');
+    if (score < 60) weaknesses.push('Below average performance');
+    if (score < 50) weaknesses.push('Pattern needs improvement');
+    return { score, grade: envioGrade, strengths, weaknesses };
+  }
+
+  // Fallback: local computation when Envio data not available
   const winRate = Number(pattern.winRate) / 100;
   const roi = Number(pattern.roi) / 100;
   const volume = Number(pattern.totalVolume);
@@ -251,10 +308,14 @@ function calculateHealthMetrics(pattern: Pattern): PatternHealth {
  * Check if pattern is trending
  */
 function checkIfTrending(pattern: Pattern): boolean {
+  // Prefer Envio-computed trend direction if available
+  if (pattern.trendDirection) {
+    return pattern.trendDirection === 'improving';
+  }
+
+  // Fallback: local estimate when Envio data not available
   const winRate = Number(pattern.winRate) / 100;
   const roi = Number(pattern.roi) / 100;
-
-  // Pattern is trending if it has strong metrics
   return winRate >= 65 && roi >= 20;
 }
 

@@ -65,7 +65,7 @@ export function ExecutionStatsDisplay({ delegationId, stats, isLoading }: Execut
   if (!stats || stats.totalExecutions === 0) {
     return (
       <div className="glass-card p-4 text-center space-y-2">
-        <div className="text-3xl">⏳</div>
+        <div className="text-2xl">⏳</div>
         <div className="text-sm text-muted">No executions yet</div>
         <div className="text-xs text-muted">Pattern will execute automatically when conditions match</div>
       </div>
@@ -96,8 +96,8 @@ export function ExecutionStatsDisplay({ delegationId, stats, isLoading }: Execut
       </div>
 
       {/* Success Rate Ring */}
-      <div className="flex items-center justify-center py-4">
-        <div className="relative w-32 h-32">
+      <div className="flex items-center justify-center py-2 sm:py-4">
+        <div className="relative w-24 h-24 sm:w-32 sm:h-32">
           {/* Background circle */}
           <svg className="w-full h-full" viewBox="0 0 100 100">
             <circle
@@ -133,11 +133,11 @@ export function ExecutionStatsDisplay({ delegationId, stats, isLoading }: Execut
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         {/* Total Executions */}
         <div className="glass-card p-3 space-y-1">
           <div className="text-xs text-muted">Total Executions</div>
-          <div className="text-xl font-bold text-gradient-primary">
+          <div className="text-lg font-bold text-gradient-primary">
             {stats.totalExecutions}
           </div>
         </div>
@@ -145,7 +145,7 @@ export function ExecutionStatsDisplay({ delegationId, stats, isLoading }: Execut
         {/* Successful */}
         <div className="glass-card p-3 space-y-1">
           <div className="text-xs text-muted">Successful</div>
-          <div className="text-xl font-bold text-success">
+          <div className="text-lg font-bold text-success">
             {stats.successfulExecutions}
           </div>
         </div>
@@ -153,7 +153,7 @@ export function ExecutionStatsDisplay({ delegationId, stats, isLoading }: Execut
         {/* Failed */}
         <div className="glass-card p-3 space-y-1">
           <div className="text-xs text-muted">Failed</div>
-          <div className="text-xl font-bold text-error">
+          <div className="text-lg font-bold text-error">
             {stats.failedExecutions}
           </div>
         </div>
@@ -161,7 +161,7 @@ export function ExecutionStatsDisplay({ delegationId, stats, isLoading }: Execut
         {/* Volume */}
         <div className="glass-card p-3 space-y-1">
           <div className="text-xs text-muted">Volume Executed</div>
-          <div className="text-xl font-bold text-gradient-secondary">
+          <div className="text-lg font-bold text-gradient-secondary">
             {(Number(stats.totalVolumeExecuted) / 1e18).toFixed(2)}
           </div>
         </div>
@@ -169,13 +169,13 @@ export function ExecutionStatsDisplay({ delegationId, stats, isLoading }: Execut
 
       {/* Gas Efficiency */}
       <div className="glass-card p-3 space-y-2">
-        <div className="flex items-center justify-between text-xs">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 text-xs">
           <span className="text-muted">Avg Gas per Execution</span>
           <span className="font-bold text-gradient-accent">
             {avgGasPerExecution.toLocaleString(undefined, { maximumFractionDigits: 0 })}
           </span>
         </div>
-        <div className="flex items-center justify-between text-xs">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 text-xs">
           <span className="text-muted">Total Gas Used</span>
           <span className="font-mono text-muted">
             {Number(stats.totalGasUsed).toLocaleString()}
@@ -261,7 +261,7 @@ export function ExecutionLog({ logs, maxEntries = 10 }: ExecutionLogProps) {
 
   if (displayLogs.length === 0) {
     return (
-      <div className="glass-card p-6 text-center space-y-2">
+      <div className="glass-card p-4 sm:p-6 text-center space-y-2">
         <div className="text-3xl">📋</div>
         <div className="text-sm text-muted">No execution history</div>
       </div>
@@ -288,7 +288,7 @@ export function ExecutionLog({ logs, maxEntries = 10 }: ExecutionLogProps) {
 
             {/* Info */}
             <div className="flex-1 text-xs space-y-1">
-              <div className="flex items-center justify-between">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
                 <span className="text-muted">
                   {new Date(log.timestamp * 1000).toLocaleTimeString()}
                 </span>

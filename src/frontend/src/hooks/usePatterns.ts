@@ -15,6 +15,8 @@ export interface Pattern {
   createdAt: bigint;
   successfulExecutions: number;
   failedExecutions: number;
+  trendDirection?: string;  // Envio-computed: "improving" | "declining" | "stable"
+  qualityGrade?: string;    // Envio-computed: "A+" | "A" | "B" | "C" | "D" | "F"
 }
 
 
@@ -91,6 +93,8 @@ export function usePatterns(pollIntervalMs = 10000) {
             createdAt: BigInt(p.createdAt || Math.floor(Date.now() / 1000)),
             successfulExecutions: p.successfulExecutions || 0,
             failedExecutions: p.failedExecutions || 0,
+            trendDirection: p.trendDirection || undefined,
+            qualityGrade: p.qualityGrade || undefined,
           }));
 
           setPatterns(formattedPatterns);
