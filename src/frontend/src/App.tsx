@@ -14,6 +14,7 @@ import { MyDelegations } from './components/MyDelegations'
 import { EnvioMetricsDashboard } from './components/EnvioMetricsDashboard'
 import { LiveExecutionFeed } from './components/LiveExecutionFeed'
 import { EnvioDataFlow } from './components/EnvioDataFlow'
+import { AnalyticsCharts } from './components/AnalyticsCharts'
 import { useUserStats } from './hooks/useUserStats'
 import { ENVIO_GRAPHQL_URL } from './contracts/config'
 import { useEnvioMetrics } from './hooks/useEnvioMetrics'
@@ -214,6 +215,13 @@ export function App() {
               <EnvioMetricsDashboard />
             </motion.section>
 
+            {/* Analytics Charts — Pattern ROI + Execution Timeline */}
+            <motion.section
+              variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}
+            >
+              <AnalyticsCharts />
+            </motion.section>
+
             {/* Envio Data Flow + Live Execution Feed */}
             <motion.section
               variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}
@@ -326,6 +334,7 @@ export function App() {
               >
                 {activeTab === 'patterns' && (
                   <div className="space-y-8">
+                    <AnalyticsCharts />
                     <PatternLeaderboard />
                     <PatternBrowser />
                   </div>
