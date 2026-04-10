@@ -1,6 +1,6 @@
 /**
  * @file EventHandlers.ts
- * @description Main event handlers for Envio indexer — Mirror Protocol
+ * @description Main event handlers for Envio indexer — Mirror Protocol (with earnings)
  * @author Mirror Protocol Team
  *
  * Registers all 8 event handlers using Envio v2 registration API:
@@ -8,7 +8,7 @@
  * - DelegationRouter: DelegationCreated, DelegationRevoked, DelegationUpdated, TradeExecuted
  */
 
-import { BehavioralNFT, DelegationRouter } from "../generated";
+import { BehavioralNFT, DelegationRouter } from "./generated";
 
 // ─── Performance tracking ───────────────────────────────────────────────────
 // Tracks real handler processing times for the Envio metrics dashboard

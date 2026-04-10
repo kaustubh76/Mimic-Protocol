@@ -107,6 +107,9 @@ type Pattern @entity {
 
   "Delegation history for this pattern"
   delegations: [Delegation!]! @derivedFrom(field: "pattern")
+
+  "Execution history"
+  executions: [Execution!]! @derivedFrom(field: "pattern")
 }
 
 """
@@ -430,8 +433,37 @@ type Delegator @entity {
 }
 
 """
+Execution entity (placeholder for future ExecutionEngine integration)
+Tracks automated pattern executions
+"""
+type Execution @entity {
+  "Unique execution ID"
+  id: ID!
+
+  "Pattern being executed"
+  pattern: Pattern!
+
+  "Execution timestamp"
+  timestamp: BigInt! @index
+
+  "Execution success status"
+  success: Boolean! @index
+
+  "Transaction hash"
+  txHash: Bytes!
+
+  "Gas used"
+  gasUsed: BigInt!
+
+  "Profit/loss from execution"
+  profitLoss: BigInt!
+
+  "Error message (if failed)"
+  error: String
+}
+
+"""
 TradeExecution entity tracking individual trade executions
-Populated by DelegationRouter.TradeExecuted handler
 """
 type TradeExecution @entity {
   "Unique execution ID: {delegationId}-{timestamp}-{blockNumber}"
