@@ -738,6 +738,17 @@ contract ExecutionEngine is Ownable, Pausable, ReentrancyGuard {
     }
 
     /**
+     * @notice Approve `spender` to pull up to `amount` of `token` from this contract.
+     * @dev    Required so the ExecutionEngine's trading float (e.g. WETH) can be
+     *         spent by a DEX adapter during executeTrade. Uses SafeERC20.forceApprove
+     *         to handle tokens that require the allowance be zeroed first.
+     */
+    function approveToken(IERC20 token, address spender, uint256 amount) external onlyOwner {
+        if (address(token) == address(0) || spender == address(0)) revert ZeroAddress();
+        token.forceApprove(spender, amount);
+    }
+
+    /**
      * @notice Update maximum delegation depth
      */
     function setMaxDelegationDepth(uint256 depth) external onlyOwner {
