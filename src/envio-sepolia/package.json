@@ -1,0 +1,7 @@
+{
+  "name": "mirror-protocol-envio",
+  "version": "1.0.0",
+  "dependencies": {
+    "envio": "2.32.6"
+  }
+}
