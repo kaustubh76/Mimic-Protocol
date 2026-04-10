@@ -46,6 +46,9 @@ test-results/
 # Envio
 .envio/
 envio_output/
+generated/
+src/envio/generated/
+src/envio/src/generated/
 
 # Logs
 logs/
@@ -64,3 +67,5 @@ tmp/
 # Database
 *.db
 *.sqlite
+.vercel
+.env*.local
