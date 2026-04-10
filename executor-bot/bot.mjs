@@ -1,21 +1,26 @@
 /**
- * Mirror Protocol — Executor Bot
+ * Mirror Protocol — Executor Bot (Sepolia)
  *
- * Watches Envio GraphQL for active delegations and automatically
- * executes trades via ExecutionEngine when on-chain conditions match.
+ * Watches Envio GraphQL for active delegations and automatically executes
+ * real Uniswap V2 swaps through the UniswapV2Adapter on Ethereum Sepolia
+ * whenever on-chain conditions match.
  *
- * This demonstrates the "Best On-chain Automation" bounty:
- * - Envio provides < 50ms signal detection
- * - Bot executes trades on Monad within milliseconds
- * - No manual intervention needed
+ * Flow:
+ *   1. Poll Envio (Sepolia indexer) for active delegations + pattern metrics
+ *   2. Check per-delegation conditions (min win rate / ROI / volume)
+ *   3. Call ExecutionEngine.executeTrade with callData =
+ *      UniswapV2Adapter.swap(WETH, amount, minOut, ExecutionEngine)
+ *   4. UniswapV2Adapter pulls WETH from the ExecutionEngine, swaps via the
+ *      real Sepolia Uniswap V2 Router02, sends USDC back to the engine
+ *   5. TradeExecuted event fires, Envio indexes it, frontend feed renders it
  *
  * Usage:
  *   node executor-bot/bot.mjs
  *
  * Requirements:
- *   - .env with PRIVATE_KEY, MONAD_RPC_URL, contract addresses
- *   - Envio indexer running (pnpm envio dev in src/envio/)
- *   - Deployer wallet added as executor on ExecutionEngine
+ *   - .env with DEPLOYER_PRIVATE_KEY (must be the executor on the engine)
+ *   - .env with SEPOLIA_RPC_URL (defaults to publicnode)
+ *   - .env with VITE_ENVIO_GRAPHQL_URL_SEPOLIA (the live Sepolia indexer URL)
  */
 
 import { createWalletClient, createPublicClient, http, parseEther, encodeFunctionData } from 'viem';
@@ -42,23 +47,54 @@ function loadEnv() {
 
 const ENV = loadEnv();
 
-const MONAD_CHAIN = {
-  id: 10143,
-  name: 'Monad Testnet',
-  nativeCurrency: { name: 'Monad', symbol: 'MON', decimals: 18 },
-  rpcUrls: { default: { http: [ENV.MONAD_RPC_URL || 'https://testnet-rpc.monad.xyz'] } },
+const SEPOLIA_CHAIN = {
+  id: 11155111,
+  name: 'Sepolia',
+  nativeCurrency: { name: 'Sepolia Ether', symbol: 'ETH', decimals: 18 },
+  rpcUrls: {
+    default: {
+      http: [ENV.SEPOLIA_RPC_URL || 'https://ethereum-sepolia-rpc.publicnode.com'],
+    },
+  },
 };
 
 const GRAPHQL_ENDPOINT =
-  ENV.ENVIO_GRAPHQL_URL || 'https://indexer.dev.hyperindex.xyz/4cda827/v1/graphql';
+  ENV.VITE_ENVIO_GRAPHQL_URL_SEPOLIA ||
+  ENV.ENVIO_GRAPHQL_URL ||
+  'https://indexer.dev.hyperindex.xyz/009ef9b/v1/graphql';
 
 const CONTRACTS = {
-  EXECUTION_ENGINE: (ENV.EXECUTION_ENGINE_ADDRESS || '0x4364457325CeB1Af9f0BDD72C0927eD30CB69eD8'),
-  DELEGATION_ROUTER: (ENV.DELEGATION_ROUTER_ADDRESS || '0xd5499e0d781b123724dF253776Aa1EB09780AfBf'),
-  BEHAVIORAL_NFT: (ENV.BEHAVIORAL_NFT_ADDRESS || '0x6943e7D39F3799d0b8fa9D6aD6B63861a15a8d26'),
-  MOCK_DEX: (ENV.MOCK_DEX_ADDRESS || '0x8108e615e7858f246f820eae0844c983ea5e9a12'),
-  TEST_TOKEN: (ENV.TEST_TOKEN_ADDRESS || '0x21C06C325F7b308cF1B52568B462747944B3Fde6'),
+  // Mirror Protocol on Sepolia (gate 7 deploy)
+  EXECUTION_ENGINE: (ENV.SEPOLIA_EXECUTION_ENGINE_ADDRESS || '0x1C1b05628EFaD25804E663dEeA97e224ccA1eD5A'),
+  DELEGATION_ROUTER: (ENV.SEPOLIA_DELEGATION_ROUTER_ADDRESS || '0xD36fB1E9537fa3b7b15B9892eb0E42A0226577a8'),
+  BEHAVIORAL_NFT: (ENV.SEPOLIA_BEHAVIORAL_NFT_ADDRESS || '0xCFa22481dDa2E4758115D3e826C2FfA1eC9c3954'),
+  // UniswapV2Adapter — wraps the real Sepolia Uniswap V2 Router02
+  UNISWAP_V2_ADAPTER: (ENV.SEPOLIA_UNISWAP_ADAPTER_ADDRESS || '0x5B59f315d4E2670446ed7B130584A326A0f7c2D3'),
+  // Sepolia Uniswap V2 infrastructure (verified live)
+  WETH: (ENV.SEPOLIA_WETH || '0xfFf9976782d46CC05630D1f6eBAb18b2324d6B14'),
+  USDC: (ENV.SEPOLIA_TOKEN_B || '0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238'),
 };
+
+// Size of each executed swap. The ExecutionEngine holds a 0.1 WETH float
+// (seeded during the gate 7 deploy), so this allows ~100 demo trades before
+// the float needs topping up. The engine's balance check at ExecutionEngine.sol
+// line 504-507 is read against the delegation's smart account balance, not
+// the engine's float, so the smart accounts also need WETH — handled separately.
+const TRADE_AMOUNT = parseEther('0.001');
+
+// UniswapV2Adapter.swap(IERC20 tokenIn, uint256 amountIn, uint256 minAmountOut, address to)
+const UNISWAP_V2_ADAPTER_ABI = [{
+  name: 'swap',
+  type: 'function',
+  stateMutability: 'nonpayable',
+  inputs: [
+    { name: 'tokenIn', type: 'address' },
+    { name: 'amountIn', type: 'uint256' },
+    { name: 'minAmountOut', type: 'uint256' },
+    { name: 'to', type: 'address' },
+  ],
+  outputs: [{ name: 'amountOut', type: 'uint256' }],
+}];
 
 // ─── Delegation Conditions Cache ────────────────────────────────────────────
 const conditionsCache = new Map();
@@ -266,19 +302,31 @@ async function processExecution(delegation, walletClient, publicClient, executor
   console.log(`    Envio metrics: winRate=${patternMetrics.winRate} roi=${patternMetrics.roi} volume=${patternMetrics.totalVolume}`);
   console.log(`    Conditions: minWR=${conditions.minWinRate} minROI=${conditions.minROI} → EXECUTING`);
 
-  const tradeAmount = parseEther('0.001'); // Small test amount
+  const tradeAmount = TRADE_AMOUNT; // 0.001 WETH per trade (see constant above)
 
-  // Use deployed TestToken and MockDEX for real execution
-  const tradeToken = CONTRACTS.TEST_TOKEN;
-  const targetDex = CONTRACTS.MOCK_DEX;
+  // Real swap through UniswapV2Adapter.
+  // The adapter pulls `tradeAmount` WETH from msg.sender (= ExecutionEngine)
+  // via safeTransferFrom, routes it through the real Sepolia Uniswap V2
+  // Router02 (WETH -> USDC), and sends the USDC back to `to` (= ExecutionEngine).
+  // The engine's WETH allowance for the adapter was set to MAX during gate 7
+  // via engine.approveToken(WETH, adapter, MAX).
+  const swapCallData = encodeFunctionData({
+    abi: UNISWAP_V2_ADAPTER_ABI,
+    functionName: 'swap',
+    args: [
+      CONTRACTS.WETH,                 // tokenIn
+      tradeAmount,                    // amountIn (0.001 WETH)
+      0n,                             // minAmountOut = 0 for demo; slippage check lives on the router
+      CONTRACTS.EXECUTION_ENGINE,     // to — swapped USDC accumulates in the engine
+    ],
+  });
 
-  // MockDEX accepts any call via receive() — empty callData for demo
   const tradeParams = {
     delegationId,
-    token: tradeToken,
+    token: CONTRACTS.WETH,            // informational: what we're "trading in"
     amount: tradeAmount,
-    targetContract: targetDex,
-    callData: '0x',
+    targetContract: CONTRACTS.UNISWAP_V2_ADAPTER,
+    callData: swapCallData,
   };
 
   const metrics = {
@@ -356,7 +404,7 @@ async function main() {
   console.log('');
   console.log('══════════════════════════════════════════════════════');
   console.log('   Mirror Protocol — Executor Bot                     ');
-  console.log('   Powered by Envio HyperSync on Monad Testnet        ');
+  console.log('   Powered by Envio HyperSync on Ethereum Sepolia     ');
   console.log('══════════════════════════════════════════════════════');
   console.log('');
 
@@ -365,13 +413,15 @@ async function main() {
     process.exit(1);
   }
 
-  const privKey = (ENV.PRIVATE_KEY || ENV.DEPLOYER_PRIVATE_KEY);
-  const account = privateKeyToAccount(`0x${privKey}`);
+  // Accept keys with or without the 0x prefix.
+  const rawKey = (ENV.PRIVATE_KEY || ENV.DEPLOYER_PRIVATE_KEY);
+  const privKey = rawKey.startsWith('0x') ? rawKey : `0x${rawKey}`;
+  const account = privateKeyToAccount(privKey);
 
-  const transport = http(ENV.MONAD_RPC_URL || 'https://testnet-rpc.monad.xyz');
+  const transport = http(ENV.SEPOLIA_RPC_URL || 'https://ethereum-sepolia-rpc.publicnode.com');
 
-  const publicClient = createPublicClient({ chain: MONAD_CHAIN, transport });
-  const walletClient = createWalletClient({ account, chain: MONAD_CHAIN, transport });
+  const publicClient = createPublicClient({ chain: SEPOLIA_CHAIN, transport });
+  const walletClient = createWalletClient({ account, chain: SEPOLIA_CHAIN, transport });
 
   console.log(`Executor address: ${account.address}`);
   console.log(`ExecutionEngine:  ${CONTRACTS.EXECUTION_ENGINE}`);

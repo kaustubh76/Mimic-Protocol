@@ -18,7 +18,7 @@ import { AnalyticsCharts } from './components/AnalyticsCharts'
 import { useUserStats } from './hooks/useUserStats'
 import { ENVIO_GRAPHQL_URL } from './contracts/config'
 import { useEnvioMetrics } from './hooks/useEnvioMetrics'
-import { MONAD_CHAIN_ID } from './contracts/config'
+import { SEPOLIA_CHAIN_ID, SEPOLIA_CONTRACTS } from './contracts/config'
 import './globals.css'
 
 type Tab = 'patterns' | 'delegations' | 'live' | 'account'
@@ -33,7 +33,7 @@ export function App() {
   const [mounted, setMounted] = useState(false)
   const [scrolled, setScrolled] = useState(false)
 
-  const isCorrectChain = chainId === MONAD_CHAIN_ID
+  const isCorrectChain = chainId === SEPOLIA_CHAIN_ID
 
   useEffect(() => {
     setMounted(true)
@@ -68,7 +68,7 @@ export function App() {
                   Mirror Protocol
                 </h1>
                 <p className="text-sm text-muted">
-                  Powered by Envio HyperSync · Monad Testnet
+                  Powered by Envio HyperSync · Ethereum Sepolia
                 </p>
               </div>
             </div>
@@ -84,7 +84,7 @@ export function App() {
               <a href="https://docs.envio.dev" target="_blank" rel="noopener noreferrer" className="text-muted hover:text-white transition-colors">
                 Envio Docs
               </a>
-              <a href="https://explorer.testnet.monad.xyz" target="_blank" rel="noopener noreferrer" className="text-muted hover:text-white transition-colors">
+              <a href="https://sepolia.etherscan.io" target="_blank" rel="noopener noreferrer" className="text-muted hover:text-white transition-colors">
                 Explorer
               </a>
             </nav>
@@ -104,7 +104,7 @@ export function App() {
             <div className="flex items-center justify-center gap-2 text-sm">
               <span className="text-xl">⚠️</span>
               <span className="font-semibold">
-                Please switch to Monad Testnet (Chain ID: {MONAD_CHAIN_ID})
+                Please switch to Ethereum Sepolia (Chain ID: {SEPOLIA_CHAIN_ID})
               </span>
             </div>
           </div>
@@ -476,7 +476,7 @@ export function App() {
                   MetaMask Toolkit
                 </span>
                 <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-gradient-accent">
-                  Monad Testnet
+                  Ethereum Sepolia
                 </span>
               </div>
             </div>
@@ -491,7 +491,7 @@ export function App() {
                 <a href={ENVIO_GRAPHQL_URL} target="_blank" rel="noopener noreferrer" className="text-sm text-muted hover:text-white transition-colors">
                   GraphQL API
                 </a>
-                <a href="https://explorer.testnet.monad.xyz/address/0x6943e7D39F3799d0b8fa9D6aD6B63861a15a8d26" target="_blank" rel="noopener noreferrer" className="text-sm text-muted hover:text-white transition-colors">
+                <a href={`https://sepolia.etherscan.io/address/${SEPOLIA_CONTRACTS.BEHAVIORAL_NFT}`} target="_blank" rel="noopener noreferrer" className="text-sm text-muted hover:text-white transition-colors">
                   Contract Explorer
                 </a>
                 <a href="https://docs.envio.dev" target="_blank" rel="noopener noreferrer" className="text-sm text-muted hover:text-white transition-colors">
@@ -500,8 +500,8 @@ export function App() {
                 <a href="https://docs.metamask.io/delegation-toolkit/" target="_blank" rel="noopener noreferrer" className="text-sm text-muted hover:text-white transition-colors">
                   MetaMask Docs
                 </a>
-                <a href="https://testnet.monad.xyz" target="_blank" rel="noopener noreferrer" className="text-sm text-muted hover:text-white transition-colors">
-                  Monad Testnet
+                <a href="https://sepolia.etherscan.io" target="_blank" rel="noopener noreferrer" className="text-sm text-muted hover:text-white transition-colors">
+                  Sepolia Explorer
                 </a>
               </div>
             </div>
@@ -511,14 +511,15 @@ export function App() {
               <h4 className="text-sm font-bold text-white uppercase tracking-wider">Smart Contracts</h4>
               <div className="space-y-2">
                 {[
-                  { name: 'BehavioralNFT', addr: '0x6943e7D39F3799d0b8fa9D6aD6B63861a15a8d26' },
-                  { name: 'DelegationRouter', addr: '0xd5499e0d781b123724dF253776Aa1EB09780AfBf' },
-                  { name: 'PatternDetector', addr: '0x28BEC7E4d25D385BBf5FD4d2CF5163c513662CaE' },
-                  { name: 'ExecutionEngine', addr: '0x4364457325CeB1Af9f0BDD72C0927eD30CB69eD8' },
+                  { name: 'BehavioralNFT', addr: SEPOLIA_CONTRACTS.BEHAVIORAL_NFT },
+                  { name: 'DelegationRouter', addr: SEPOLIA_CONTRACTS.DELEGATION_ROUTER },
+                  { name: 'PatternDetector', addr: SEPOLIA_CONTRACTS.PATTERN_DETECTOR },
+                  { name: 'ExecutionEngine', addr: SEPOLIA_CONTRACTS.EXECUTION_ENGINE },
+                  { name: 'UniswapV2Adapter', addr: SEPOLIA_CONTRACTS.UNISWAP_V2_ADAPTER },
                 ].map(c => (
                   <a
                     key={c.name}
-                    href={`https://explorer.testnet.monad.xyz/address/${c.addr}`}
+                    href={`https://sepolia.etherscan.io/address/${c.addr}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center justify-between text-xs group"
@@ -536,7 +537,7 @@ export function App() {
           {/* Bottom Bar */}
           <div className="pt-6 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-3">
             <p className="text-xs text-muted">
-              Mirror Protocol &copy; 2025 &middot; Built on Monad Testnet (Chain ID {MONAD_CHAIN_ID})
+              Mirror Protocol &copy; 2026 &middot; Live on Ethereum Sepolia (Chain ID {SEPOLIA_CHAIN_ID}) &middot; Real Uniswap V2 execution
             </p>
             <div className="flex items-center gap-4 text-xs text-muted">
               <span className="flex items-center gap-1.5">
@@ -546,7 +547,7 @@ export function App() {
                 </span>
                 Envio Indexer Live
               </span>
-              <span>Monad Testnet</span>
+              <span>Ethereum Sepolia</span>
             </div>
           </div>
         </div>

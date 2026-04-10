@@ -36,10 +36,12 @@ export const monadTestnet = defineChain({
 })
 
 export const config = createConfig({
-  chains: [monadTestnet, sepolia],
+  // Sepolia first = default chain after the Sepolia pivot (April 2026).
+  // Monad Testnet kept in the list so existing wallets connected to it still load.
+  chains: [sepolia, monadTestnet],
   connectors: [injected()],
   transports: {
-    [monadTestnet.id]: http(),
     [sepolia.id]: http(),
+    [monadTestnet.id]: http(),
   },
 })

@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { formatEther } from 'viem';
 import { useLiveExecutions } from '../hooks/useLiveExecutions';
 
-const EXPLORER_URL = 'https://explorer.testnet.monad.xyz';
+const EXPLORER_URL = 'https://sepolia.etherscan.io';
 
 function timeAgo(timestamp: string): string {
   const now = Math.floor(Date.now() / 1000);
