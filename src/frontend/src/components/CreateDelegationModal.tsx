@@ -120,7 +120,7 @@ export function CreateDelegationModal({
                   {hash.slice(0, 10)}...{hash.slice(-8)}
                 </code>
                 <a
-                  href={`https://explorer.testnet.monad.xyz/tx/${hash}`}
+                  href={`https://sepolia.etherscan.io/tx/${hash}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-xs text-gradient-secondary hover:underline flex items-center justify-center gap-1"

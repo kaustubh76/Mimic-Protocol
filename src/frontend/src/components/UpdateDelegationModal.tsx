@@ -216,7 +216,7 @@ export function UpdateDelegationModal({
                     <div>
                       <div className="font-semibold mb-1">Transaction Submitted</div>
                       <div className="text-xs opacity-75">
-                        Waiting for confirmation on Monad testnet...
+                        Waiting for confirmation on Ethereum Sepolia...
                       </div>
                     </div>
                   </div>

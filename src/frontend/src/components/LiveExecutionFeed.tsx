@@ -71,7 +71,7 @@ export function LiveExecutionFeed() {
           </div>
           <div className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-white/5">
             <span className="text-purple-400 font-bold">{parseFloat(formatEther(totalVolume)).toFixed(4)}</span>
-            <span className="text-muted">MON vol</span>
+            <span className="text-muted">WETH vol</span>
           </div>
           <div className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-white/5">
             <span className="text-blue-400 font-bold">{executions.length}</span>
@@ -138,7 +138,7 @@ export function LiveExecutionFeed() {
                             target="_blank"
                             rel="noopener noreferrer"
                             className="font-mono hover:text-purple-400 transition-colors"
-                            title="View on Monad Explorer"
+                            title="View on Sepolia Etherscan"
                           >
                             {shortenHash(exec.txHash)}
                           </a>
@@ -153,7 +153,7 @@ export function LiveExecutionFeed() {
                       <div className="text-sm font-bold text-white">
                         {parseFloat(formatEther(BigInt(exec.amount))).toFixed(4)}
                       </div>
-                      <div className="text-[10px] text-muted">MON</div>
+                      <div className="text-[10px] text-muted">WETH</div>
                     </div>
                     <div className="text-right min-w-[55px]">
                       <div className={`text-[10px] font-bold uppercase ${

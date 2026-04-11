@@ -31,10 +31,10 @@ export function DelegationEarningsDisplay({ delegationId, isActive, patternROI }
       <div className="text-2xl font-bold mb-1">
         {totalEarnings > 0 ? (
           <span className="text-gradient-secondary">
-            {earningsEth.toFixed(4)} MONAD
+            {earningsEth.toFixed(4)} WETH
           </span>
         ) : (
-          <span className="text-gray-400">0.00 MONAD</span>
+          <span className="text-gray-400">0.00 WETH</span>
         )}
       </div>
       <div className="text-xs text-muted">
@@ -43,7 +43,7 @@ export function DelegationEarningsDisplay({ delegationId, isActive, patternROI }
             Earnings
             {volumeExecuted > 0 && (
               <div className="mt-1 text-[10px]">
-                Volume: {volumeEth.toFixed(2)} MONAD
+                Volume: {volumeEth.toFixed(2)} WETH
               </div>
             )}
           </>

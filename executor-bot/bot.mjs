@@ -76,11 +76,13 @@ const CONTRACTS = {
 };
 
 // Size of each executed swap. The ExecutionEngine holds a 0.1 WETH float
-// (seeded during the gate 7 deploy), so this allows ~100 demo trades before
-// the float needs topping up. The engine's balance check at ExecutionEngine.sol
-// line 504-507 is read against the delegation's smart account balance, not
-// the engine's float, so the smart accounts also need WETH — handled separately.
-const TRADE_AMOUNT = parseEther('0.001');
+// (seeded during the gate 7 deploy). At 0.005 WETH per trade this allows
+// ~20 trades before the float needs topping up, and each trade is visually
+// meaningful in the UI (~41 USDC out at current Sepolia WETH/USDC rates).
+// The engine's balance check at ExecutionEngine.sol line 504-507 is read
+// against the delegation's smart account balance, not the engine's float,
+// so the smart accounts also need WETH — handled by ensureSmartAccountFunded.
+const TRADE_AMOUNT = parseEther('0.005');
 
 // UniswapV2Adapter.swap(IERC20 tokenIn, uint256 amountIn, uint256 minAmountOut, address to)
 const UNISWAP_V2_ADAPTER_ABI = [{

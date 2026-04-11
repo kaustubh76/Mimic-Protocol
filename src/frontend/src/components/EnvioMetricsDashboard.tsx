@@ -196,14 +196,14 @@ export function EnvioMetricsDashboard() {
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
                 <span className="text-xs text-muted">Total Indexed Volume</span>
                 <span className="text-sm font-bold text-gradient-secondary">
-                  {parseFloat(formatEther(metrics.totalVolume)).toFixed(2)} MON
+                  {parseFloat(formatEther(metrics.totalVolume)).toFixed(4)} WETH
                 </span>
               </div>
               {metrics.totalEarnings > 0n && (
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
                   <span className="text-xs text-muted">Total Earnings</span>
                   <span className="text-sm font-bold text-green-400">
-                    +{parseFloat(formatEther(metrics.totalEarnings)).toFixed(2)} MON
+                    +{parseFloat(formatEther(metrics.totalEarnings)).toFixed(4)} WETH
                   </span>
                 </div>
               )}

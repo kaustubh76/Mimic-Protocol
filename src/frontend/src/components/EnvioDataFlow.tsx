@@ -8,7 +8,7 @@ interface EnvioDataFlowProps {
 
 const topRow = [
   { id: 'delegate', label: 'User Delegates', icon: '👤', sub: 'On-chain tx' },
-  { id: 'onchain', label: 'Monad Event', icon: '⛓', sub: 'Block confirmed' },
+  { id: 'onchain', label: 'Sepolia Event', icon: '⛓', sub: 'Block confirmed' },
   { id: 'envio', label: 'Envio HyperSync', icon: '⚡', sub: '', highlight: true },
   { id: 'graphql', label: 'GraphQL API', icon: '📊', sub: 'Queryable' },
 ];

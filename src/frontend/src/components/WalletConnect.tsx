@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react';
 import { useAccount, useConnect, useDisconnect, useChainId, useSwitchChain } from 'wagmi';
 import { motion, AnimatePresence } from 'framer-motion';
-import { MONAD_CHAIN_ID } from '../contracts/config';
+import { SEPOLIA_CHAIN_ID } from '../contracts/config';
 
 export function WalletConnect() {
   const { address, isConnected } = useAccount();
@@ -24,7 +24,7 @@ export function WalletConnect() {
 
   const handleNetworkSwitch = () => {
     if (switchChain) {
-      switchChain({ chainId: MONAD_CHAIN_ID });
+      switchChain({ chainId: SEPOLIA_CHAIN_ID });
     }
   };
 
@@ -47,13 +47,13 @@ export function WalletConnect() {
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.3 }}
       >
-        {chainId !== MONAD_CHAIN_ID && (
+        {chainId !== SEPOLIA_CHAIN_ID && (
           <motion.button
             onClick={handleNetworkSwitch}
             className="btn btn--warning btn--sm"
             whileTap={{ scale: 0.97 }}
           >
-            <span>Switch to Monad</span>
+            <span>Switch to Sepolia</span>
           </motion.button>
         )}
 

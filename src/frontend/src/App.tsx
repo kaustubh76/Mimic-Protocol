@@ -151,7 +151,7 @@ export function App() {
                 className="text-xl text-secondary max-w-2xl mx-auto"
               >
                 Mirror Protocol turns on-chain trading behavior into executable, delegatable NFTs.
-                Powered by Envio's lightning-fast indexing on Monad.
+                Powered by Envio's lightning-fast indexing on Ethereum Sepolia.
               </motion.p>
 
               <motion.div
@@ -466,7 +466,7 @@ export function App() {
                 </div>
               </div>
               <p className="text-sm text-muted leading-relaxed">
-                Behavioral liquidity infrastructure on Monad. Transform on-chain trading patterns into executable, delegatable NFTs with sub-50ms detection.
+                Behavioral liquidity infrastructure on Ethereum Sepolia. Transform on-chain trading patterns into executable, delegatable NFTs with sub-50ms detection.
               </p>
               <div className="flex items-center gap-3 pt-1">
                 <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-gradient-primary">

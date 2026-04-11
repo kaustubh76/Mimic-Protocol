@@ -145,7 +145,7 @@ export function MyDelegations() {
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
               </span>
-              <span>Real-time data from Monad testnet ({delegations.length} delegation{delegations.length !== 1 ? 's' : ''})</span>
+              <span>Real-time data from Ethereum Sepolia ({delegations.length} delegation{delegations.length !== 1 ? 's' : ''})</span>
             </p>
           )}
         </div>
@@ -320,7 +320,7 @@ export function MyDelegations() {
                 ? parseFloat(formatEther(portfolioStats.totalVolume)).toFixed(2)
                 : '0.00'}
             </div>
-            <div className="text-xs text-muted">Total Volume (MONAD)</div>
+            <div className="text-xs text-muted">Total Volume (WETH)</div>
           </div>
 
           {/* Total Earnings */}
@@ -330,7 +330,7 @@ export function MyDelegations() {
                 ? parseFloat(formatEther(portfolioStats.totalEarnings)).toFixed(4)
                 : '0.00'}
             </div>
-            <div className="text-xs text-muted">Total Earnings (MONAD)</div>
+            <div className="text-xs text-muted">Total Earnings (WETH)</div>
           </div>
 
           {/* Total Executions */}

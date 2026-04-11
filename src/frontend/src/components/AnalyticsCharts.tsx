@@ -25,7 +25,7 @@ function CustomTooltip({ active, payload, label }: any) {
           <span className="font-bold" style={{ color: entry.color }}>
             {typeof entry.value === 'number' ? entry.value.toFixed(2) : entry.value}
             {entry.name.includes('ROI') || entry.name.includes('Win') ? '%' : ''}
-            {entry.name.includes('Volume') ? ' MON' : ''}
+            {entry.name.includes('Volume') ? ' WETH' : ''}
           </span>
         </div>
       ))}

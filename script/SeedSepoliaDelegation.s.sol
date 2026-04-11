@@ -36,9 +36,6 @@ contract SeedSepoliaDelegation is Script {
     address constant DEFAULT_ROUTER = 0xD36fB1E9537fa3b7b15B9892eb0E42A0226577a8;
     address constant DEFAULT_NFT    = 0xCFa22481dDa2E4758115D3e826C2FfA1eC9c3954;
 
-    // Seed pattern 1 = "Momentum" (gate 7 mint, 87.5% win rate, 28.7% ROI).
-    uint256 constant PATTERN_TOKEN_ID = 1;
-
     // 50% allocation in basis points (router accepts 1-10000).
     uint256 constant PERCENTAGE_ALLOCATION = 5000;
 
@@ -53,49 +50,71 @@ contract SeedSepoliaDelegation is Script {
         BehavioralNFT    nft    = BehavioralNFT(nftAddr);
 
         console.log("==================================================");
-        console.log("MIRROR PROTOCOL - SEED SEPOLIA DELEGATION");
+        console.log("MIRROR PROTOCOL - SEED SEPOLIA DELEGATIONS");
         console.log("==================================================");
         console.log("Deployer:         ", deployer);
         console.log("Chain ID:         ", block.chainid);
         console.log("Balance:          ", deployer.balance);
         console.log("DelegationRouter: ", routerAddr);
         console.log("BehavioralNFT:    ", nftAddr);
-        console.log("Pattern token ID: ", PATTERN_TOKEN_ID);
         console.log("Allocation (bps): ", PERCENTAGE_ALLOCATION);
         console.log("==================================================");
 
         require(block.chainid == 11155111, "Not Sepolia");
-
-        // Pre-flight: confirm pattern is active. If it's not, bail early
-        // rather than broadcast a failing tx.
-        require(nft.isPatternActive(PATTERN_TOKEN_ID), "Pattern not active");
 
         // Use the deployer address as the "smart account" — legal per router
         // source, only requires != address(0). Makes the bot's later
         // ensureSmartAccountFunded call a no-op self-transfer.
         address smartAccount = deployer;
 
+        // Attempt a delegation on every seed pattern (1..7). Each call runs
+        // in its own broadcast tx. If a delegation already exists for a given
+        // pattern (DelegationAlreadyExists revert), we skip it — makes the
+        // script idempotent across re-runs.
+        //
+        // Note: we include pattern 1 in the loop even though it was seeded
+        // by an earlier run of this script. The try/catch makes the re-try
+        // harmless (it reverts in the router and we log a skip).
+        uint256 created = 0;
+        uint256 skipped = 0;
+
         vm.startBroadcast(deployerPrivateKey);
 
-        uint256 delegationId = router.createSimpleDelegation(
-            PATTERN_TOKEN_ID,
-            PERCENTAGE_ALLOCATION,
-            smartAccount
-        );
+        for (uint256 pId = 1; pId <= 7; pId++) {
+            if (!nft.isPatternActive(pId)) {
+                console.log("  [skip] pattern", pId, "inactive");
+                skipped++;
+                continue;
+            }
+
+            try router.createSimpleDelegation(pId, PERCENTAGE_ALLOCATION, smartAccount) returns (uint256 delegationId) {
+                console.log("  [ok]   pattern", pId, "-> delegation", delegationId);
+                created++;
+            } catch {
+                // Most likely DelegationAlreadyExists — delegation for this
+                // (delegator, pattern) pair already exists from a prior run.
+                // Could also be an edge case we haven't seen, but in either
+                // case the right move is to continue rather than abort.
+                console.log("  [skip] pattern", pId, "already delegated or revert");
+                skipped++;
+            }
+        }
 
         vm.stopBroadcast();
 
         console.log("");
         console.log("==================================================");
-        console.log("DELEGATION CREATED");
+        console.log("SEED RESULT");
         console.log("==================================================");
-        console.log("Delegation ID:    ", delegationId);
-        console.log("Smart account:    ", smartAccount);
+        console.log("Created:         ", created);
+        console.log("Skipped/existed: ", skipped);
+        console.log("Smart account:   ", smartAccount);
         console.log("");
         console.log("Next steps:");
-        console.log("  1. Wait ~3s for Envio to index DelegationCreated");
+        console.log("  1. Wait ~3s for Envio to index the DelegationCreated events");
         console.log("  2. Start the bot: node executor-bot/bot.mjs");
-        console.log("  3. Bot's next cycle will pick it up and fire a real swap");
+        console.log("  3. Bot will pick up all active delegations and execute trades");
+        console.log("     against the real Sepolia Uniswap V2 WETH/USDC pool");
         console.log("==================================================");
     }
 
