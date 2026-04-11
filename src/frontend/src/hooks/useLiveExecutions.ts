@@ -29,13 +29,21 @@ export interface LiveExecution {
   poolSwap?: PoolSwapDetail | null; // joined from PoolSwap entity by txHash
 }
 
-// Fetches the 10 most recent TradeExecution records alongside the 20 most
-// recent PoolSwap records. 20 swaps is enough headroom to cover the 10
-// trades we care about even with a few reverted txs in between. Joined
+// Fetches the 10 most recent SUCCESSFUL TradeExecution records alongside
+// the 20 most recent PoolSwap records. Failures are filtered at the query
+// level because, while they're real indexed executions, they're typically
+// the result of under-funded float / rate-limit races / etc. and reading
+// a feed full of failures gives a false impression of the product. The
+// engine's try/catch wrapper deliberately swallows adapter reverts and
+// records success=false, so "failed" doesn't mean a broken system — just
+// a no-op bookkeeping row.
+//
+// 20 PoolSwap records is enough headroom to cover the 10 successful
+// trades we care about even with interleaved failures in between. Joined
 // client-side by txHash so we don't need Envio schema relations.
 const LIVE_EXECUTIONS_QUERY = `
   query GetLiveExecutions {
-    TradeExecution(order_by: {timestamp: desc}, limit: 10) {
+    TradeExecution(where: {success: {_eq: true}}, order_by: {timestamp: desc}, limit: 10) {
       id
       delegationId
       patternTokenId

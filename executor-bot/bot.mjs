@@ -407,6 +407,32 @@ async function processExecution(delegation, walletClient, publicClient, executor
     console.warn(`  [RATE→WARN] executionStats read failed: ${err.shortMessage || err.message}`);
   }
 
+  // Float check: every trade drains the engine's WETH float by TRADE_AMOUNT.
+  // The engine's try/catch wraps the adapter's safeTransferFrom, so
+  // under-funded executions still mine as recorded on-chain failures
+  // (success=false) — which means the bot would keep burning ~70k gas per
+  // cycle on guaranteed-failure tx submissions until the rate limit kicks
+  // in. Skip the whole cycle cleanly if the float is below TRADE_AMOUNT.
+  try {
+    const engineFloat = await publicClient.readContract({
+      address: CONTRACTS.WETH,
+      abi: WETH9_ABI,
+      functionName: 'balanceOf',
+      args: [CONTRACTS.EXECUTION_ENGINE],
+    });
+    if (engineFloat < TRADE_AMOUNT) {
+      console.log(
+        `  [FUND→LOW] engine WETH float ${engineFloat} wei < TRADE_AMOUNT ${TRADE_AMOUNT} wei — ` +
+        `top up with: forge script script/RefundEngineWETH.s.sol --rpc-url sepolia --broadcast --legacy`
+      );
+      return;
+    }
+  } catch (err) {
+    // Chain read failed — fall through. Worst case is a recorded failure,
+    // no worse than before this check existed.
+    console.warn(`  [FUND→WARN] engine float read failed: ${err.shortMessage || err.message}`);
+  }
+
   // Get pattern metrics from Envio (joined in GraphQL query — zero chain reads)
   const envioPattern = delegation.pattern;
   if (!envioPattern) {
