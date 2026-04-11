@@ -65,10 +65,43 @@ export const ABIS = {
   EXECUTION_ENGINE: extractAbi(ExecutionEngineABI),
 };
 
-// Envio GraphQL endpoint — Sepolia indexer (live since 2026-04-11)
-export const ENVIO_GRAPHQL_URL =
-  import.meta.env.VITE_ENVIO_GRAPHQL_URL_SEPOLIA ||
-  import.meta.env.VITE_ENVIO_GRAPHQL_URL ||
-  'https://indexer.dev.hyperindex.xyz/009ef9b/v1/graphql';
+// Envio GraphQL endpoint — Sepolia indexer (live since 2026-04-11).
+//
+// We deliberately do NOT honour the legacy `VITE_ENVIO_GRAPHQL_URL` env var
+// here even though older Vercel projects may still have it set. The legacy
+// var pointed at the orphaned Monad indexer at /4cda827/, which is on a
+// different Envio instance with no CORS allowance for the Vercel origin.
+// Any value other than the live Sepolia indexer URL would surface as a
+// CORS preflight failure in the browser console.
+//
+// The hardcoded URL below is the source of truth. To override (e.g. for a
+// preview branch pointing at a fresh indexer), set VITE_ENVIO_GRAPHQL_URL_SEPOLIA
+// in the Vercel dashboard. Any other env var name is ignored on purpose.
+const SEPOLIA_ENVIO_DEFAULT = 'https://indexer.dev.hyperindex.xyz/009ef9b/v1/graphql';
 
-console.log('[Mirror] Active chain:', ACTIVE_CHAIN_ID, '| Envio:', ENVIO_GRAPHQL_URL, '| RPC:', SEPOLIA_RPC_URL.substring(0, 50) + '...');
+// Belt-and-braces: even if VITE_ENVIO_GRAPHQL_URL_SEPOLIA somehow holds an
+// orphaned Monad URL hash (legacy values 4cda827 / b1106ec), refuse it and
+// fall back to the Sepolia default. Future build accidents can't reintroduce
+// the CORS regression.
+const FORBIDDEN_HASHES = ['4cda827', 'b1106ec'];
+const envCandidate = import.meta.env.VITE_ENVIO_GRAPHQL_URL_SEPOLIA;
+const isForbidden = (url: string | undefined): boolean =>
+  !!url && FORBIDDEN_HASHES.some(h => url.includes(h));
+
+export const ENVIO_GRAPHQL_URL =
+  envCandidate && !isForbidden(envCandidate) ? envCandidate : SEPOLIA_ENVIO_DEFAULT;
+
+if (envCandidate && isForbidden(envCandidate)) {
+  console.warn(
+    '[Mirror] Forbidden legacy Envio URL in env var (',
+    envCandidate,
+    ') — falling back to Sepolia default',
+    SEPOLIA_ENVIO_DEFAULT
+  );
+}
+
+console.log(
+  '[Mirror] Active chain:', ACTIVE_CHAIN_ID,
+  '| Envio:', ENVIO_GRAPHQL_URL,
+  '| RPC:', SEPOLIA_RPC_URL.substring(0, 50) + '...'
+);
