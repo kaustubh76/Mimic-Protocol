@@ -96,6 +96,94 @@ const UNISWAP_V2_ADAPTER_ABI = [{
   outputs: [{ name: 'amountOut', type: 'uint256' }],
 }];
 
+// Minimal WETH9 ABI — just the three calls the top-up helper needs.
+const WETH9_ABI = [
+  {
+    name: 'balanceOf',
+    type: 'function',
+    stateMutability: 'view',
+    inputs: [{ name: 'owner', type: 'address' }],
+    outputs: [{ name: '', type: 'uint256' }],
+  },
+  {
+    name: 'deposit',
+    type: 'function',
+    stateMutability: 'payable',
+    inputs: [],
+    outputs: [],
+  },
+  {
+    name: 'transfer',
+    type: 'function',
+    stateMutability: 'nonpayable',
+    inputs: [
+      { name: 'to', type: 'address' },
+      { name: 'amount', type: 'uint256' },
+    ],
+    outputs: [{ name: '', type: 'bool' }],
+  },
+];
+
+/**
+ * Ensure a delegation's smart account holds at least `amountNeeded` WETH.
+ *
+ * Why this exists:
+ *   ExecutionEngine._validateExecution calls IERC20(token).balanceOf(smartAccount)
+ *   and reverts if it's below the trade amount. A freshly-created delegation's
+ *   smart account starts with zero WETH. Without this helper, the very first
+ *   bot execution against any new delegation would always revert.
+ *
+ * Strategy:
+ *   1. Read smartAccount's current WETH balance via the WETH9 contract.
+ *   2. If sufficient, return early (no-op).
+ *   3. Otherwise wrap `amountNeeded` ETH into WETH (executor EOA calls
+ *      WETH.deposit{value: amountNeeded}).
+ *   4. Transfer that WETH to the smart account.
+ *
+ * The executor EOA only needs enough native ETH to cover gas + the topup
+ * amounts. At 0.001 WETH per trade, 0.05 ETH funds ~50 top-ups with room
+ * to spare for gas.
+ */
+async function ensureSmartAccountFunded(smartAccount, amountNeeded, walletClient, publicClient) {
+  const currentBalance = await publicClient.readContract({
+    address: CONTRACTS.WETH,
+    abi: WETH9_ABI,
+    functionName: 'balanceOf',
+    args: [smartAccount],
+  });
+
+  if (currentBalance >= amountNeeded) {
+    console.log(`    [FUND→SKIP] smart account ${smartAccount.slice(0, 10)}… holds ${currentBalance} wei WETH (>= ${amountNeeded})`);
+    return;
+  }
+
+  const topUpAmount = amountNeeded - currentBalance;
+  console.log(`    [FUND→WRAP] wrapping ${topUpAmount} wei ETH → WETH for smart account ${smartAccount.slice(0, 10)}…`);
+
+  // 1) Wrap ETH into WETH on the executor EOA.
+  const depositHash = await walletClient.writeContract({
+    address: CONTRACTS.WETH,
+    abi: WETH9_ABI,
+    functionName: 'deposit',
+    args: [],
+    value: topUpAmount,
+    gas: 100000n,
+  });
+  await publicClient.waitForTransactionReceipt({ hash: depositHash, timeout: 30000 });
+
+  // 2) Transfer the wrapped WETH from executor EOA → smart account.
+  const transferHash = await walletClient.writeContract({
+    address: CONTRACTS.WETH,
+    abi: WETH9_ABI,
+    functionName: 'transfer',
+    args: [smartAccount, topUpAmount],
+    gas: 80000n,
+  });
+  await publicClient.waitForTransactionReceipt({ hash: transferHash, timeout: 30000 });
+
+  console.log(`    [FUND→OK] smart account now holds ${amountNeeded} wei WETH (tx: ${transferHash.slice(0, 10)}…)`);
+}
+
 // ─── Delegation Conditions Cache ────────────────────────────────────────────
 const conditionsCache = new Map();
 
@@ -303,6 +391,20 @@ async function processExecution(delegation, walletClient, publicClient, executor
   console.log(`    Conditions: minWR=${conditions.minWinRate} minROI=${conditions.minROI} → EXECUTING`);
 
   const tradeAmount = TRADE_AMOUNT; // 0.001 WETH per trade (see constant above)
+
+  // Ensure the delegation's smart account has enough WETH for the engine's
+  // balanceOf check. Freshly-created delegations start at zero WETH.
+  const smartAccount = delegation.smartAccountAddress;
+  if (!smartAccount) {
+    console.log(`  [FUND→SKIP] Delegation #${delegationId}: no smartAccountAddress on Envio record`);
+    return;
+  }
+  try {
+    await ensureSmartAccountFunded(smartAccount, tradeAmount, walletClient, publicClient);
+  } catch (err) {
+    console.log(`  ❌ Top-up failed: ${err.shortMessage || err.message}`);
+    return;
+  }
 
   // Real swap through UniswapV2Adapter.
   // The adapter pulls `tradeAmount` WETH from msg.sender (= ExecutionEngine)
