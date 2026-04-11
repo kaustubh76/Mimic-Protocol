@@ -273,6 +273,13 @@ const EXECUTION_ENGINE_ABI = [
     ],
     stateMutability: 'view',
   },
+  {
+    name: 'minExecutionInterval',
+    type: 'function',
+    inputs: [],
+    outputs: [{ name: '', type: 'uint256' }],
+    stateMutability: 'view',
+  },
 ];
 
 // ─── Envio Queries ───────────────────────────────────────────────────────────
@@ -344,12 +351,59 @@ async function fetchSystemMetrics() {
 
 let executedThisRun = new Set();
 
+// Cache for the engine's minExecutionInterval — read once per bot process.
+let cachedMinExecutionInterval = null;
+
+async function getMinExecutionInterval(publicClient) {
+  if (cachedMinExecutionInterval !== null) return cachedMinExecutionInterval;
+  try {
+    cachedMinExecutionInterval = await publicClient.readContract({
+      address: CONTRACTS.EXECUTION_ENGINE,
+      abi: EXECUTION_ENGINE_ABI,
+      functionName: 'minExecutionInterval',
+    });
+  } catch {
+    // Default to 60s (the engine's constructor default) if the read fails.
+    cachedMinExecutionInterval = 60n;
+  }
+  return cachedMinExecutionInterval;
+}
+
 async function processExecution(delegation, walletClient, publicClient, executorAddress) {
   const delegationId = BigInt(delegation.delegationId);
   const patternId = BigInt(delegation.patternTokenId);
 
   // Skip if already executed this run
   if (executedThisRun.has(delegation.id)) return;
+
+  // Rate limit: the engine enforces a minimum interval between successive
+  // executions on the same delegation (ExecutionEngine._validateExecution at
+  // contracts/ExecutionEngine.sol:458-463). Skip this cycle if we're still
+  // inside the cooldown window — otherwise the tx would just revert on-chain
+  // with ExecutionIntervalNotMet and waste gas.
+  try {
+    const stats = await publicClient.readContract({
+      address: CONTRACTS.EXECUTION_ENGINE,
+      abi: EXECUTION_ENGINE_ABI,
+      functionName: 'executionStats',
+      args: [delegationId],
+    });
+    const lastExecutionTime = stats[5]; // 6th field in the tuple
+    if (lastExecutionTime > 0n) {
+      const interval = await getMinExecutionInterval(publicClient);
+      const now = BigInt(Math.floor(Date.now() / 1000));
+      const nextAllowed = lastExecutionTime + interval;
+      if (now < nextAllowed) {
+        const remaining = nextAllowed - now;
+        console.log(`  [RATE→SKIP] Delegation #${delegationId}: cooldown ${remaining}s remaining`);
+        return;
+      }
+    }
+  } catch (err) {
+    // If the chain read fails, let the tx go through — the engine will
+    // reject it with a clear revert if we're still rate-limited.
+    console.warn(`  [RATE→WARN] executionStats read failed: ${err.shortMessage || err.message}`);
+  }
 
   // Get pattern metrics from Envio (joined in GraphQL query — zero chain reads)
   const envioPattern = delegation.pattern;
