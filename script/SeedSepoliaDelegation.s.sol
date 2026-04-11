@@ -67,14 +67,16 @@ contract SeedSepoliaDelegation is Script {
         // ensureSmartAccountFunded call a no-op self-transfer.
         address smartAccount = deployer;
 
-        // Attempt a delegation on every seed pattern (1..7). Each call runs
-        // in its own broadcast tx. If a delegation already exists for a given
-        // pattern (DelegationAlreadyExists revert), we skip it — makes the
-        // script idempotent across re-runs.
+        // Pre-flight: detect which pattern IDs already have a delegation
+        // from this delegator, so we don't attempt to re-create them during
+        // the broadcast. Forge's script broadcast simulator aborts on any
+        // reverted sub-call (even Solidity-level try/catch'd ones), so we
+        // must gate before calling `createSimpleDelegation` rather than
+        // catching afterwards.
         //
-        // Note: we include pattern 1 in the loop even though it was seeded
-        // by an earlier run of this script. The try/catch makes the re-try
-        // harmless (it reverts in the router and we log a skip).
+        // The router exposes `getDelegationId(delegator, patternId)` which
+        // returns 0 if no delegation exists, else the existing id. We use
+        // that to skip pre-existing delegations cleanly.
         uint256 created = 0;
         uint256 skipped = 0;
 
@@ -87,17 +89,20 @@ contract SeedSepoliaDelegation is Script {
                 continue;
             }
 
-            try router.createSimpleDelegation(pId, PERCENTAGE_ALLOCATION, smartAccount) returns (uint256 delegationId) {
-                console.log("  [ok]   pattern", pId, "-> delegation", delegationId);
-                created++;
-            } catch {
-                // Most likely DelegationAlreadyExists — delegation for this
-                // (delegator, pattern) pair already exists from a prior run.
-                // Could also be an edge case we haven't seen, but in either
-                // case the right move is to continue rather than abort.
-                console.log("  [skip] pattern", pId, "already delegated or revert");
+            // Pattern 1 was seeded in an earlier run, so there's already a
+            // delegation. Check explicitly before attempting the create to
+            // avoid the DelegationAlreadyExists revert that breaks the
+            // broadcast simulator.
+            uint256 existing = router.getDelegationId(deployer, pId);
+            if (existing != 0) {
+                console.log("  [skip] pattern", pId, "already delegated as id", existing);
                 skipped++;
+                continue;
             }
+
+            uint256 delegationId = router.createSimpleDelegation(pId, PERCENTAGE_ALLOCATION, smartAccount);
+            console.log("  [ok]   pattern", pId, "-> delegation", delegationId);
+            created++;
         }
 
         vm.stopBroadcast();
