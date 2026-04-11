@@ -504,6 +504,47 @@ type TradeExecution @entity {
 }
 
 """
+PoolSwap entity mirroring UniswapV2Adapter.Swap events.
+Joined client-side with TradeExecution by txHash so the LiveExecutionFeed
+can display real amountIn / amountOut / tokenIn / tokenOut / pool detail
+for every trade, instead of only the bookkeeping amount on TradeExecution.
+"""
+type PoolSwap @entity {
+  "Unique swap ID: {txHash}-{logIndex}"
+  id: ID!
+
+  "Address that initiated the swap (the ExecutionEngine during normal flow)"
+  sender: Bytes! @index
+
+  "Token spent by the adapter"
+  tokenIn: Bytes!
+
+  "Token received by the adapter"
+  tokenOut: Bytes!
+
+  "Exact input amount in tokenIn's smallest unit"
+  amountIn: BigInt!
+
+  "Realized output amount returned by the Uniswap V2 router"
+  amountOut: BigInt!
+
+  "Recipient of the output tokens"
+  to: Bytes!
+
+  "Adapter contract that emitted the Swap event"
+  adapter: Bytes!
+
+  "Transaction hash — join key for TradeExecution"
+  txHash: Bytes! @index
+
+  "Block number"
+  blockNumber: BigInt!
+
+  "Block timestamp"
+  timestamp: BigInt! @index
+}
+
+"""
 Event entity for raw event storage
 Useful for debugging and analytics
 """

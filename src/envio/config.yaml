@@ -26,6 +26,12 @@ networks:
           - event: "DelegationRevoked(uint256 indexed delegationId, address indexed delegator, uint256 indexed patternTokenId, uint256 timestamp)"
           - event: "DelegationUpdated(uint256 indexed delegationId, uint256 percentageAllocation, uint256 timestamp)"
           - event: "TradeExecuted(uint256 indexed delegationId, uint256 indexed patternTokenId, address indexed executor, address token, uint256 amount, bool success, uint256 timestamp)"
+      - name: UniswapV2Adapter
+        address:
+          - "0x5B59f315d4E2670446ed7B130584A326A0f7c2D3"
+        handler: EventHandlers.ts
+        events:
+          - event: "Swap(address indexed sender, address indexed tokenIn, address indexed tokenOut, uint256 amountIn, uint256 amountOut, address to)"
 
 rollback_on_reorg: true
 

@@ -8,7 +8,7 @@
  * - DelegationRouter: DelegationCreated, DelegationRevoked, DelegationUpdated, TradeExecuted
  */
 
-import { BehavioralNFT, DelegationRouter } from "./generated";
+import { BehavioralNFT, DelegationRouter, UniswapV2Adapter } from "./generated";
 
 // ─── Performance tracking ───────────────────────────────────────────────────
 // Tracks real handler processing times for the Envio metrics dashboard
@@ -666,4 +666,29 @@ DelegationRouter.TradeExecuted.handler(async ({ event, context }) => {
   }
 
   context.log.info(`Trade executed on Delegation #${delegationId}: success=${success}, amount=${amount}, earnings=${tradeEarnings}`);
+});
+
+// ==========================================
+// UniswapV2Adapter: Swap
+// ==========================================
+// Emitted by the UniswapV2Adapter every time the engine routes a trade
+// through the real Sepolia Uniswap V2 Router. Captures the real DEX
+// detail (tokenIn, tokenOut, amountIn, amountOut, pool sender) that
+// DelegationRouter.TradeExecuted doesn't carry. The frontend joins this
+// entity with TradeExecution by txHash to render the "real swap" line
+// in the LiveExecutionFeed.
+UniswapV2Adapter.Swap.handler(async ({ event, context }) => {
+  context.PoolSwap.set({
+    id: `${event.transaction.hash}-${event.logIndex}`,
+    sender: event.params.sender,
+    tokenIn: event.params.tokenIn,
+    tokenOut: event.params.tokenOut,
+    amountIn: event.params.amountIn,
+    amountOut: event.params.amountOut,
+    to: event.params.to,
+    adapter: event.srcAddress,
+    txHash: event.transaction.hash,
+    blockNumber: BigInt(event.block.number),
+    timestamp: BigInt(event.block.timestamp),
+  });
 });
