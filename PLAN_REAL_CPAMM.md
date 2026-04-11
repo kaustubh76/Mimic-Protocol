@@ -392,7 +392,40 @@ The old Monad-facing Envio indexer at `https://indexer.dev.hyperindex.xyz/4cda82
 
 ---
 
-## 12. Decision points requiring user sign-off before write-phase begins
+## 12. Testing
+
+Two-layer test harness at [test/run-sepolia-harness.sh](test/run-sepolia-harness.sh):
+
+```bash
+./test/run-sepolia-harness.sh
+```
+
+**Layer 1 — unit + integration tests (MockDEX, local EVM):**
+`forge test --no-match-contract SepoliaPivot` → 143 tests across 7 suites. Runs the existing pre-pivot coverage over `BehavioralNFT`, `DelegationRouter`, `ExecutionEngine`, and `PatternDetector` using in-file `MockDEX` stubs. Fast (<1s), deterministic, no network required.
+
+**Layer 2 — forked Sepolia integration test (real Uniswap V2):**
+`forge test --match-contract SepoliaPivot --fork-url $SEPOLIA_RPC_URL -vv` → 4 tests in [test/SepoliaPivot.t.sol](test/SepoliaPivot.t.sol):
+
+1. `test_AdapterIsWiredCorrectly` — asserts the live deploy wiring: engine.owner, executor role, WETH float present, adapter allowance is MAX, adapter points at the real Sepolia Uniswap V2 Router. One-shot sanity check; diagnose any pivot regression here first.
+2. `test_SeededPatternsAreActive` — asserts pattern 1 and pattern 7 from the gate 7 seed set are still active and owned by the deployer.
+3. `test_FullFlow_CreateDelegationAndExecuteRealSwap` — **the critical test.** Creates a fresh delegation as a `makeAddr`-derived EOA, funds the smart account with WETH (mirroring the bot's `ensureSmartAccountFunded` helper), builds the exact `tradeParams` + `callData` the bot would produce, executes the swap, and asserts the engine's WETH balance dropped by `TRADE_AMOUNT` and its USDC balance rose (real Uniswap V2 liquidity). Logs the realized WETH→USDC rate.
+4. `test_ExecuteTrade_ReturnsFalseIfEngineUnderfunded` — drains the engine's WETH float inside the fork and asserts `executeTrade` returns `false` (not a revert — the engine wraps `_externalCall` in try/catch at [ExecutionEngine.sol:512-517](contracts/ExecutionEngine.sol#L512-L517) and swallows failures so bookkeeping continues).
+
+The forked test uses `vm.createSelectFork` to snapshot live Sepolia into an in-memory EVM. **Nothing writes to real Sepolia; no Sepolia ETH is spent.** Runtime: ~14s dominated by the RPC fetch for the fork snapshot.
+
+**Last verified run:** full harness green at commit after `a767a93`. The full-flow test showed `0.001 WETH → 8.26341 USDC` against real current Sepolia Uniswap V2 liquidity.
+
+**Assumptions the forked tests make about live state:**
+- `ExecutionEngine` at `0x1C1b05628...` still holds ≥ `TRADE_AMOUNT` (0.001 WETH) in its float
+- `ExecutionEngine.allowance(adapter)` is still `type(uint256).max`
+- The WETH/USDC Uniswap V2 pair at `0x72e46e15...` still has non-trivial reserves
+- Pattern 1 (Momentum) is still active on the `BehavioralNFT` contract
+
+If any of those drift, Layer 2 fails loudly with an actionable error message. Re-fund the engine's float via `WETH.deposit` + `WETH.transfer`, re-run, and the tests pass again.
+
+---
+
+## 13. Decision points requiring user sign-off before write-phase begins
 
 1. **Approve §5.1 (thin UniswapV2Adapter) vs the alternative of modifying `_externalCall` to forward value.** Recommended: adapter.
 2. **Approve §5.2 default pair (WETH/UNI with on-chain fallback to USDC or DAI).** Yes/no.
