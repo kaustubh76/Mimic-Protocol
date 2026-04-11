@@ -77,13 +77,20 @@ export const ABIS = {
 // The hardcoded URL below is the source of truth. To override (e.g. for a
 // preview branch pointing at a fresh indexer), set VITE_ENVIO_GRAPHQL_URL_SEPOLIA
 // in the Vercel dashboard. Any other env var name is ignored on purpose.
-const SEPOLIA_ENVIO_DEFAULT = 'https://indexer.dev.hyperindex.xyz/009ef9b/v1/graphql';
+// Indexer URL history:
+//   4cda827 — orphaned Monad indexer (pre-pivot)
+//   b1106ec — older Monad indexer
+//   009ef9b — first Sepolia indexer (before UniswapV2Adapter.Swap indexing)
+//   14ba103 — current Sepolia indexer (includes PoolSwap entity from adapter Swap events)
+const SEPOLIA_ENVIO_DEFAULT = 'https://indexer.dev.hyperindex.xyz/14ba103/v1/graphql';
 
-// Belt-and-braces: even if VITE_ENVIO_GRAPHQL_URL_SEPOLIA somehow holds an
-// orphaned Monad URL hash (legacy values 4cda827 / b1106ec), refuse it and
-// fall back to the Sepolia default. Future build accidents can't reintroduce
-// the CORS regression.
-const FORBIDDEN_HASHES = ['4cda827', 'b1106ec'];
+// Belt-and-braces: even if VITE_ENVIO_GRAPHQL_URL_SEPOLIA somehow holds one
+// of the legacy indexer hashes, refuse it and fall back to the current
+// Sepolia default. Prevents stale Vercel env vars (and future build
+// accidents) from pointing the frontend at a dead/outdated indexer.
+// Any new indexer deployment should retire its predecessor by adding
+// the old hash here.
+const FORBIDDEN_HASHES = ['4cda827', 'b1106ec', '009ef9b'];
 const envCandidate = import.meta.env.VITE_ENVIO_GRAPHQL_URL_SEPOLIA;
 const isForbidden = (url: string | undefined): boolean =>
   !!url && FORBIDDEN_HASHES.some(h => url.includes(h));

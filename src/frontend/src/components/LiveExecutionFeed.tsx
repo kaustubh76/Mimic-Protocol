@@ -1,9 +1,44 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { formatEther } from 'viem';
-import { useLiveExecutions } from '../hooks/useLiveExecutions';
+import { formatEther, formatUnits } from 'viem';
+import { useLiveExecutions, type PoolSwapDetail } from '../hooks/useLiveExecutions';
 
 const EXPLORER_URL = 'https://sepolia.etherscan.io';
+
+// Sepolia Uniswap V2 WETH/USDC pair (verified during gate 1 pool discovery).
+// Used for the "pool 0x72e46e15" clickable link on every trade row so users
+// can verify the swap happened against a real DEX pool.
+const WETH_USDC_PAIR = '0x72e46e15ef83c896de44b1874b4af7ddab5b4f74';
+
+// Known token metadata for the WETH/USDC pool. The UniswapV2Adapter swaps
+// between WETH and USDC only; other tokens will render as raw addresses.
+const TOKEN_INFO: Record<string, { symbol: string; decimals: number }> = {
+  // WETH
+  '0xfff9976782d46cc05630d1f6ebab18b2324d6b14': { symbol: 'WETH', decimals: 18 },
+  // Sepolia USDC
+  '0x1c7d4b196cb0c7b01d743fbc6116a902379c7238': { symbol: 'USDC', decimals: 6 },
+};
+
+function tokenInfo(address: string): { symbol: string; decimals: number } {
+  return TOKEN_INFO[address.toLowerCase()] ?? { symbol: `${address.slice(0, 6)}…`, decimals: 18 };
+}
+
+/**
+ * Format a PoolSwap as "0.005 WETH → 39.71 USDC". Precision is tuned to
+ * the token: WETH gets 4 decimals (so 0.005 shows as "0.0050"), USDC gets
+ * 2 decimals (so 39.707 shows as "39.71").
+ */
+function formatPoolSwap(swap: PoolSwapDetail): string {
+  const inTok = tokenInfo(swap.tokenIn);
+  const outTok = tokenInfo(swap.tokenOut);
+  const amountInStr = parseFloat(formatUnits(BigInt(swap.amountIn), inTok.decimals)).toFixed(
+    inTok.decimals >= 18 ? 4 : 2
+  );
+  const amountOutStr = parseFloat(formatUnits(BigInt(swap.amountOut), outTok.decimals)).toFixed(
+    outTok.decimals >= 18 ? 4 : 2
+  );
+  return `${amountInStr} ${inTok.symbol} → ${amountOutStr} ${outTok.symbol}`;
+}
 
 function timeAgo(timestamp: string): string {
   const now = Math.floor(Date.now() / 1000);
@@ -126,8 +161,8 @@ export function LiveExecutionFeed() {
                           D#{exec.delegationId}
                         </span>
                         <span className="text-muted text-xs">→</span>
-                        <span className="text-purple-400 font-mono text-xs">
-                          P#{exec.patternTokenId}
+                        <span className="text-purple-400 font-mono text-xs capitalize">
+                          {exec.patternType ?? `P#${exec.patternTokenId}`}
                         </span>
                       </div>
                       <div className="flex items-center gap-1.5 text-[11px] text-muted mt-0.5">
@@ -144,6 +179,29 @@ export function LiveExecutionFeed() {
                           </a>
                         )}
                       </div>
+                      {/* Real DEX detail sub-line — only rendered when PoolSwap is
+                          joined on this execution. Shows the actual amountIn -> amountOut
+                          from the UniswapV2Adapter.Swap event, the pair label, and a
+                          clickable link to the real Uniswap V2 WETH/USDC pool on Sepolia. */}
+                      {exec.poolSwap && (
+                        <div className="flex items-center gap-1.5 text-[11px] mt-0.5 flex-wrap">
+                          <span className="text-cyan-300 font-mono">
+                            {formatPoolSwap(exec.poolSwap)}
+                          </span>
+                          <span className="text-muted">·</span>
+                          <span className="text-muted">Uniswap V2</span>
+                          <span className="text-muted">·</span>
+                          <a
+                            href={`${EXPLORER_URL}/address/${WETH_USDC_PAIR}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="font-mono text-muted hover:text-purple-400 transition-colors"
+                            title="View WETH/USDC pair on Sepolia Etherscan"
+                          >
+                            pool {shortenHash(WETH_USDC_PAIR)}
+                          </a>
+                        </div>
+                      )}
                     </div>
                   </div>
 
