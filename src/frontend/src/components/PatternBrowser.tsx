@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { usePatterns, Pattern } from '../hooks/usePatterns';
 import { CreateDelegationModal } from './CreateDelegationModal';
+import { CreatePatternModal } from './CreatePatternModal';
 import { EnhancedPatternCard } from './EnhancedPatternCard';
 import { EmptyState } from './EmptyState';
 
@@ -9,6 +10,7 @@ export function PatternBrowser() {
   const { patterns, isLoading, error, usingTestData, isSyncing, refetch } = usePatterns();
   const [selectedPattern, setSelectedPattern] = useState<Pattern | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isMintModalOpen, setIsMintModalOpen] = useState(false);
 
   const handleDelegateClick = (pattern: Pattern) => {
     setSelectedPattern(pattern);
@@ -129,8 +131,17 @@ export function PatternBrowser() {
           )}
         </div>
 
-        <div className="glass-card px-4 py-2">
-          <span className="text-sm font-semibold text-muted">{patterns.length} Patterns</span>
+        <div className="flex items-center gap-2">
+          <div className="glass-card px-4 py-2">
+            <span className="text-sm font-semibold text-muted">{patterns.length} Patterns</span>
+          </div>
+          <button
+            onClick={() => setIsMintModalOpen(true)}
+            className="btn btn--primary btn--sm flex items-center gap-1.5"
+          >
+            <span>+</span>
+            <span>Mint Pattern</span>
+          </button>
         </div>
       </div>
 
@@ -162,6 +173,15 @@ export function PatternBrowser() {
           />
         )}
       </AnimatePresence>
+
+      {/* Mint Pattern Modal */}
+      <CreatePatternModal
+        isOpen={isMintModalOpen}
+        onClose={() => {
+          setIsMintModalOpen(false);
+          if (refetch) refetch();
+        }}
+      />
     </div>
   );
 }
