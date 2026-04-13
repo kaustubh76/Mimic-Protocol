@@ -25,7 +25,7 @@ Before ANY implementation, verify:
 - Are we using Envio's hosted service capabilities fully?
 
 #### 3. Technical Stack Compliance
-- Monad Testnet: Chain ID 10143
+- Ethereum Sepolia: Chain ID 11155111
 - MetaMask Delegation Toolkit (not generic delegation)
 - Envio HyperSync for all indexing
 - Smart contracts in Solidity 0.8.20+
@@ -174,7 +174,7 @@ test/              # Comprehensive tests
 - Envio HyperCore integration
 - Pattern detection < 50ms
 - MetaMask delegations working
-- Monad deployment successful
+- Sepolia deployment successful
 
 ### P1 (Important — Scale & Differentiation)
 - Cross-chain aggregation
@@ -242,7 +242,7 @@ Metrics: [Performance data]
 - **Envio Docs**: https://docs.envio.dev
 - **HyperSync API**: https://hypersync.envio.dev
 - **MetaMask Delegation**: https://docs.metamask.io/delegation-toolkit/
-- **Monad Testnet**: https://testnet.monad.xyz
+- **Ethereum Sepolia**: https://sepolia.etherscan.io
 - **Project Context**: CLAUDE.md
 
 ## Success Metrics

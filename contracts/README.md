@@ -17,7 +17,7 @@
 - **License**: MIT
 - **Solidity Version**: ^0.8.20
 - **Inheritance**: ERC721, ERC721URIStorage, Ownable, Pausable, ReentrancyGuard
-- **Network**: Monad Testnet (Chain ID: 10143)
+- **Network**: Ethereum Sepolia (Chain ID: 11155111)
 
 ## Architecture
 
@@ -254,12 +254,12 @@ function createDelegation(uint256 patternId) external {
 
 ```bash
 # 1. Set environment variables in .env
-MONAD_RPC_URL=https://testnet.monad.xyz/rpc
+SEPOLIA_RPC_URL=https://ethereum-sepolia-rpc.publicnode.com
 DEPLOYER_PRIVATE_KEY=your_private_key_here
 
 # 2. Deploy contract
 forge script script/DeployBehavioralNFT.s.sol:DeployBehavioralNFT \
-    --rpc-url monad \
+    --rpc-url sepolia \
     --broadcast \
     --verify
 
@@ -268,12 +268,12 @@ cast send $BEHAVIORAL_NFT_ADDRESS \
     "setPatternDetector(address)" \
     $PATTERN_DETECTOR_ADDRESS \
     --private-key $DEPLOYER_PRIVATE_KEY \
-    --rpc-url $MONAD_RPC_URL
+    --rpc-url $SEPOLIA_RPC_URL
 ```
 
 ### Post-Deployment Checklist
 
-- [ ] Contract deployed to Monad testnet
+- [ ] Contract deployed to Ethereum Sepolia
 - [ ] Contract verified on explorer
 - [ ] Address saved to `.env` as `BEHAVIORAL_NFT_ADDRESS`
 - [ ] Pattern detector address set via `setPatternDetector()`
@@ -328,7 +328,7 @@ contracts:
       - PatternPerformanceUpdated
       - Transfer
     startBlock: ${DEPLOYMENT_BLOCK}
-    network: monad
+    network: sepolia
 ```
 
 ### Event Handler
@@ -408,6 +408,6 @@ MIT License - see LICENSE file for details
 
 ---
 
-**Built on Monad with Envio HyperSync and MetaMask Smart Accounts**
+**Built on Ethereum Sepolia with Envio HyperSync and MetaMask Smart Accounts**
 
 *"Your trading style is now a product. Own it. Trade it. Delegate it."*

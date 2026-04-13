@@ -21,7 +21,7 @@ Output goes to `src/frontend/dist/`.
 
 | Variable | Value | Purpose |
 |----------|-------|---------|
-| `VITE_ENVIO_GRAPHQL_URL` | `https://indexer.dev.hyperindex.xyz/4cda827/v1/graphql` | Envio HyperSync endpoint |
+| `VITE_ENVIO_GRAPHQL_URL` | `https://indexer.dev.hyperindex.xyz/14ba103/v1/graphql` | Envio HyperSync endpoint |
 
 This is also hardcoded in `src/frontend/src/contracts/config.ts` as a fallback.
 
@@ -40,7 +40,7 @@ In `vercel.json` (or Vercel project settings):
   "rewrites": [
     {
       "source": "/api/envio/:path*",
-      "destination": "https://indexer.dev.hyperindex.xyz/4cda827/v1/:path*"
+      "destination": "https://indexer.dev.hyperindex.xyz/14ba103/v1/:path*"
     }
   ]
 }
@@ -77,7 +77,7 @@ In `vercel.json` (or Vercel project settings):
 After deployment:
 1. Open the Vercel URL
 2. Connect MetaMask wallet
-3. Switch to Monad testnet (Chain ID 10143)
+3. Switch to Ethereum Sepolia (Chain ID 11155111)
 4. Verify patterns load from on-chain data
 5. Check Envio metrics dashboard shows live data
 6. Confirm no CORS errors in browser console

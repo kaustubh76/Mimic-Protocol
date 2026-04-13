@@ -13,7 +13,7 @@ Mirror Protocol is a behavioral liquidity infrastructure built on four principle
 
 ## System Components
 
-### 1. Smart Contracts (Monad Testnet — Chain ID 10143)
+### 1. Smart Contracts (Ethereum Sepolia — Chain ID 11155111)
 
 | Contract | Purpose |
 |---|---|
@@ -21,7 +21,7 @@ Mirror Protocol is a behavioral liquidity infrastructure built on four principle
 | **PatternDetector** | On-chain pattern detection helpers (type classification, performance updates) |
 | **DelegationRouter** | Wraps MetaMask Delegation Toolkit; stores per-delegation trigger conditions |
 | **ExecutionEngine** | Authorized keeper interface; enforces cooldowns; tracks execution stats |
-| **MockDEX** / **TestToken** | Test-mode trade target and ERC-20 for demo flows |
+| **UniswapV2Adapter** | Adapter for real Uniswap V2 trade execution |
 
 ### 2. Envio HyperSync Indexer
 
@@ -78,8 +78,8 @@ The frontend never calls an RPC for reads — all read data comes from Envio. Th
        │ createDelegation(patternId, percentage, conditions)
        ▼
 ┌───────────────────────────────────┐
-│    DelegationRouter (Monad)       │
-│    + ExecutionEngine (Monad)      │
+│    DelegationRouter (Sepolia)     │
+│    + ExecutionEngine (Sepolia)    │
 └──────┬────────────────────────────┘
        │ DelegationCreated event
        │ TradeExecuted event
@@ -123,12 +123,12 @@ Aggregating in the frontend means fetching every pattern and every trade on ever
 
 Pure on-chain autonomy would require every delegation check to run as an EVM transaction, which is expensive and bounded by gas. Off-chain keepers can evaluate thousands of delegations per cycle with zero gas cost, then submit only the transactions that need to fire.
 
-### Why Monad specifically?
+### Why Ethereum Sepolia?
 
-- **Fast block time** (<1s) makes the execution loop feel instant
-- **EVM compatibility** means we use standard Solidity tooling (Foundry, OpenZeppelin)
-- **Envio native support** for Monad via HyperSync — no custom indexer setup needed
-- **Low gas** makes frequent executions economically viable
+- **Battle-tested infrastructure** — Ethereum's primary testnet with reliable uptime
+- **EVM native** means we use standard Solidity tooling (Foundry, OpenZeppelin)
+- **Envio native support** for Ethereum Sepolia via HyperSync — no custom indexer setup needed
+- **Real Uniswap V2 deployment** available for production-grade trade execution
 
 ---
 
@@ -140,7 +140,7 @@ Pure on-chain autonomy would require every delegation check to run as an EVM tra
 | Bot cycle time | 5s | 5s (configurable) |
 | Chain → Envio indexing delay | <1s | **~500ms** |
 | Chain → UI visibility | <10s | **~5s** (polling interval bound) |
-| Trade execution latency | <1s | **~400ms** (Monad block time) |
+| Trade execution latency | <1s | **~12s** (Sepolia block time) |
 | Frontend page load | <2s | **<1.5s** (Vite + gzip) |
 
 ---
@@ -164,7 +164,7 @@ Pure on-chain autonomy would require every delegation check to run as an EVM tra
 
 **Multi-chain expansion:**
 - Envio supports multi-chain config natively; adding a chain is a schema update
-- Frontend config is a single constant (`MONAD_CHAIN_ID`); add more chain IDs and switch-chain UI
+- Frontend config is a single constant (`SEPOLIA_CHAIN_ID`); add more chain IDs and switch-chain UI
 - Bot needs per-chain wallet clients (trivial with viem's chain object pattern)
 
 **Event volume:**
@@ -177,7 +177,7 @@ Pure on-chain autonomy would require every delegation check to run as an EVM tra
 
 | Layer | Stack |
 |---|---|
-| Chain | Monad Testnet (Chain ID 10143) |
+| Chain | Ethereum Sepolia (Chain ID 11155111) |
 | Contracts | Solidity 0.8.20+, Foundry, OpenZeppelin |
 | Indexer | Envio HyperSync (hosted) |
 | Frontend | React 18, Vite 5, TypeScript, Tailwind CSS, Framer Motion, recharts |

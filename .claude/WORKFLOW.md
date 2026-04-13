@@ -43,7 +43,7 @@ You: /status
 Claude: [Generates comprehensive status report]
 - Envio integration: 60% complete
 - P0 Task: Complete pattern detection
-- Blocker: Need Monad testnet tokens
+- Blocker: Need Sepolia testnet ETH
 ```
 
 ## 📝 Feature Development Workflow
@@ -521,7 +521,7 @@ Never skip back to implementation without validation if major changes needed.
 - [ ] Under 5 minutes
 
 ### Deployment
-- [ ] Deployed to Monad testnet
+- [ ] Deployed to Ethereum Sepolia
 - [ ] Smart contracts verified
 - [ ] Frontend accessible
 - [ ] API working

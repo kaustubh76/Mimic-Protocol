@@ -1,6 +1,6 @@
 # Mirror Protocol - Frontend Integration
 
-Complete MetaMask Delegation Toolkit integration for Mirror Protocol, enabling NFT-based behavioral pattern delegations on Monad testnet.
+Complete MetaMask Delegation Toolkit integration for Mirror Protocol, enabling NFT-based behavioral pattern delegations on Ethereum Sepolia.
 
 ## 📦 Installation
 
@@ -263,33 +263,33 @@ Display and manage user delegations.
 
 ## 🔧 Configuration
 
-### Contract Addresses (Monad Testnet)
+### Contract Addresses (Ethereum Sepolia)
 
 Update `lib/contracts.ts` with deployed addresses:
 
 ```typescript
 export const CONTRACT_ADDRESSES: ContractAddresses = {
-  behavioralNFT: '0x3ceBC8049BdAC66BfbAECC94Cce756122ed25DAc',
-  delegationRouter: '0x56C145f5567f8DB77533c825cf4205F1427c5517',
+  behavioralNFT: '0xCFa22481dDa2E4758115D3e826C2FfA1eC9c3954',
+  delegationRouter: '0xD36fB1E9537fa3b7b15B9892eb0E42A0226577a8',
 };
 ```
 
 ### Network Configuration
 
-Monad Testnet is configured in `lib/metamask.ts`:
+Ethereum Sepolia is configured in `lib/metamask.ts`:
 
 ```typescript
-export const monadTestnet: Chain = {
-  id: 10143,
-  name: 'Monad Testnet',
+export const sepoliaChain: Chain = {
+  id: 11155111,
+  name: 'Ethereum Sepolia',
   rpcUrls: {
     default: {
-      http: ['https://monad-testnet.g.alchemy.com/v2/pFkOAygOyJ72KbT_I-LM0'],
+      http: ['https://ethereum-sepolia-rpc.publicnode.com'],
     },
   },
   blockExplorers: {
     default: {
-      url: 'https://explorer.testnet.monad.xyz',
+      url: 'https://sepolia.etherscan.io',
     },
   },
 };
@@ -455,7 +455,7 @@ if (!isMetaMaskInstalled()) {
 ### Wrong Network
 
 ```tsx
-// MetaMask SDK automatically prompts to switch to Monad testnet
+// MetaMask SDK automatically prompts to switch to Ethereum Sepolia
 // or adds the network if not configured
 ```
 
@@ -481,7 +481,7 @@ See `/examples` directory for complete working examples:
 
 ## 🔗 Links
 
-- **Monad Testnet Explorer**: https://explorer.testnet.monad.xyz
+- **Ethereum Sepolia Explorer**: https://sepolia.etherscan.io
 - **MetaMask Delegation Toolkit**: https://docs.metamask.io/delegation-toolkit/
 - **Viem Documentation**: https://viem.sh
 

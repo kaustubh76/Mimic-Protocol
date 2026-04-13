@@ -1,7 +1,7 @@
 # Claude Context - Mirror Protocol Development Guide
 
 ## Project Overview
-Mirror Protocol is an Envio-powered behavioral liquidity infrastructure built on the Monad blockchain. It transforms on-chain trading behavior into executable, delegatable infrastructure using Envio HyperSync for real-time indexing and pattern detection.
+Mirror Protocol is an Envio-powered behavioral liquidity infrastructure built on Ethereum Sepolia. It transforms on-chain trading behavior into executable, delegatable infrastructure using Envio HyperSync for real-time indexing and pattern detection.
 
 ## Core Concept
 Users' trading patterns are detected by Envio HyperSync, minted as NFTs, and can be delegated to via MetaMask Smart Accounts for automated execution. The protocol demonstrates how Envio's indexing infrastructure enables a new class of real-time, data-driven DeFi applications.
@@ -62,7 +62,7 @@ class EnvioHyperCore {
 
 ### Configuration
 - `.env` - Environment variables (keys, RPCs)
-- `hardhat.config.js` - Monad network configuration
+- `hardhat.config.js` - Ethereum Sepolia network configuration
 - `package.json` - Dependencies and scripts
 
 ## Envio Integration Best Practices
@@ -114,7 +114,7 @@ const delegation = await DelegationFramework.create({
 |--------|---------|--------|
 | Query latency | <50ms | <20ms |
 | Event throughput | 102 eps | 10,000+ eps |
-| Chains supported | 1 (Monad) | 5+ |
+| Chains supported | 1 (Ethereum Sepolia) | 5+ |
 | Concurrent queries | ~10 | 1,000+ |
 
 ## Common Issues & Solutions
@@ -138,7 +138,7 @@ const delegation = await DelegationFramework.create({
 - [ ] Emergency stops functional
 
 ## Deployment Steps
-1. Deploy contracts to Monad testnet
+1. Deploy contracts to Ethereum Sepolia
 2. Initialize Envio indexer with deployed addresses
 3. Start Envio HyperCore
 4. Verify pattern detection working
@@ -155,14 +155,14 @@ const delegation = await DelegationFramework.create({
 ## Resources
 - Envio Docs: https://docs.envio.dev
 - MetaMask Delegation Toolkit: https://docs.metamask.io/delegation-toolkit/
-- Monad Testnet: https://testnet.monad.xyz
+- Ethereum Sepolia: https://sepolia.etherscan.io
 - HyperSync API: https://hypersync.envio.dev
 
 ## Current Status
 - Envio HyperCore implemented
 - Pattern detection working
 - Delegation structure complete
-- Smart contracts deployed to Monad testnet
+- Smart contracts deployed to Ethereum Sepolia
 - Frontend live on Vercel
 - Envio hosted service deployed
 

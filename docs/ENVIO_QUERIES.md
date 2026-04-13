@@ -2,7 +2,7 @@
 
 All queries below can be pasted directly into the Envio GraphQL playground at:
 
-**https://indexer.dev.hyperindex.xyz/4cda827/v1/graphql**
+**https://indexer.dev.hyperindex.xyz/14ba103/v1/graphql**
 
 Each query is annotated with its purpose and the UI component or bot logic it powers.
 

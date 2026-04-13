@@ -37,7 +37,7 @@ npm run preview
 
 - **Node.js**: v18 or later
 - **MetaMask**: Browser extension installed
-- **Monad Testnet**: ETH for gas fees
+- **Ethereum Sepolia**: ETH for gas fees
 
 ---
 
@@ -57,15 +57,15 @@ export const CONTRACT_ADDRESSES = {
 
 ### Network Configuration
 
-Monad testnet is configured in `lib/metamask.ts`:
+Ethereum Sepolia is configured in `lib/metamask.ts`:
 
 ```typescript
-export const monadTestnet: Chain = {
-  id: 10143,
-  name: 'Monad Testnet',
+export const sepoliaChain: Chain = {
+  id: 11155111,
+  name: 'Ethereum Sepolia',
   rpcUrls: {
     default: {
-      http: ['https://monad-testnet.g.alchemy.com/v2/pFkOAygOyJ72KbT_I-LM0'],
+      http: ['https://ethereum-sepolia-rpc.publicnode.com'],
     },
   },
 };
@@ -79,7 +79,7 @@ export const monadTestnet: Chain = {
 
 1. Click "Connect MetaMask" button
 2. Approve connection in MetaMask
-3. MetaMask will prompt to switch to Monad testnet
+3. MetaMask will prompt to switch to Ethereum Sepolia
 4. Approve network switch
 
 ### Step 2: Create Smart Account
@@ -177,7 +177,7 @@ Each pattern displays:
 ✅ **NFT-Based Delegations** - "Trading patterns as NFTs with delegatable permissions"
 ✅ **Custom Permissions** - "Spend limits, expiration, token whitelists"
 ✅ **Conditional Execution** - "Only execute if win rate > 60%, ROI > 10%"
-✅ **Monad Testnet** - "Deployed and tested on Monad"
+✅ **Ethereum Sepolia** - "Deployed and tested on Ethereum Sepolia"
 
 ---
 
@@ -198,12 +198,12 @@ Each pattern displays:
 
 **Solution**:
 - MetaMask should auto-prompt to switch networks
-- If not, manually add Monad testnet:
-  - Network Name: `Monad Testnet`
-  - RPC URL: `https://monad-testnet.g.alchemy.com/v2/pFkOAygOyJ72KbT_I-LM0`
-  - Chain ID: `10143`
-  - Currency Symbol: `MON`
-  - Explorer: `https://explorer.testnet.monad.xyz`
+- If not, manually add Ethereum Sepolia:
+  - Network Name: `Ethereum Sepolia`
+  - RPC URL: `https://ethereum-sepolia-rpc.publicnode.com`
+  - Chain ID: `11155111`
+  - Currency Symbol: `ETH`
+  - Explorer: `https://sepolia.etherscan.io`
 
 ### No Patterns Showing
 
@@ -214,7 +214,7 @@ Each pattern displays:
 - Use the pattern minting script:
   ```bash
   cd /Users/apple/Desktop/Mimic\ Protocol
-  forge script script/MintPattern.s.sol --rpc-url $MONAD_RPC_URL --broadcast
+  forge script script/MintPattern.s.sol --rpc-url $SEPOLIA_RPC_URL --broadcast
   ```
 
 ### Transaction Failures
@@ -277,9 +277,9 @@ npm run deploy
 ## 🔗 Resources
 
 - **Application**: http://localhost:3000 (dev)
-- **Monad Explorer**: https://explorer.testnet.monad.xyz
-- **BehavioralNFT**: https://explorer.testnet.monad.xyz/address/0x3ceBC8049BdAC66BfbAECC94Cce756122ed25DAc
-- **DelegationRouter**: https://explorer.testnet.monad.xyz/address/0x56C145f5567f8DB77533c825cf4205F1427c5517
+- **Sepolia Explorer**: https://sepolia.etherscan.io
+- **BehavioralNFT**: https://sepolia.etherscan.io/address/0xCFa22481dDa2E4758115D3e826C2FfA1eC9c3954
+- **DelegationRouter**: https://sepolia.etherscan.io/address/0xD36fB1E9537fa3b7b15B9892eb0E42A0226577a8
 - **MetaMask Docs**: https://docs.metamask.io/delegation-toolkit/
 - **Envio Docs**: https://docs.envio.dev
 
@@ -301,8 +301,8 @@ npm run deploy
 ## ✅ Checklist for Demo
 
 - [ ] MetaMask installed and connected
-- [ ] Monad testnet ETH in wallet
-- [ ] Contracts deployed to Monad testnet
+- [ ] Sepolia testnet ETH in wallet
+- [ ] Contracts deployed to Ethereum Sepolia
 - [ ] At least 1 pattern minted
 - [ ] Frontend running on localhost:3000
 - [ ] Smart Account created

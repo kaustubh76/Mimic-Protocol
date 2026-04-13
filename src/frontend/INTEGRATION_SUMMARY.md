@@ -31,7 +31,7 @@ npm install  # ✅ Complete
 
 3. **Contract Configuration** - [lib/contracts.ts](lib/contracts.ts)
    - Full ABIs for DelegationRouter and BehavioralNFT
-   - Deployed addresses on Monad testnet
+   - Deployed addresses on Ethereum Sepolia
    - Type-safe contract interactions
 
 4. **TypeScript Types** - [types/delegation.ts](types/delegation.ts)
@@ -102,7 +102,7 @@ npm install  # ✅ Complete
 ✅ **Type-Safe** - Full TypeScript with Viem
 ✅ **React Hooks** - Custom hooks for state management
 ✅ **Production Ready** - Error handling, validation, tx tracking
-✅ **Monad Testnet** - Chain ID 10143, fully configured
+✅ **Ethereum Sepolia** - Chain ID 11155111, fully configured
 ✅ **Simple & Advanced** - Quick delegations + custom permissions
 ✅ **Well Documented** - Examples and API reference
 
@@ -150,24 +150,24 @@ function QuickDelegate() {
 
 ## 🔧 Configuration
 
-### Contract Addresses (Monad Testnet)
+### Contract Addresses (Ethereum Sepolia)
 
 ```typescript
 const CONTRACT_ADDRESSES = {
-  behavioralNFT: '0x3ceBC8049BdAC66BfbAECC94Cce756122ed25DAc',
-  delegationRouter: '0x56C145f5567f8DB77533c825cf4205F1427c5517',
+  behavioralNFT: '0xCFa22481dDa2E4758115D3e826C2FfA1eC9c3954',
+  delegationRouter: '0xD36fB1E9537fa3b7b15B9892eb0E42A0226577a8',
 };
 ```
 
 ### Network Configuration
 
 ```typescript
-const monadTestnet = {
-  id: 10143,
-  name: 'Monad Testnet',
+const sepoliaChain = {
+  id: 11155111,
+  name: 'Ethereum Sepolia',
   rpcUrls: {
     default: {
-      http: ['https://monad-testnet.g.alchemy.com/v2/pFkOAygOyJ72KbT_I-LM0'],
+      http: ['https://ethereum-sepolia-rpc.publicnode.com'],
     },
   },
 };
@@ -203,7 +203,7 @@ To test the integration:
 2. **Connect MetaMask**:
    - Click "Connect MetaMask"
    - Approve connection
-   - MetaMask will prompt to switch to Monad testnet
+   - MetaMask will prompt to switch to Ethereum Sepolia
 
 3. **Create Smart Account**:
    - Click "Create Smart Account"
@@ -283,7 +283,7 @@ This integration provides everything needed to:
 1. **Build Frontend UI** - Use the components to create demo interface
 2. **Connect to Envio** - Integrate with Envio HyperSync for real-time pattern data
 3. **Add Styling** - Apply CSS to components
-4. **Test End-to-End** - Complete delegation flow on Monad testnet
+4. **Test End-to-End** - Complete delegation flow on Ethereum Sepolia
 
 ---
 

@@ -2,16 +2,16 @@
 
 # 🔄 Mirror Protocol
 
-### Behavioral Liquidity Infrastructure on Monad
+### Behavioral Liquidity Infrastructure on Ethereum Sepolia
 
 **Transform on-chain trading behavior into executable, delegatable NFTs — powered by Envio HyperSync.**
 
 [![Live Demo](https://img.shields.io/badge/Live%20Demo-mirror--protocol--nine.vercel.app-8B5CF6?style=for-the-badge)](https://mirror-protocol-nine.vercel.app)
-[![Monad Testnet](https://img.shields.io/badge/Chain-Monad%20Testnet-8B5CF6?style=for-the-badge)](https://testnet.monad.xyz)
+[![Ethereum Sepolia](https://img.shields.io/badge/Chain-Ethereum%20Sepolia-8B5CF6?style=for-the-badge)](https://sepolia.etherscan.io)
 [![Envio HyperSync](https://img.shields.io/badge/Indexer-Envio%20HyperSync-06B6D4?style=for-the-badge)](https://envio.dev)
 [![Vercel](https://img.shields.io/badge/Deployed-Vercel-000000?style=for-the-badge&logo=vercel)](https://mirror-protocol-nine.vercel.app)
 
-**[🚀 Live Demo](https://mirror-protocol-nine.vercel.app)** · **[📖 Blog Article](./BLOG.md)** · **[⚡ Envio Playground](https://indexer.dev.hyperindex.xyz/4cda827/v1/graphql)** · **[🔍 Contracts on Explorer](https://explorer.testnet.monad.xyz/address/0x6943e7D39F3799d0b8fa9D6aD6B63861a15a8d26)**
+**[🚀 Live Demo](https://mirror-protocol-nine.vercel.app)** · **[📖 Blog Article](./BLOG.md)** · **[⚡ Envio Playground](https://indexer.dev.hyperindex.xyz/14ba103/v1/graphql)** · **[🔍 Contracts on Explorer](https://sepolia.etherscan.io/address/0xCFa22481dDa2E4758115D3e826C2FfA1eC9c3954)**
 
 </div>
 
@@ -45,7 +45,7 @@ The executor bot makes a single Envio query per cycle joining `Delegation → Pa
                  │ 1. Delegate capital to Pattern NFT
                  ▼
 ┌──────────────────────────────────────────────────────────────────┐
-│             Smart Contracts on Monad Testnet                      │
+│             Smart Contracts on Ethereum Sepolia                    │
 │  ┌─────────────┐  ┌──────────────────┐  ┌───────────────────┐   │
 │  │ BehavioralNFT│  │DelegationRouter  │  │ ExecutionEngine   │   │
 │  │  (ERC-721)  │  │ (MetaMask DT)    │  │ (Auto Executor)   │   │
@@ -90,7 +90,7 @@ cd ../../executor-bot
 node bot.mjs
 ```
 
-Open [http://localhost:3000](http://localhost:3000) and connect a MetaMask wallet to Monad Testnet (Chain ID `10143`).
+Open [http://localhost:3000](http://localhost:3000) and connect a MetaMask wallet to Ethereum Sepolia (Chain ID `11155111`).
 
 ## Project Structure
 
@@ -111,20 +111,21 @@ Mimic-Protocol/
 └── README.md
 ```
 
-## Contract Addresses (Monad Testnet — Chain ID 10143)
+## Contract Addresses (Ethereum Sepolia — Chain ID 11155111)
 
 | Contract | Address |
 |---|---|
-| **BehavioralNFT** | [`0x6943e7D39F3799d0b8fa9D6aD6B63861a15a8d26`](https://explorer.testnet.monad.xyz/address/0x6943e7D39F3799d0b8fa9D6aD6B63861a15a8d26) |
-| **DelegationRouter** | [`0xd5499e0d781b123724dF253776Aa1EB09780AfBf`](https://explorer.testnet.monad.xyz/address/0xd5499e0d781b123724dF253776Aa1EB09780AfBf) |
-| **PatternDetector** | [`0x28BEC7E4d25D385BBf5FD4d2CF5163c513662CaE`](https://explorer.testnet.monad.xyz/address/0x28BEC7E4d25D385BBf5FD4d2CF5163c513662CaE) |
-| **ExecutionEngine** | [`0x4364457325CeB1Af9f0BDD72C0927eD30CB69eD8`](https://explorer.testnet.monad.xyz/address/0x4364457325CeB1Af9f0BDD72C0927eD30CB69eD8) |
+| **BehavioralNFT** | [`0xCFa22481dDa2E4758115D3e826C2FfA1eC9c3954`](https://sepolia.etherscan.io/address/0xCFa22481dDa2E4758115D3e826C2FfA1eC9c3954) |
+| **DelegationRouter** | [`0xD36fB1E9537fa3b7b15B9892eb0E42A0226577a8`](https://sepolia.etherscan.io/address/0xD36fB1E9537fa3b7b15B9892eb0E42A0226577a8) |
+| **PatternDetector** | [`0x4C122A516930a5E23f3c31Db53Ee008a2720527E`](https://sepolia.etherscan.io/address/0x4C122A516930a5E23f3c31Db53Ee008a2720527E) |
+| **ExecutionEngine** | [`0x1C1b05628EFaD25804E663dEeA97e224ccA1eD5A`](https://sepolia.etherscan.io/address/0x1C1b05628EFaD25804E663dEeA97e224ccA1eD5A) |
+| **UniswapV2Adapter** | [`0x5B59f315d4E2670446ed7B130584A326A0f7c2D3`](https://sepolia.etherscan.io/address/0x5B59f315d4E2670446ed7B130584A326A0f7c2D3) |
 
 ## Tech Stack
 
 | Layer | Technology |
 |---|---|
-| **Chain** | Monad Testnet (Chain ID 10143) |
+| **Chain** | Ethereum Sepolia (Chain ID 11155111) |
 | **Smart Contracts** | Solidity 0.8.20+, Foundry, OpenZeppelin |
 | **Indexer** | Envio HyperSync (hosted) |
 | **Frontend** | React 18, Vite, TypeScript, Tailwind CSS, Framer Motion, recharts |
@@ -139,8 +140,8 @@ Current protocol state (auto-updated via Envio):
 - **13** active trading patterns
 - **9** active delegations
 - **47** successful trade executions (100% success rate)
-- **290.02 MON** total volume indexed
-- **112.76 MON** total earnings distributed
+- **290.02 ETH** total volume indexed
+- **112.76 ETH** total earnings distributed
 - **<5ms** average Envio query latency
 
 ## Documentation
@@ -154,8 +155,8 @@ Current protocol state (auto-updated via Envio):
 
 - **Live App**: [mirror-protocol-nine.vercel.app](https://mirror-protocol-nine.vercel.app)
 - **GitHub**: [kaustubh76/Mimic-Protocol](https://github.com/kaustubh76/Mimic-Protocol)
-- **Envio GraphQL Playground**: [indexer.dev.hyperindex.xyz/4cda827/v1/graphql](https://indexer.dev.hyperindex.xyz/4cda827/v1/graphql)
-- **Monad Testnet**: [testnet.monad.xyz](https://testnet.monad.xyz)
+- **Envio GraphQL Playground**: [indexer.dev.hyperindex.xyz/14ba103/v1/graphql](https://indexer.dev.hyperindex.xyz/14ba103/v1/graphql)
+- **Ethereum Sepolia**: [sepolia.etherscan.io](https://sepolia.etherscan.io)
 - **Envio Docs**: [docs.envio.dev](https://docs.envio.dev)
 
 ## License
@@ -166,6 +167,6 @@ MIT © Kaustubh Agrawal
 
 <div align="center">
 
-**Built with ⚡ Envio HyperSync on 🟣 Monad Testnet**
+**Built with ⚡ Envio HyperSync on Ethereum Sepolia · Real Uniswap V2 execution**
 
 </div>
