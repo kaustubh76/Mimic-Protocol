@@ -75,14 +75,22 @@ const CONTRACTS = {
   USDC: (ENV.SEPOLIA_TOKEN_B || '0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238'),
 };
 
-// Size of each executed swap. The ExecutionEngine holds a 0.1 WETH float
-// (seeded during the gate 7 deploy). At 0.005 WETH per trade this allows
-// ~20 trades before the float needs topping up, and each trade is visually
-// meaningful in the UI (~41 USDC out at current Sepolia WETH/USDC rates).
-// The engine's balance check at ExecutionEngine.sol line 504-507 is read
-// against the delegation's smart account balance, not the engine's float,
-// so the smart accounts also need WETH — handled by ensureSmartAccountFunded.
-const TRADE_AMOUNT = parseEther('0.005');
+// ─── Trade direction configuration ──────────────────────────────────────────
+// TRADE_TOKEN: the input token for each swap. Currently USDC (the engine
+// accumulated USDC from prior WETH→USDC swaps, so we flip the direction to
+// swap USDC→WETH). To switch back to WETH→USDC, change TRADE_TOKEN to
+// CONTRACTS.WETH and TRADE_AMOUNT to parseEther('0.005').
+//
+// TRADE_AMOUNT: 5 USDC (6 decimals = 5_000_000). At ~$8200/ETH implied by
+// the Sepolia pool, this produces ~0.0006 WETH per swap. The engine holds
+// ~2300 USDC from prior swaps, so this supports ~460 trades before topping up.
+//
+// The engine's balance check at ExecutionEngine.sol line 504-507 reads
+// IERC20(token).balanceOf(smartAccount) — so the delegation's smart account
+// (= executor EOA) must also hold some USDC. The SetupUSDCTrades script
+// recovers 100 USDC from the engine to the executor for this purpose.
+const TRADE_TOKEN = CONTRACTS.USDC;
+const TRADE_AMOUNT = 5_000_000n; // 5 USDC (6 decimals)
 
 // UniswapV2Adapter.swap(IERC20 tokenIn, uint256 amountIn, uint256 minAmountOut, address to)
 const UNISWAP_V2_ADAPTER_ABI = [{
@@ -407,29 +415,28 @@ async function processExecution(delegation, walletClient, publicClient, executor
     console.warn(`  [RATE→WARN] executionStats read failed: ${err.shortMessage || err.message}`);
   }
 
-  // Float check: every trade drains the engine's WETH float by TRADE_AMOUNT.
-  // The engine's try/catch wraps the adapter's safeTransferFrom, so
-  // under-funded executions still mine as recorded on-chain failures
-  // (success=false) — which means the bot would keep burning ~70k gas per
-  // cycle on guaranteed-failure tx submissions until the rate limit kicks
-  // in. Skip the whole cycle cleanly if the float is below TRADE_AMOUNT.
+  // Float check: every trade drains the engine's TRADE_TOKEN float by
+  // TRADE_AMOUNT. Skip the cycle if the engine doesn't have enough to avoid
+  // burning gas on guaranteed-to-fail adapter safeTransferFrom calls.
   try {
     const engineFloat = await publicClient.readContract({
-      address: CONTRACTS.WETH,
-      abi: WETH9_ABI,
+      address: TRADE_TOKEN,
+      abi: WETH9_ABI, // balanceOf is ERC20-compatible
       functionName: 'balanceOf',
       args: [CONTRACTS.EXECUTION_ENGINE],
     });
     if (engineFloat < TRADE_AMOUNT) {
+      const tokenLabel = TRADE_TOKEN === CONTRACTS.USDC ? 'USDC' : 'WETH';
+      const refundCmd = TRADE_TOKEN === CONTRACTS.USDC
+        ? 'forge script script/SetupUSDCTrades.s.sol --rpc-url sepolia --broadcast --legacy'
+        : 'forge script script/RefundEngineWETH.s.sol --rpc-url sepolia --broadcast --legacy';
       console.log(
-        `  [FUND→LOW] engine WETH float ${engineFloat} wei < TRADE_AMOUNT ${TRADE_AMOUNT} wei — ` +
-        `top up with: forge script script/RefundEngineWETH.s.sol --rpc-url sepolia --broadcast --legacy`
+        `  [FUND→LOW] engine ${tokenLabel} float ${engineFloat} < TRADE_AMOUNT ${TRADE_AMOUNT} — ` +
+        `top up with: ${refundCmd}`
       );
       return;
     }
   } catch (err) {
-    // Chain read failed — fall through. Worst case is a recorded failure,
-    // no worse than before this check existed.
     console.warn(`  [FUND→WARN] engine float read failed: ${err.shortMessage || err.message}`);
   }
 
@@ -472,42 +479,68 @@ async function processExecution(delegation, walletClient, publicClient, executor
   console.log(`    Envio metrics: winRate=${patternMetrics.winRate} roi=${patternMetrics.roi} volume=${patternMetrics.totalVolume}`);
   console.log(`    Conditions: minWR=${conditions.minWinRate} minROI=${conditions.minROI} → EXECUTING`);
 
-  const tradeAmount = TRADE_AMOUNT; // 0.001 WETH per trade (see constant above)
+  const tradeAmount = TRADE_AMOUNT;
 
-  // Ensure the delegation's smart account has enough WETH for the engine's
-  // balanceOf check. Freshly-created delegations start at zero WETH.
+  // Ensure the delegation's smart account holds enough of the trade token
+  // (USDC or WETH) for the engine's balanceOf(smartAccount) check. When
+  // smartAccount == executor (our current delegation setup), the executor
+  // already holds the token after running the setup script. We just verify
+  // the balance is sufficient; if not, there's nothing we can auto-mint
+  // (USDC has no faucet), so we skip with a message.
   const smartAccount = delegation.smartAccountAddress;
   if (!smartAccount) {
     console.log(`  [FUND→SKIP] Delegation #${delegationId}: no smartAccountAddress on Envio record`);
     return;
   }
-  try {
-    await ensureSmartAccountFunded(smartAccount, tradeAmount, walletClient, publicClient);
-  } catch (err) {
-    console.log(`  ❌ Top-up failed: ${err.shortMessage || err.message}`);
-    return;
+
+  // For WETH trades, the old ensureSmartAccountFunded wraps ETH automatically.
+  // For USDC trades, we just check the balance — the SetupUSDCTrades script
+  // pre-funded the executor with USDC via engine.recoverTokens.
+  if (TRADE_TOKEN === CONTRACTS.WETH) {
+    try {
+      await ensureSmartAccountFunded(smartAccount, tradeAmount, walletClient, publicClient);
+    } catch (err) {
+      console.log(`  ❌ Top-up failed: ${err.shortMessage || err.message}`);
+      return;
+    }
+  } else {
+    // For non-WETH tokens (USDC), just check balance
+    try {
+      const bal = await publicClient.readContract({
+        address: TRADE_TOKEN,
+        abi: WETH9_ABI, // balanceOf is ERC20-compatible
+        functionName: 'balanceOf',
+        args: [smartAccount],
+      });
+      if (bal < tradeAmount) {
+        console.log(`  [FUND→LOW] smart account ${TRADE_TOKEN === CONTRACTS.USDC ? 'USDC' : 'token'} balance ${bal} < ${tradeAmount} — run SetupUSDCTrades script`);
+        return;
+      }
+      console.log(`    [FUND→OK] smart account holds ${bal} of trade token (>= ${tradeAmount})`);
+    } catch (err) {
+      console.warn(`  [FUND→WARN] smart account balance read failed: ${err.shortMessage || err.message}`);
+    }
   }
 
   // Real swap through UniswapV2Adapter.
-  // The adapter pulls `tradeAmount` WETH from msg.sender (= ExecutionEngine)
-  // via safeTransferFrom, routes it through the real Sepolia Uniswap V2
-  // Router02 (WETH -> USDC), and sends the USDC back to `to` (= ExecutionEngine).
-  // The engine's WETH allowance for the adapter was set to MAX during gate 7
-  // via engine.approveToken(WETH, adapter, MAX).
+  // The adapter pulls TRADE_AMOUNT of TRADE_TOKEN from the ExecutionEngine
+  // (msg.sender during _externalCall), routes it through the real Sepolia
+  // Uniswap V2 Router, and sends the output token back to the engine.
+  // Engine approvals: WETH set during gate 7, USDC set by SetupUSDCTrades.
   const swapCallData = encodeFunctionData({
     abi: UNISWAP_V2_ADAPTER_ABI,
     functionName: 'swap',
     args: [
-      CONTRACTS.WETH,                 // tokenIn
-      tradeAmount,                    // amountIn (0.001 WETH)
-      0n,                             // minAmountOut = 0 for demo; slippage check lives on the router
-      CONTRACTS.EXECUTION_ENGINE,     // to — swapped USDC accumulates in the engine
+      TRADE_TOKEN,                    // tokenIn (USDC or WETH)
+      tradeAmount,                    // amountIn
+      0n,                             // minAmountOut = 0 for demo
+      CONTRACTS.EXECUTION_ENGINE,     // to — output token accumulates in the engine
     ],
   });
 
   const tradeParams = {
     delegationId,
-    token: CONTRACTS.WETH,            // informational: what we're "trading in"
+    token: TRADE_TOKEN,               // what we're trading in
     amount: tradeAmount,
     targetContract: CONTRACTS.UNISWAP_V2_ADAPTER,
     callData: swapCallData,
