@@ -23,13 +23,13 @@ echo "Sepolia RPC: $SEPOLIA_RPC_URL"
 echo
 
 echo "▸ Layer 1: existing unit + integration tests (MockDEX)"
-forge test --no-match-contract SepoliaPivot
+forge test --no-match-contract "SepoliaPivot|MultiLayerDelegation"
 echo "  ✓ layer 1 passed"
 echo
 
-echo "▸ Layer 2: forked Sepolia integration test (real adapter + real Uniswap V2)"
+echo "▸ Layer 2: forked Sepolia tests (real adapter + real Uniswap V2 + multi-layer)"
 SEPOLIA_RPC_URL="$SEPOLIA_RPC_URL" forge test \
-    --match-contract SepoliaPivot \
+    --match-contract "SepoliaPivot|MultiLayerDelegation" \
     --fork-url "$SEPOLIA_RPC_URL" \
     -vv
 echo "  ✓ layer 2 passed"
