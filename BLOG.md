@@ -1,289 +1,177 @@
-# Building Real-Time Behavioral Trading Infrastructure with Envio HyperSync
+# Mirror Protocol: Turning Trading Strategies Into Executable, Delegatable NFTs
 
-### How I used Envio to power sub-5ms pattern detection, real-time trade execution, and a live dashboard that runs against real Uniswap V2 liquidity.
+### A real-time DeFi product built on Envio HyperSync — with real Uniswap V2 execution, behavioral pattern detection, and a vision for what comes next.
 
 *By Kaustubh Agrawal*
 
 ![Mirror Protocol Live Dashboard](./docs/images/dashboard-hero.png)
-*[mirror-protocol-nine.vercel.app](https://mirror-protocol-nine.vercel.app) — 139+ real trades, 7 strategy NFTs, sub-5ms Envio queries, live on Ethereum Sepolia.*
+
+**[Open the live demo →](https://mirror-protocol-nine.vercel.app)**
 
 ---
 
-## The Project
+## Open the Site. Watch for 10 Seconds.
 
-**Mirror Protocol** is a DeFi application where trading strategies become NFTs, other users delegate capital to those NFTs, and an automated bot executes real Uniswap V2 swaps when on-chain conditions match — all orchestrated through Envio HyperSync's real-time event indexing.
+You'll see numbers ticking up in real time. A green "LIVE" dot pulsing. A feed of trades sliding in — each one showing a real Uniswap V2 swap: `5.00 USDC → 0.0007 WETH`, with a clickable link to the actual transaction on Sepolia Etherscan.
 
-> A trader mints their strategy as an ERC-721. Other users delegate with conditions like "only execute if win rate > 80%." A keeper bot queries Envio every 5 seconds, validates conditions in <5ms, and fires a real swap. The whole cycle — from on-chain event to dashboard render — takes under 3 seconds.
+Nothing is simulated. These are real tokens, moving through a real DEX, on a real blockchain, indexed in real time by Envio HyperSync. The dashboard isn't showing you cached data or a replay — it's showing you what's happening *right now*.
 
-Everything runs on Ethereum Sepolia with real Uniswap V2 liquidity. 139+ successful swaps have executed so far, both WETH→USDC and USDC→WETH, all verifiable on [Sepolia Etherscan](https://sepolia.etherscan.io).
-
----
-
-## Why I Built This on Envio
-
-The core problem Mirror Protocol solves is **speed of decision**. The executor bot needs to answer a question every 5 seconds: "which delegations are active, what are their pattern metrics, and should I execute a trade right now?"
-
-Without a real-time indexer, answering that question means reading from the blockchain directly:
-
-```
-Per delegation:
-  → getDelegationBasics()      ~200ms RPC call
-  → getPatternMetadata()       ~200ms RPC call  
-  → getDelegationConditions()  ~200ms RPC call
-
-× 7 active delegations = 21 RPC calls = 4.2 seconds minimum
-```
-
-That's a 4-second decision latency before the bot can even begin building a transaction. At that speed, the "real-time" dashboard would update once every 10 seconds at best. The product wouldn't feel alive.
-
-**With Envio HyperSync**, the same information comes from one GraphQL query in **3-5ms**:
-
-```graphql
-{
-  Delegation(where: {isActive: {_eq: true}}) {
-    delegationId
-    patternTokenId
-    percentageAllocation
-    smartAccountAddress
-    pattern {
-      winRate
-      roi
-      totalVolume
-      isActive
-      patternType
-    }
-  }
-}
-```
-
-One round-trip. Every field. Sub-5ms. That's the difference between a product that feels like a dashboard and one that feels like a live feed.
+That's Mirror Protocol.
 
 ---
 
-## The Envio Integration — Technical Deep Dive
+## The Product
 
-### Event Architecture
+Mirror Protocol is a new kind of DeFi infrastructure: **behavioral liquidity**.
 
-Mirror Protocol emits 8 distinct events across 3 contracts, all indexed by Envio:
+The idea is simple. Good traders have patterns — momentum plays, mean reversion entries, arbitrage windows. Today, those patterns live in a trader's head or in a private script. Mirror Protocol makes them **on-chain, ownable, and delegatable**.
 
-**BehavioralNFT** (pattern lifecycle):
-- `PatternMinted` — new strategy created, indexed with type + creator + metadata
-- `PatternPerformanceUpdated` — win rate, volume, ROI changes
-- `PatternDeactivated` — strategy retired
-- `Transfer` — NFT ownership changes
+### How it works for users:
 
-**DelegationRouter** (delegation management):
-- `DelegationCreated` — new capital delegation with allocation % and smart account
-- `DelegationRevoked` — delegation withdrawn
-- `DelegationUpdated` — allocation changed
-- `TradeExecuted` — execution result with amount, success flag, timestamp
+**For pattern creators:**
+You connect your wallet, click **"+ Mint Pattern"**, describe your trading strategy (type, win rate, volume, confidence), and mint it as an ERC-721 NFT. Your strategy is now a permanent, verifiable on-chain asset with embedded performance metrics.
 
-**UniswapV2Adapter** (DEX execution):
-- `Swap` — real swap detail: tokenIn, tokenOut, amountIn, amountOut, recipient
+**For delegators:**
+You browse the pattern marketplace, see each strategy's live win rate, ROI, and trade volume. You pick one, click **"Delegate"**, set your allocation percentage, and sign. Your capital is now linked to that pattern's execution conditions.
 
-### Schema Design
+**For the protocol:**
+An executor bot watches every active delegation through Envio's real-time index. Every 5 seconds, it checks: are conditions met? Is the win rate above the delegator's threshold? If yes — a real Uniswap V2 swap fires automatically. USDC goes in, WETH comes out (or vice versa). The trade is confirmed, indexed, and visible on the dashboard within seconds.
 
-I designed the Envio schema around how the data gets consumed, not how the contracts emit it:
-
-```graphql
-type Pattern @entity {
-  tokenId: BigInt! @index
-  patternType: String!
-  creator: Bytes! @index
-  winRate: BigInt!
-  roi: Int!
-  totalVolume: BigInt!
-  isActive: Boolean! @index
-  # Derived counts — computed in the handler, not queried separately
-  delegationCount: Int!
-  successfulExecutions: Int!
-}
-
-type TradeExecution @entity {
-  delegationId: BigInt! @index
-  pattern: Pattern!          # ← Envio relation, enables nested queries
-  amount: BigInt!
-  success: Boolean! @index   # ← indexed for the success-only feed filter
-  txHash: Bytes! @index      # ← join key for PoolSwap
-}
-
-type PoolSwap @entity {
-  tokenIn: Bytes!
-  tokenOut: Bytes!
-  amountIn: BigInt!
-  amountOut: BigInt!          # ← the real Uniswap V2 output amount
-  txHash: Bytes! @index       # ← join key for TradeExecution
-}
-```
-
-**Key design decisions:**
-
-1. **`Pattern` has derived counts** (`delegationCount`, `successfulExecutions`) that get incremented in the event handler rather than computed via aggregation queries. This keeps the frontend's pattern-browser query fast — one `Pattern(limit: 20)` call returns everything the card needs without joins.
-
-2. **`PoolSwap` is a separate entity joined by `txHash`**, not nested under `TradeExecution`. This is because the `Swap` event comes from a different contract (the adapter) than `TradeExecuted` (the engine). Envio doesn't enforce cross-contract event relations, so the frontend joins them client-side: fetch both in one GraphQL request, build a `Map<txHash, PoolSwap>`, attach to each trade row.
-
-3. **`success` is indexed on `TradeExecution`** so the LiveExecutionFeed can query `where: {success: {_eq: true}}` at the GraphQL level instead of filtering 139+ rows client-side. This matters because the engine's try/catch wrapper records failed swaps as `success: false` — without the filter, the feed would show a mix of real trades and under-funded failures.
-
-### Event Handler Pattern
-
-Every handler follows the same structure: read the event, compute derived state, write entities, update system metrics. Here's the `TradeExecuted` handler (simplified):
-
-```typescript
-DelegationRouter.TradeExecuted.handler(async ({ event, context }) => {
-  const { delegationId, patternTokenId, amount, success, timestamp } = event.params;
-
-  // 1. Write the TradeExecution entity
-  context.TradeExecution.set({
-    id: `${delegationId}-${timestamp}-${event.block.number}`,
-    delegation_id: delegationId.toString(),
-    pattern_id: patternTokenId.toString(),
-    amount,
-    success,
-    timestamp: BigInt(timestamp),
-    txHash: event.transaction.hash,
-    // ...
-  });
-
-  // 2. Update the delegation's running stats
-  const delegation = await context.Delegation.get(delegationId.toString());
-  if (delegation) {
-    context.Delegation.set({
-      ...delegation,
-      totalExecutions: delegation.totalExecutions + 1,
-      successfulExecutions: delegation.successfulExecutions + (success ? 1 : 0),
-      totalAmountTraded: delegation.totalAmountTraded + amount,
-    });
-  }
-
-  // 3. Update the pattern's execution counts
-  const pattern = await context.Pattern.get(patternTokenId.toString());
-  if (pattern) {
-    context.Pattern.set({
-      ...pattern,
-      successfulExecutions: pattern.successfulExecutions + (success ? 1 : 0),
-    });
-  }
-
-  // 4. Update global system metrics
-  // ... (similar read-modify-write on SystemMetrics entity)
-});
-```
-
-**Why this matters:** Every piece of state the frontend and bot need — delegation stats, pattern metrics, system-wide counters — is computed incrementally in the handler and available via a single GraphQL query. No aggregation, no client-side computation, no chain reads. The handler does the work once at index time; every subsequent query is a direct read.
-
-### HyperSync Configuration
-
-```yaml
-networks:
-  - id: 11155111  # Ethereum Sepolia
-    start_block: 10633021
-    hypersync_config:
-      url: https://sepolia.hypersync.xyz
-    contracts:
-      - name: BehavioralNFT
-        address: ["0xCFa22481dDa2E4758115D3e826C2FfA1eC9c3954"]
-        handler: EventHandlers.ts
-        events:
-          - event: "PatternMinted(uint256 indexed tokenId, ...)"
-          # ... 4 events
-
-      - name: DelegationRouter
-        address: ["0xD36fB1E9537fa3b7b15B9892eb0E42A0226577a8"]
-        handler: EventHandlers.ts
-        events:
-          - event: "DelegationCreated(uint256 indexed delegationId, ...)"
-          # ... 4 events
-
-      - name: UniswapV2Adapter
-        address: ["0x5B59f315d4E2670446ed7B130584A326A0f7c2D3"]
-        handler: EventHandlers.ts
-        events:
-          - event: "Swap(address indexed sender, ...)"
-```
-
-**HyperSync vs RPC polling:** The indexer uses HyperSync (`hypersync_config`) instead of RPC polling (`rpc_config`). HyperSync batch-fetches historical events efficiently — the initial sync from block 10633021 to head (covering all 139+ trades) completes in **under 30 seconds**. With RPC polling on Sepolia, the same sync would take minutes due to per-block rate limits.
-
-### Envio Hosted Service
-
-The indexer runs on Envio's hosted service via a dedicated Git branch (`envio-deploy-sepolia`). Every push triggers a rebuild + redeploy with a new GraphQL endpoint. The current endpoint:
-
-```
-https://indexer.dev.hyperindex.xyz/14ba103/v1/graphql
-```
-
-The hosted service handles reorgs (`rollback_on_reorg: true`), auto-scales with event volume, and provides a built-in GraphQL explorer for debugging queries.
+No manual intervention. No centralized matching. Just patterns, delegations, and automated execution — all on-chain.
 
 ---
 
-## How Envio Powers Each Product Feature
+## The Proof: Live on Ethereum Sepolia
 
-| Feature | Envio's Role | Without Envio |
-|---|---|---|
-| **Live Execution Feed** | Polls `TradeExecution + PoolSwap` every 5s, renders in <100ms | Would need to parse raw tx receipts per trade — 200ms+ per row, N RPC calls |
-| **Pattern Browser** | Single `Pattern(limit: 20)` query returns win rate, ROI, volume, delegation count | 4 RPC calls per pattern × 7 patterns = 1.4s+ load time |
-| **Bot Decision Loop** | One query for all 7 delegations + pattern metrics in 3-5ms | 21 RPC calls = 4.2s decision latency per cycle |
-| **Portfolio Dashboard** | `Delegation` entity has pre-computed `totalAmountTraded`, `totalEarnings` | Client-side aggregation across N trade receipts |
-| **DEX Detail Display** | `PoolSwap` entity stores real amountIn/amountOut from adapter Swap event | Parse Uniswap V2 pair logs from raw receipts per trade |
-| **Analytics Charts** | `SystemMetrics` entity with running totals updated per event | Full-table scan or client-side aggregation |
+This isn't a whitepaper. Everything described above is deployed, running, and verifiable:
 
----
+| | |
+|---|---|
+| **Total successful trades** | **139+** real Uniswap V2 swaps |
+| **Trading pairs** | WETH ↔ USDC (bidirectional) |
+| **Strategy patterns** | 7 active — Momentum, Mean Reversion, Arbitrage, Liquidity, Yield, Composite |
+| **Active delegations** | 7, each with distinct allocation percentages |
+| **Delegation depth** | Up to 3 layers (delegator → sub-delegator → executor) |
+| **Envio query latency** | **3-5ms** per decision cycle |
+| **Test coverage** | 149 tests, including forked Sepolia integration against real Uniswap V2 |
+| **DEX pool** | [WETH/USDC on Sepolia Uniswap V2](https://sepolia.etherscan.io/address/0x72e46e15ef83c896de44b1874b4af7ddab5b4f74) |
 
-## Real DEX Execution
-
-Every trade is a real Uniswap V2 swap through this flow:
-
-```
-ExecutionEngine._externalCall(adapter, callData)
-  → UniswapV2Adapter.swap(tokenIn, amountIn, minOut, to)
-    → IERC20(tokenIn).safeTransferFrom(engine, adapter, amountIn)
-    → router.swapExactTokensForTokens([tokenIn, tokenOut], to)
-      → real constant-product math in WETH/USDC pair
-    → emit Swap(sender, tokenIn, tokenOut, amountIn, amountOut, to)
-  → engine records TradeExecuted event
-→ Envio indexes both events in <50ms
-→ Frontend joins by txHash, renders: "5.00 USDC → 0.0007 WETH"
-```
-
-**Pool:** [WETH/USDC on Sepolia](https://sepolia.etherscan.io/address/0x72e46e15ef83c896de44b1874b4af7ddab5b4f74) — ~40 WETH / ~340K USDC reserves.
-
-**Bidirectional:** Both WETH→USDC and USDC→WETH, same adapter, same pool. The bot's trade direction is configurable without contract changes.
+Every trade in the feed links to Sepolia Etherscan. Click any transaction hash — you'll see real ERC-20 transfers, real Uniswap V2 swap events, real block confirmations. This is not a mockup.
 
 ---
 
-## Contracts
+## The Architecture
 
-| Contract | Address | What It Does |
-|---|---|---|
-| [BehavioralNFT](https://sepolia.etherscan.io/address/0xCFa22481dDa2E4758115D3e826C2FfA1eC9c3954) | `0xCFa224…` | ERC-721 with on-chain win rate, ROI, volume |
-| [PatternDetector](https://sepolia.etherscan.io/address/0x4C122A516930a5E23f3c31Db53Ee008a2720527E) | `0x4C122A…` | Validates strategy quality before minting |
-| [DelegationRouter](https://sepolia.etherscan.io/address/0xD36fB1E9537fa3b7b15B9892eb0E42A0226577a8) | `0xD36fB1…` | Manages delegations with permissions + conditions |
-| [ExecutionEngine](https://sepolia.etherscan.io/address/0x1C1b05628EFaD25804E663dEeA97e224ccA1eD5A) | `0x1C1b05…` | Orchestrates execution, 3-layer delegation chains |
-| [UniswapV2Adapter](https://sepolia.etherscan.io/address/0x5B59f315d4E2670446ed7B130584A326A0f7c2D3) | `0x5B59f3…` | Wraps Uniswap V2 Router02 with indexable events |
+```
+┌──────────────────────────────────────────────────┐
+│                                                    │
+│   User mints strategy pattern → ERC-721 NFT       │
+│                    ↓                                │
+│   Others delegate capital → DelegationRouter       │
+│   (conditions: min win rate, min ROI, allocation)  │
+│                    ↓                                │
+│   Envio HyperSync indexes all events (<50ms)       │
+│                    ↓                                │
+│   Executor bot queries Envio (3-5ms response)      │
+│   → "Should I trade? Yes — conditions met."        │
+│                    ↓                                │
+│   UniswapV2Adapter → real Uniswap V2 Router02     │
+│   → real WETH/USDC swap on Sepolia                 │
+│                    ↓                                │
+│   Trade event indexed → dashboard updates live     │
+│                                                    │
+└──────────────────────────────────────────────────┘
+```
+
+Five smart contracts, each with a single responsibility:
+
+- **BehavioralNFT** — mints strategy patterns as ERC-721 tokens with on-chain performance metadata
+- **PatternDetector** — validates strategy quality before allowing a mint (configurable thresholds)
+- **DelegationRouter** — manages who delegates to which pattern, with permissions and conditions
+- **ExecutionEngine** — orchestrates the actual trade execution, supporting up to 3-layer delegation chains
+- **UniswapV2Adapter** — wraps the real Uniswap V2 Router so the engine can swap through real DEX liquidity
+
+All contracts are deployed on Ethereum Sepolia and verified on Etherscan. [View them all →](https://github.com/kaustubh76/Mimic-Protocol#contract-addresses)
 
 ---
 
-## Testing
+## Why Envio HyperSync
 
-149 tests including **forked Sepolia integration tests** against real Uniswap V2:
+Mirror Protocol's execution speed depends entirely on how fast the bot can read on-chain state. Every 5 seconds, it needs to know: which delegations are active, what's each pattern's current win rate, and should a trade fire?
 
-```bash
-./test/run-sepolia-harness.sh
-# Layer 1: 143 unit/integration tests — <1 second
-# Layer 2: 6 forked Sepolia tests — ~30 seconds
-#   ✓ Adapter wiring correct
-#   ✓ Full flow: delegate → fund → swap → assert balance changes
-#   ✓ 3-layer delegation executes all layers
-#   ✓ Underfunded engine returns false (not revert)
-# All 149 tests passed ✓
+Reading that from the blockchain directly would take **4+ seconds** per cycle — 21 RPC calls across 7 delegations. By the time the bot finishes reading, the data is already stale.
+
+**Envio HyperSync delivers the same answer in 3-5 milliseconds.** One GraphQL query, one round-trip, every field the bot needs. That's what makes the dashboard feel alive — the indexer is so fast that the gap between "event happens on-chain" and "user sees it in the feed" is measured in seconds, not minutes.
+
+The live dashboard's `4ms` query latency badge isn't marketing. It's the actual time Envio took to answer the last query. Every time a visitor notices how fast the feed updates, they're experiencing HyperSync — they just don't know it yet.
+
+---
+
+## What's Next: The Roadmap
+
+Mirror Protocol today is a working proof of concept. Here's where it's going.
+
+### Uniswap V3 Trade Engine
+
+The current adapter routes through Uniswap V2 — one pool, one fee tier, basic `swapExactTokensForTokens`. The next major upgrade is a **V3-native trade engine** that unlocks:
+
+- **Multi-fee-tier routing** — choose between 0.05%, 0.3%, and 1% fee pools based on which has the best liquidity for the trade size
+- **Concentrated liquidity awareness** — route around price ranges where liquidity is thin, reducing slippage
+- **Real slippage protection** — use Uniswap V3's `QuoterV2` to compute a real `amountOutMinimum` before every trade, instead of the current `minAmountOut = 0`
+- **Multi-hop paths** — route USDC → WETH → DAI when the direct pair is thin, picking the path with the lowest price impact
+- **Richer Envio telemetry** — V3 swaps carry fee tier, tick data, and sqrtPriceX96, giving the dashboard execution-quality metrics (slippage vs. quoted, fee-tier distribution charts, price impact per trade)
+
+The V3 adapter is designed as a **drop-in replacement** for the V2 adapter. The ExecutionEngine doesn't change — it still calls `adapter.swap()`. The bot doesn't change — it still reads from Envio. Only the adapter contract swaps out. This means the upgrade can ship without redeploying the core protocol.
+
+### TradingView Strategy Input → NFT Patterns
+
+This is the feature that makes Mirror Protocol a real product, not just an infrastructure demo.
+
+Today, minting a pattern requires manually entering trade stats (win rate, volume, P&L) through the frontend modal. That works for the proof of concept, but the real vision is:
+
+**Connect your TradingView account → Mirror Protocol reads your strategy's backtest results → auto-populates the pattern data → one-click mint as an NFT.**
+
+The flow:
+
 ```
+TradingView Pine Script strategy
+  → Export performance report (win rate, profit factor, max drawdown, trade count)
+  → Mirror Protocol parses the report
+  → PatternDetector validates against on-chain thresholds
+  → BehavioralNFT mints with TradingView-verified metrics
+  → Pattern appears in the marketplace with a "TradingView Verified" badge
+```
+
+This bridges the gap between **traditional trading** (where millions of traders already backtest strategies on TradingView) and **on-chain execution** (where those strategies can be delegated to and auto-executed through real DEX liquidity). The trader keeps ownership of their strategy as an NFT. Delegators get access to proven, verifiable performance data. The protocol handles execution.
+
+### Beyond Sepolia
+
+The current deployment is on Ethereum Sepolia (testnet). The path to production:
+
+- **Mainnet deployment** — same contracts, real ETH, real USDC, real stakes. The architecture is chain-agnostic; only the contract addresses and RPC URLs change.
+- **Multi-chain expansion** — Envio HyperSync supports 50+ chains. Mirror Protocol's indexer can be configured to watch contracts on Arbitrum, Base, Optimism, or Polygon with a config change. Cross-chain pattern aggregation becomes possible: a strategy that performs well on Arbitrum can be delegated to on Base.
+- **Gasless delegation** — integrate ERC-4337 account abstraction so delegators don't need ETH to create delegations. The protocol sponsors the gas, funded by a fee on successful trade execution.
+
+---
+
+## The Numbers That Matter
+
+| What you can verify | How |
+|---|---|
+| 139+ real Uniswap V2 swaps | Click any tx hash in the [live feed](https://mirror-protocol-nine.vercel.app) → opens on Sepolia Etherscan |
+| Sub-5ms Envio indexing | Open the [GraphQL playground](https://indexer.dev.hyperindex.xyz/14ba103/v1/graphql), run any query, check the response time |
+| 149 passing tests | Clone the [repo](https://github.com/kaustubh76/Mimic-Protocol), run `./test/run-sepolia-harness.sh` |
+| Bidirectional trading | The feed shows both `WETH → USDC` and `USDC → WETH` swaps |
+| Real pool liquidity | [WETH/USDC pair on Sepolia](https://sepolia.etherscan.io/address/0x72e46e15ef83c896de44b1874b4af7ddab5b4f74) — ~40 WETH reserves |
+| Pattern minting works | Connect MetaMask on Sepolia, click "+ Mint Pattern", fill the form, sign |
 
 ---
 
 ## Try It
 
-**[Live Dashboard](https://mirror-protocol-nine.vercel.app)** — watch the feed, no wallet needed.
+**[Live Dashboard](https://mirror-protocol-nine.vercel.app)** — open it, watch the feed, browse patterns. No wallet needed.
 
-**[Envio Playground](https://indexer.dev.hyperindex.xyz/14ba103/v1/graphql)** — run this query:
+**[Envio Playground](https://indexer.dev.hyperindex.xyz/14ba103/v1/graphql)** — paste this and hit play:
 
 ```graphql
 {
@@ -298,25 +186,24 @@ ExecutionEngine._externalCall(adapter, callData)
 }
 ```
 
-**[Source Code](https://github.com/kaustubh76/Mimic-Protocol)** — `./test/run-sepolia-harness.sh` runs 149 tests against real Sepolia.
+**[Source Code](https://github.com/kaustubh76/Mimic-Protocol)** — everything is open source. Clone, explore, run the tests.
 
 ---
 
-## Tech Stack
+## Built With
 
-| Layer | Technology |
-|---|---|
-| Indexing | **Envio HyperSync + HyperIndex** |
-| Smart Contracts | Solidity 0.8.20, Foundry |
-| DEX | Uniswap V2 Router02 (Sepolia) |
-| Frontend | React, wagmi, viem, Framer Motion |
-| Bot | Node.js, viem, Envio GraphQL |
-| Chain | Ethereum Sepolia (11155111) |
+**[Envio HyperSync](https://docs.envio.dev)** — real-time event indexing that makes sub-5ms pattern detection possible
+
+**Ethereum Sepolia** — testnet deployment with real Uniswap V2 liquidity
+
+**Solidity + Foundry** — 5 smart contracts, 149 tests, forked integration testing
+
+**React + wagmi + viem** — live dashboard with real-time feed updates
 
 ---
 
-*Built with [Envio HyperSync](https://docs.envio.dev) on Ethereum Sepolia*
+*Mirror Protocol is built by Kaustubh Agrawal as a demonstration of what becomes possible when infrastructure is fast enough to be invisible.*
 
-*[Live Demo](https://mirror-protocol-nine.vercel.app) · [Source](https://github.com/kaustubh76/Mimic-Protocol) · [Envio Playground](https://indexer.dev.hyperindex.xyz/14ba103/v1/graphql)*
+*The product runs. The trades are real. The code is open. [See for yourself →](https://mirror-protocol-nine.vercel.app)*
 
-**Tags:** `Envio` `HyperSync` `HyperIndex` `DeFi` `Uniswap V2` `NFT` `Ethereum` `Web3`
+**Tags:** `Envio` `HyperSync` `DeFi` `Uniswap` `NFT` `Ethereum` `Web3` `TradingView`
