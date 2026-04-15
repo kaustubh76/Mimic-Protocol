@@ -1,282 +1,199 @@
-# The Fastest Way to Sell Infrastructure Is to Make Users Feel It
+# I Built a DeFi Product That Executes Real Trades on Uniswap — Here's What I Learned About Selling Infrastructure
 
-### I built Mirror Protocol to prove one thing: that the best way to grow Envio HyperSync isn't another benchmark chart — it's a product users can touch, with real trades they can verify on-chain.
+*By Kaustubh Agrawal*
 
 ![Mirror Protocol Live Dashboard](./docs/images/dashboard-hero.png)
-*[mirror-protocol-nine.vercel.app](https://mirror-protocol-nine.vercel.app) — 7 strategy NFTs, 7 active delegations, 139+ real Uniswap V2 swaps, bidirectional WETH/USDC trading, all live on Ethereum Sepolia.*
+
+I spent the last few weeks building [Mirror Protocol](https://mirror-protocol-nine.vercel.app), a DeFi application that turns on-chain trading strategies into mintable NFTs and auto-executes real Uniswap V2 swaps when delegation conditions match. It runs on Ethereum Sepolia with [Envio HyperSync](https://docs.envio.dev) powering the real-time indexing.
+
+**The numbers as of today:** 139 successful trades executed through real Uniswap V2 liquidity, 5 smart contracts deployed, 7 strategy patterns active, bidirectional WETH/USDC trading, sub-5ms Envio query latency, and a [live dashboard](https://mirror-protocol-nine.vercel.app) where you can watch it all happen.
+
+This post isn't about the code (that's on [GitHub](https://github.com/kaustubh76/Mimic-Protocol)). It's about what I learned building a product on top of developer infrastructure — and why I think the approach I stumbled into might be useful for anyone trying to grow an infra product.
 
 ---
 
-Open the site. Don't connect anything. Just wait three seconds.
+## The Idea That Started It
 
-The metrics count up. A green dot pulses in the corner. A new trade slides into the feed — `5.00 USDC → 0.0007 WETH · Uniswap V2 · pool 0x72e46e…` — timestamped "just now." Click the transaction hash. Sepolia Etherscan opens. You're looking at a real Uniswap V2 swap, confirmed on a real block, with real token transfers. Nothing you did triggered any of it — it's all happening because the chain is moving, Envio is indexing, and the page is listening.
+I kept seeing the same pattern at every blockchain infrastructure company: incredible technology, terrible demos. An indexer that processes 10,000 events per second gets sold with a latency chart and a migration guide. A delegation toolkit gets sold with API documentation and a quickstart. Both are technically correct. Neither makes a non-engineer care.
 
-That's the whole pitch. You didn't read it. You felt it.
+I wanted to flip that. What if the demo wasn't a tutorial — it was a working product? What if instead of showing people *numbers about speed*, I showed them *speed itself*?
 
----
-
-## The Problem Every Infra Team Has
-
-If you sell developer infrastructure, you know this sentence by heart:
-
-> *"Our indexer is 50x faster than the alternative."*
-
-It's true. It's also dead on arrival. Numbers on a landing page ask the reader to trust you, translate the claim into their own roadmap, and care enough to keep reading. Most people won't. They bounce, they forget, they pick whichever tool their friend mentioned last.
-
-This isn't a product problem. It's a positioning problem. Infrastructure is inherently invisible — by the time a user benefits from a faster indexer, they're three abstractions away from knowing it exists. Your job as a growth engineer is to close that distance. To make the invisible tangible. To turn a latency chart into a heartbeat.
-
-Mirror Protocol is my attempt to do exactly that.
+That's how Mirror Protocol started: as a bet that I could take Envio's indexing infrastructure and build something on top of it that would make the speed *visible* to anyone who opened the page.
 
 ---
 
-## The Thesis
+## What Mirror Protocol Does (the Short Version)
 
-Here is the argument in one line:
+> A trader mints their proven strategy as an ERC-721 NFT with embedded performance metrics. Other users delegate capital to that NFT with conditions like "only execute if win rate is above 80%." An executor bot watches Envio's indexed data and fires a real Uniswap V2 swap the moment the conditions match. Everything — minting, delegating, executing, confirming — shows up on the dashboard within seconds.
 
-**An infrastructure product grows fastest when a non-developer can experience what it unlocks in under ten seconds — without reading a single word of documentation.**
-
-Everything else in Mirror Protocol is a consequence of that thesis. The demo is the homepage. The homepage has no tutorial, no "learn more" button, no marketing video. It just runs — live, on a real chain, with real data, reacting to real events the moment they happen. A visitor's first interaction isn't reading about the product; it's watching the product do something.
-
-That single design choice changes the entire funnel. Instead of Docs → Tutorial → Hello World → Production (which only works on engineers who are already looking), you get Live Demo → "wait, what?" → GitHub → Envio (which works on anyone with an internet connection). One funnel is niche and slow. The other is organic and viral.
+That paragraph took me ages to get right. The first version was three paragraphs long and started with "ERC-6551 token-bound accounts." I lost 90% of potential readers in the first sentence. The lesson: **your one-paragraph pitch is your most important deliverable.** If a PM, an investor, and an engineer can all understand it in one read, you've won.
 
 ---
 
-## What Mirror Protocol Actually Does
+## The Part Most Demos Skip: It's Actually Real
 
-In one paragraph, so anyone can follow:
+This is the thing I'm most proud of, and it's the thing that changed how I think about demos.
 
-> *Mirror Protocol turns successful trading strategies into NFTs. A trader mints their proven strategy as an ERC-721 with embedded performance metrics — win rate, ROI, volume. Other users delegate capital to that NFT with conditions like "only execute if win rate is above 80%." A keeper bot watches the indexed data via Envio HyperSync and fires a real Uniswap V2 swap the moment the conditions match. The entire flow — minting, delegation, detection, execution, confirmation — is visible on the dashboard within seconds.*
+Mirror Protocol doesn't simulate trades. Every single swap goes through a real smart contract ([UniswapV2Adapter](https://sepolia.etherscan.io/address/0x5B59f315d4E2670446ed7B130584A326A0f7c2D3)) that wraps the actual Uniswap V2 Router02 on Sepolia. When the bot fires a trade, real USDC gets pulled from the ExecutionEngine, goes through real constant-product math in a real [WETH/USDC pool](https://sepolia.etherscan.io/address/0x72e46e15ef83c896de44b1874b4af7ddab5b4f74), and real WETH comes back. You can click any transaction hash in the feed and verify it yourself on Etherscan.
+
+I didn't start with real execution. The first version used a `MockDEX.sol` contract that returned 98% of the input regardless of pool state. It worked for testing. But during a demo run-through, I clicked a transaction hash in the feed, landed on the block explorer, and realized the swap was... nothing. Just an empty function call that emitted an event. The "trade" was a lie the UI was telling.
+
+That bothered me enough to spend three days integrating real Uniswap V2. It was painful — I had to:
+
+- Deploy a `UniswapV2Adapter` that handles approvals, encodes swap paths, and emits rich events
+- Add `approveToken()` to the ExecutionEngine so it could authorize the adapter to spend its float
+- Fund the engine with real WETH (wrapped from Sepolia ETH)
+- Modify the executor bot to encode real `swapExactTokensForTokens` callData
+- Add a `PoolSwap` entity to the Envio indexer so the frontend could show actual amountIn/amountOut
+
+But now when someone clicks a tx hash, they see real token transfers. That changes the conversation from "nice demo" to "wait, this actually works."
+
+**Lesson I didn't expect:** making it real didn't just improve the demo. It improved the *code*. Fake execution hides bugs. Real execution surfaces them immediately. I found three contract issues during the Uniswap integration that the mock path never triggered.
 
 ---
 
-## Not a Simulation — Real DEX Execution
+## The Pivot I Didn't Plan
 
-This is the part most demos skip. Mirror Protocol doesn't simulate trades. It executes them.
+The original plan was to build on Monad testnet. I deployed everything, set up the Envio indexer, got the bot running — and then discovered that every DEX on Monad testnet had been wiped in a chain reset.
 
-Every trade the bot fires goes through a `UniswapV2Adapter` contract that wraps the real Uniswap V2 Router02 on Ethereum Sepolia. The adapter pulls tokens from the ExecutionEngine's float, calls `swapExactTokensForTokens` against the real WETH/USDC pair ([pool 0x72e46e15…](https://sepolia.etherscan.io/address/0x72e46e15ef83c896de44b1874b4af7ddab5b4f74)), and delivers the output tokens back to the engine. The entire swap — from the adapter's `safeTransferFrom` to the pair's constant-product math to the token transfer — is one atomic on-chain transaction.
+I spent a full day verifying this. I probed every address in the official [`monad-crypto/protocols`](https://github.com/monad-crypto/protocols) registry on GitHub — Bean Exchange, Ambient, Uniswap V2, Uniswap V3, LFJ, Monorail, Kuru, iZUMi. Every single one returned `eth_getCode == "0x"`. No code. No router. No factory. No pools.
 
-**Bidirectional trading:** The system trades both directions — WETH → USDC and USDC → WETH — using the same adapter contract and the same pool. The trade direction is configurable per deployment. This isn't a hardcoded one-way demo; it's a real trading engine that can execute any strategy the pattern defines.
+Two-line proof anyone can reproduce:
 
-The adapter emits a rich `Swap(sender, tokenIn, tokenOut, amountIn, amountOut, to)` event that Envio HyperSync indexes in real time. The frontend joins that event with the engine's `TradeExecuted` event by transaction hash, and every row in the Live Execution Feed renders the actual realized swap: `5.00 USDC → 0.0007 WETH · Uniswap V2 · pool 0x72e46e…`. Click the pool link and you land on Sepolia Etherscan, looking at a real Uniswap V2 pair with real reserves and real swap history.
-
-As of this writing, **139 successful trades** have executed across 7 delegations spanning 7 distinct pattern strategies (Momentum, Mean Reversion, Arbitrage, Liquidity, Yield, Composite). The engine has processed both WETH→USDC and USDC→WETH swaps through real on-chain liquidity. Every swap is verifiable on Sepolia Etherscan — not because I'm claiming it, but because you can click any transaction hash in the feed and see it yourself.
-
----
-
-## How It Works Under the Hood
-
-### The Smart Contract Stack
-
-```
-┌─────────────────────────────────────────────────────────┐
-│  User mints pattern NFT (BehavioralNFT)                 │
-│  ↓                                                       │
-│  PatternDetector validates: trades, win rate, volume,    │
-│  confidence, cooldown → mints ERC-721 with metadata      │
-│  ↓                                                       │
-│  Other users create delegations (DelegationRouter)       │
-│  → specify allocation %, smart account, conditions        │
-│  → up to 3 layers of nested delegation (depth limit)     │
-│  ↓                                                       │
-│  Executor bot polls Envio GraphQL every 5s               │
-│  → fetches active delegations + pattern metrics (<5ms)   │
-│  → validates conditions (win rate, ROI, volume gates)    │
-│  ↓                                                       │
-│  ExecutionEngine.executeTrade()                          │
-│  → validates delegation, applies % allocation            │
-│  → calls UniswapV2Adapter.swap() via _externalCall       │
-│  → adapter routes through real Uniswap V2 Router02       │
-│  → real tokens move, real swap executes                  │
-│  ↓                                                       │
-│  TradeExecuted + Swap events emitted                     │
-│  → Envio HyperSync indexes both in <50ms                 │
-│  → Frontend polls GraphQL, renders in LiveExecutionFeed  │
-└─────────────────────────────────────────────────────────┘
+```bash
+# LFJ Router V1 — official registry says it's at this address
+curl -s -X POST https://testnet-rpc.monad.xyz -H 'Content-Type: application/json' \
+  -d '{"jsonrpc":"2.0","id":1,"method":"eth_getCode","params":["0x4faCe5b0EF2757Ceb9151D14C036A1135931C70E","latest"]}'
+# → {"result":"0x"}  ← no code
 ```
 
-### Five Contracts, Each With a Clear Job
+I had two choices: deploy my own AMM on Monad, or pivot to a chain with working DEX infrastructure. I chose Ethereum Sepolia, where Uniswap V2 is deployed, verified, and has real liquidity in the WETH/USDC pool.
 
-| Contract | Address (Sepolia) | Purpose |
-|---|---|---|
-| **BehavioralNFT** | [`0xCFa224…`](https://sepolia.etherscan.io/address/0xCFa22481dDa2E4758115D3e826C2FfA1eC9c3954) | ERC-721 minting for strategy patterns. Stores win rate, ROI, volume as on-chain metadata. |
-| **PatternDetector** | [`0x4C122A…`](https://sepolia.etherscan.io/address/0x4C122A516930a5E23f3c31Db53Ee008a2720527E) | Validates pattern quality (min trades, win rate, volume, confidence) before minting. Owner-tunable thresholds. |
-| **DelegationRouter** | [`0xD36fB1…`](https://sepolia.etherscan.io/address/0xD36fB1E9537fa3b7b15B9892eb0E42A0226577a8) | Manages delegations with permissions (spend limits, expiry, token whitelists) and conditional requirements (min win rate, ROI gates). |
-| **ExecutionEngine** | [`0x1C1b05…`](https://sepolia.etherscan.io/address/0x1C1b05628EFaD25804E663dEeA97e224ccA1eD5A) | Orchestrates trade execution. Validates, allocates, calls the DEX adapter, records stats. Supports 3-layer delegation chains. |
-| **UniswapV2Adapter** | [`0x5B59f3…`](https://sepolia.etherscan.io/address/0x5B59f315d4E2670446ed7B130584A326A0f7c2D3) | Thin wrapper around Uniswap V2 Router02. Handles approvals, encodes the swap path, emits a rich Swap event for Envio to index. |
+The pivot took a full day — redeploying all five contracts, reconfiguring the Envio indexer, updating the frontend, rewiring the bot. But the result is a product that runs against *real, existing* DEX infrastructure instead of a homemade pool, which is a stronger proof point.
 
-### Why Envio Makes This Possible
+**Lesson:** Don't get attached to your chain choice. The product's value is in the behavior it demonstrates, not the network it runs on. If the infrastructure you need doesn't exist where you are, move.
 
-The bot needs to make a decision every 5 seconds: "which delegations are active, what are their pattern metrics, and should I execute?" Without Envio, answering that question requires N on-chain reads per delegation — `getDelegation()`, `getPatternMetadata()`, `getWinRate()`, etc. At 7 delegations, that's 21+ RPC calls per cycle, each taking 200-500ms. Total decision latency: **1-2 seconds minimum**, assuming the RPC doesn't rate-limit you.
+---
 
-With Envio HyperSync, the same query is one GraphQL request:
+## Why Envio Is the Load-Bearing Piece
+
+The executor bot needs to answer a question every 5 seconds: "which delegations are active, and should I execute any of them?" Without Envio, answering that means 21+ on-chain reads per cycle (one for each delegation's state, pattern metrics, and conditions). At 200ms per RPC call, that's a 4-second decision window before the bot can even submit a transaction.
+
+With Envio HyperSync, it's one GraphQL query:
 
 ```graphql
 {
   Delegation(where: {isActive: {_eq: true}}) {
-    delegationId
-    patternTokenId
-    percentageAllocation
+    delegationId patternTokenId percentageAllocation
     smartAccountAddress
-    pattern {
-      winRate roi totalVolume isActive patternType
-    }
+    pattern { winRate roi totalVolume isActive patternType }
   }
 }
 ```
 
-Response time: **3-5ms**. Every field the bot needs — delegation state, pattern metrics, allocation percentages — in a single round-trip. The bot's total cycle time from "poll Envio" to "submit tx" is under 2 seconds, of which 1.5 seconds is the Sepolia RPC latency for broadcasting the transaction. Envio's contribution to the decision is measured in single-digit milliseconds.
+Response time: **3-5ms**. Everything the bot needs in a single round-trip. The dashboard's `4ms` query latency badge isn't decoration — it's literally the time Envio took to answer the last query.
 
-This is the "invisible infrastructure" problem solved visually: the dashboard's `4ms` query latency badge is Envio's fingerprint. Every time a visitor notices how fast the feed updates, they're experiencing HyperSync without knowing it.
-
----
-
-## The NFT Minting Flow
-
-Users don't just browse pre-made patterns — they create their own. The frontend includes a full **Mint Pattern** modal where a trader enters:
-
-- **Strategy type** (Momentum, Mean Reversion, Arbitrage, Liquidity, Yield, Composite)
-- **Trade stats** (total trades, successful trades → auto-calculated win rate)
-- **Volume and P&L** (in ETH)
-- **Confidence score** (50-100%)
-
-The form calls `PatternDetector.validateAndMintPattern()` which validates the data against on-chain thresholds, mints an ERC-721 via `BehavioralNFT.mintPattern()`, and writes the performance metrics. The result is a tradeable NFT that other users can delegate to.
-
-This is the product loop:
-
-```
-Trader creates strategy → Mints as NFT → Others delegate capital →
-Bot auto-executes → Real Uniswap V2 swap → Profits accumulate →
-Strategy's metrics update → More users delegate → Cycle repeats
-```
+This is why I think live dashboards are the best way to sell indexer infrastructure. You don't have to *explain* that Envio is fast. Visitors *see* it every time the feed updates.
 
 ---
 
-## Three Moments That Sell the Product For You
+## Things I Built and What They Cost
 
-I designed the UI backward from three moments. Not features — moments. Things I wanted a user to feel in a specific order.
+| What | Stack | Lines | Time |
+|---|---|---|---|
+| **5 Smart contracts** | Solidity 0.8.20, Foundry | ~2,500 | 30% |
+| **Envio indexer** | TypeScript, HyperSync, GraphQL | ~700 | 10% |
+| **Executor bot** | Node.js, viem, Envio GraphQL | ~600 | 15% |
+| **Frontend** | React, wagmi, viem, Framer Motion | ~3,000 | 25% |
+| **Docs, blog, README** | Markdown | ~1,500 | 15% |
+| **Deploy scripts, tests, CI** | Foundry, bash | ~800 | 5% |
 
-**Moment one: the metrics breathe.** The top of the page shows live counters — trades executed, query latency, events per second — next to a pulsing green "LIVE" dot. The counters tick up as new events come in. A visitor doesn't read the numbers. They notice the page *moving*. That's the signal that this isn't a mockup, and they scroll.
+The split that surprised me: **nearly half the project is writing and UI polish.** The smart contracts were honestly the "easy" part. Making the dashboard feel alive — the pulsing dots, the sliding animations, the relative timestamps that tick every second, the animated data-flow diagram — that took longer than the delegation router.
 
-**Moment two: the feed streams.** Further down, the Live Execution Feed slides in a new trade every few seconds with a soft green highlight that fades after two seconds. Each row shows the pattern name (not just an ID — "Momentum", "Arbitrage"), the real swap detail (`5.00 USDC → 0.0007 WETH`), and a transaction hash that links straight to Sepolia Etherscan. The relative timestamp updates every second — `just now → 3s ago → 12s ago` — so even the static rows are alive. If a skeptic clicks the tx hash and lands on a real confirmed block showing a real Uniswap V2 swap, the skepticism ends there.
-
-**Moment three: the data flow reveals.** Right next to the feed, an animated diagram shows the pipeline: User → Sepolia Event → **Envio HyperSync** → GraphQL → Bot → Dashboard. The Envio node pulses in purple, brighter than everything else. The moment a visitor is impressed, the diagram tells them *exactly* which piece made that impression possible. You don't have to sell Envio after that. The product already did.
-
-These three moments compound. By the time a visitor has spent twenty seconds on the page, they've subconsciously decided the thing is real, the infrastructure is fast, and Envio is the reason. That's the entire funnel, collapsed into half a minute of ambient attention.
+I think that's the right ratio for a growth project. The infrastructure has to work. But if the presentation doesn't make someone stop scrolling, the infrastructure never gets a chance to prove itself.
 
 ---
 
-## Testing: 149 Tests, Including Forked Sepolia
+## The Test Suite I'm Actually Proud Of
 
-The project ships with a two-layer test harness:
+149 tests. Two layers:
 
-**Layer 1 — Unit + Integration (143 tests, <1 second):** Covers all contract logic using local MockDEX stubs. Pattern minting, delegation creation, execution, multi-layer chains, revocation, validation — every path tested.
+**Layer 1 (143 tests, <1 second):** Standard Foundry unit and integration tests with mock contracts. Every contract path covered — minting, delegation, execution, revocation, multi-layer chains, validation failures.
 
-**Layer 2 — Forked Sepolia (6 tests, ~30 seconds):** Snapshots live Sepolia state into an in-memory EVM and exercises the real adapter against real Uniswap V2 liquidity. Includes:
-- Adapter wiring verification (router, tokens, allowances)
-- Full flow: create delegation → fund smart account → execute swap → assert WETH decreases, USDC increases
-- 3-layer delegation: 3 independent delegators on the same pattern, all executing real swaps
-- Revert guard: engine underfunded → `executeTrade` returns `false` (not a revert — the engine's try/catch records the failure for bookkeeping)
+**Layer 2 (6 tests, ~30 seconds):** This is the interesting one. These tests use `vm.createSelectFork()` to snapshot live Sepolia state into an in-memory EVM, then exercise the real adapter against real Uniswap V2 liquidity. The full-flow test creates a fresh delegation, funds a smart account, executes a trade, and asserts the engine's WETH decreased and USDC increased — all against the real on-chain pool.
 
-Run it yourself:
+The forked test caught two assumption bugs in my own thinking:
+1. I thought `percentageAllocation` would scale the adapter's swap amount. It doesn't — it only scales the bookkeeping. The full `TRADE_AMOUNT` hits the pool regardless of allocation.
+2. I expected `executeTrade` to revert when the engine was underfunded. It doesn't — the engine's `try/catch` wrapper swallows the adapter revert and records `success=false`. That's a design feature, not a bug.
+
+Both of those would have been invisible with mock tests.
 
 ```bash
 ./test/run-sepolia-harness.sh
 # Layer 1: 143/143 passed
 # Layer 2: 6/6 passed
-# All Sepolia harness checks passed ✓
+# All Sepolia harness checks passed
 ```
 
 ---
 
-## The Split That Tells You Everything
+## Three Design Decisions That Mattered
 
-Here is how the hours on this project actually broke down:
+**1. The feed shows pattern names, not IDs.** The old version showed `P#1 → D#3`. The new version shows `Momentum → D#3`. That one change made the feed readable by someone who doesn't know what a pattern token ID is.
 
-| Work | Share of Time |
-|---|---|
-| Smart contracts, indexer, executor bot | 30% |
-| Frontend components and state | 25% |
-| Copywriting, README, blog, narrative | 20% |
-| Visual polish, animations, diagram | 15% |
-| Deployment, CI, domain, env vars | 10% |
+**2. Every trade row shows the actual swap.** `5.00 USDC → 0.0007 WETH · Uniswap V2 · pool 0x72e46e…` — the real amountIn, the real amountOut, and a clickable link to the pool on Etherscan. This is indexed from the adapter's `Swap` event via Envio and joined to the `TradeExecuted` event by transaction hash on the frontend.
 
-Nearly half the project was writing, design, and polish. That ratio isn't a mistake. It's a declaration.
-
-The infrastructure did its job. Envio is genuinely fast, the bot genuinely executes trades, the contracts genuinely hold the state. My job was to make sure a person who doesn't know what HyperSync is can look at the screen for ten seconds and understand that something impressive is happening.
+**3. The data flow diagram names Envio at the peak moment.** Right when a visitor is watching the feed and thinking "how is this updating so fast?", the animated diagram next to it shows: User → Sepolia Event → **Envio HyperSync** → GraphQL → Bot → Dashboard. The Envio node pulses brighter than everything else. That's not an accident — it's the attribution window.
 
 ---
 
-## What I'd Steal From This For Any Infra Team
+## Try It
 
-If you run growth at an indexer, an L1, a wallet SDK, a keeper network, or any infrastructure product, here is the short version of the playbook:
-
-**One.** Your flagship demo must be impossible without your product. If a visitor could imagine building it on a competitor's stack, the demo is proving the wrong thing.
-
-**Two.** Put live data on the landing page. Not charts — *data in motion.* Counters that tick. Feeds that stream. Dots that pulse. Visitors make a "is this real?" judgment in three seconds, and a static page always loses that judgment.
-
-**Three.** Name your product at the exact moment a visitor is impressed. Not in a sidebar logo, not in a footer. Inside the diagram they're already looking at. Attribution windows close fast.
-
-**Four.** Make it real. Not "looks real." Actually real. Real contracts, real swaps, real liquidity, real tokens moving on real blocks. A demo that simulates trades will always feel hollow to anyone who knows what they're looking at.
-
-**Five.** Design the funnel, not just the demo. Live demo → source code → blog → your product's docs. If any step is a dead end, you've dropped a visitor who was seconds away from becoming a user.
-
-**Six.** Measure time-to-wow, not time-to-load. The number that matters is the seconds between "page opens" and "user audibly says *oh damn*." Optimize for that.
-
----
-
-## Try It Yourself
-
-**Live site:** [mirror-protocol-nine.vercel.app](https://mirror-protocol-nine.vercel.app) — open it, don't connect your wallet, just watch the feed.
-
-**Run a live query:** Open the [Envio GraphQL playground](https://indexer.dev.hyperindex.xyz/14ba103/v1/graphql) and paste:
+- **[Live dashboard](https://mirror-protocol-nine.vercel.app)** — open it, don't connect anything, just watch for 10 seconds.
+- **[Envio GraphQL playground](https://indexer.dev.hyperindex.xyz/14ba103/v1/graphql)** — paste this query and hit play:
 
 ```graphql
 {
   SystemMetrics {
-    totalPatterns
-    totalDelegations
     successfulExecutions
     averageQueryLatency
   }
-  TradeExecution(
-    where: { success: { _eq: true } }
-    order_by: { timestamp: desc }
-    limit: 5
-  ) {
+  TradeExecution(where: {success: {_eq: true}}, order_by: {timestamp: desc}, limit: 3) {
     txHash
-    amount
-    timestamp
     pattern { patternType }
   }
-  PoolSwap(order_by: { timestamp: desc }, limit: 5) {
-    tokenIn
-    tokenOut
-    amountIn
-    amountOut
+  PoolSwap(order_by: {timestamp: desc}, limit: 3) {
+    amountIn amountOut tokenIn tokenOut
   }
 }
 ```
 
-You'll see the sub-5ms response, real trade data, and the PoolSwap entity showing actual Uniswap V2 amountIn/amountOut. Every field comes from on-chain events indexed by Envio HyperSync.
-
-**Source code:** [github.com/kaustubh76/Mimic-Protocol](https://github.com/kaustubh76/Mimic-Protocol) — the README walks you through the architecture in two minutes.
-
-**Run the tests:** Clone the repo and run `./test/run-sepolia-harness.sh`. 149 tests, including forked Sepolia integration tests against real Uniswap V2 liquidity.
+- **[Source code](https://github.com/kaustubh76/Mimic-Protocol)** — clone it, run `./test/run-sepolia-harness.sh`, see 149 tests pass against real Sepolia state.
 
 ---
 
-## The Line I Want You To Remember
+## What I'd Do Differently
 
-Infrastructure sells when users can feel it.
+**Start with real execution from day one.** I wasted time on MockDEX when I should have gone straight to Uniswap V2. The mock taught me nothing that the real integration didn't teach better and faster.
 
-That's the whole argument. Every sentence above is a footnote.
+**Don't fall in love with your chain.** I spent a day debugging why every DEX on Monad testnet had no code. I should have probed the chain in the first hour and pivoted immediately.
 
-Mirror Protocol is the proof of work. 139 real trades. 5 smart contracts. Real Uniswap V2 liquidity. Sub-5ms Envio queries. One dashboard where you can watch it all happen live. The playbook is portable. I'm ready to ship the next one.
+**Write the blog while you build.** Every bug is a story. The EIP-7702 delegation designator that broke my deploy, the rate-limit race condition in the bot, the CORS regression when the Vercel env var pointed at a dead indexer — those are the interesting parts, and I almost forgot them because I wrote this post after the code was done.
 
 ---
 
-*By Kaustubh Agrawal · Built on Ethereum Sepolia with Envio HyperSync*
+## The Takeaway
 
-*Live at [mirror-protocol-nine.vercel.app](https://mirror-protocol-nine.vercel.app)*
+Infrastructure sells when users can feel it. Not when they read about it. Not when they see a benchmark chart. When they open a page and something is already happening — live, real, verified on-chain — and they can tell within three seconds that the thing is fast.
 
-**Tags:** `Envio` `HyperSync` `DeFi` `NFT` `Uniswap V2` `Ethereum Sepolia` `Web3` `Growth Engineering` `Developer Experience`
+I built Mirror Protocol as a proof of this idea. 139 real trades. 5 contracts. Real Uniswap V2 swaps. Sub-5ms Envio queries. A live dashboard that runs whether or not you connect a wallet. Everything clickable, everything verifiable, everything real.
+
+If you're building developer infrastructure and you don't have a demo like this yet — something that makes your speed *visible* to non-engineers in under ten seconds — you should build one. Not a tutorial. Not a quickstart. A product that runs in front of people and lets the infrastructure speak for itself.
+
+---
+
+*Kaustubh Agrawal — [GitHub](https://github.com/kaustubh76) · [Mirror Protocol](https://mirror-protocol-nine.vercel.app)*
+
+*Built with [Envio HyperSync](https://docs.envio.dev) on Ethereum Sepolia*
+
+**Tags:** `Envio` `HyperSync` `DeFi` `Uniswap V2` `NFT` `Growth Engineering` `Web3` `Ethereum`
