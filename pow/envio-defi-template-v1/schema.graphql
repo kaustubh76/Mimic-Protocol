@@ -1,0 +1,88 @@
+# envio-defi-template-v1 schema
+#
+# Three-layer entity model:
+#   1. Token, Pool         — raw entities written by EventHandlers
+#   2. PoolAggregator      — derived state (cumulative volume, fees, swap count)
+#                            written by src/Aggregators/PoolAggregator.ts
+#   3. PoolHourSnapshot    — hourly time-series, epoch-aligned, written by
+#                            src/Snapshots/PoolHourSnapshot.ts
+#
+# This separation is the architecture documented in
+# ENVIO_INDEXER_TEARDOWN.md and visible in production at velodrome-finance/indexer
+# (src/EventHandlers/, src/Aggregators/, src/Snapshots/). Aggregator state is
+# computed once per event, not duplicated across handlers.
+
+# ---------------------------------------------------------------------
+# Layer 1 — raw entities
+# ---------------------------------------------------------------------
+
+type Token {
+  id: ID!                    # `${chainId}-${address}`
+  chainId: Int!
+  address: String!
+  symbol: String!
+  decimals: Int!
+  # name omitted on purpose; production indexers fetch it lazily via Effect API
+  # to avoid blocking the PoolCreated handler. See src/Effects/TokenMetadata.ts.
+}
+
+type Pool {
+  id: ID!                    # `${chainId}-${poolAddress}`
+  chainId: Int!
+  address: String!
+  token0_id: String!         # FK to Token, via the entity-id-as-string idiom
+  token1_id: String!         # documented in ENVIO_INDEXER_TEARDOWN.md
+  isStable: Boolean!         # Velodrome V2 / Aerodrome flag
+  factoryAddress: String!
+  createdAtBlock: BigInt!
+  createdAtTimestamp: BigInt!
+}
+
+# ---------------------------------------------------------------------
+# Layer 2 — derived state (Aggregator)
+# ---------------------------------------------------------------------
+
+type PoolAggregator {
+  id: ID!                    # same id as Pool — 1:1 mapping
+  chainId: Int!
+  poolAddress: String!
+
+  # Reserves are the latest Sync values; Swap handler updates volumes.
+  reserve0: BigInt!
+  reserve1: BigInt!
+
+  # Cumulative metrics. These are append-only in business meaning — every
+  # Swap event monotonically increments. The Aggregator pattern lets
+  # Mint+Burn+Swap+Fees handlers all contribute to the same entity without
+  # racing, because each handler reads-then-writes inside its preload-first
+  # block (see ENVIO_EFFECT_API_PATTERN.md).
+  cumulativeVolume0: BigInt!
+  cumulativeVolume1: BigInt!
+  cumulativeFees0: BigInt!
+  cumulativeFees1: BigInt!
+  swapCount: BigInt!
+
+  lastUpdatedTimestamp: BigInt!
+  lastSnapshotTimestamp: BigInt!
+}
+
+# ---------------------------------------------------------------------
+# Layer 3 — hourly time-series snapshots
+# ---------------------------------------------------------------------
+
+type PoolHourSnapshot {
+  id: ID!                    # `${poolId}-${hourEpoch}` where hourEpoch = floor(ts/3600)*3600
+  pool_id: String!
+  chainId: Int!
+  hourEpoch: BigInt!         # epoch-aligned hour boundary
+
+  # Values at the close of the hour. Snapshots are append-only — never
+  # mutated. Reorgs are handled by Envio's checkpoint-based delete.
+  reserve0: BigInt!
+  reserve1: BigInt!
+  cumulativeVolume0: BigInt!
+  cumulativeVolume1: BigInt!
+  hourlyVolume0: BigInt!     # delta from previous hour
+  hourlyVolume1: BigInt!
+  swapCount: BigInt!
+}

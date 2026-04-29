@@ -1,0 +1,67 @@
+# yaml-language-server: $schema=./node_modules/envio/evm.schema.json
+#
+# envio-defi-template-v1
+# Production-grade DeFi indexer scaffold. Mirrors the three-layer architecture
+# (EventHandlers -> Aggregators -> Snapshots) used in production by:
+#   - velodrome-finance/indexer  (https://github.com/velodrome-finance/indexer)
+#
+# This file ships configured for Velodrome V2 on Optimism (chain 10) and
+# Aerodrome on Base (chain 8453) so the indexer runs against real on-chain
+# data the moment the user adds an RPC URL. Adding a third chain is a
+# documented one-afternoon task — see ENVIO_MULTICHAIN_EXPANSION_RUNBOOK.md.
+
+name: envio-defi-template-v1
+description: Production-grade DeFi indexer template — Aggregators+Snapshots architecture, dynamic contract registration, Effect-API-ready
+rollback_on_reorg: true
+raw_events: false
+
+field_selection:
+  transaction_fields:
+    - "hash"
+
+contracts:
+  # PoolFactory emits PoolCreated, which dynamically registers each new pool
+  # contract via context.addPool() in src/EventHandlers/PoolFactory.ts.
+  # This is the factory pattern documented in
+  # ENVIO_INDEXER_TEARDOWN.md as the production default for DEX indexers.
+  - name: PoolFactory
+    abi_file_path: abis/PoolFactory.json
+    handler: src/EventHandlers/PoolFactory.ts
+    events:
+      - event: PoolCreated
+      - event: SetCustomFee
+
+  # Pool is registered DYNAMICALLY at runtime via context.addPool() in the
+  # PoolFactory handler. The empty `address: []` array below is intentional —
+  # do NOT hardcode pool addresses here, the factory creates new pools
+  # continuously and they would all need to be hand-listed otherwise.
+  - name: Pool
+    abi_file_path: abis/Pool.json
+    handler: src/EventHandlers/Pool.ts
+    events:
+      - event: Swap
+      - event: Mint
+      - event: Burn
+      - event: Sync
+      - event: Fees
+
+networks:
+  # Optimism mainnet — Velodrome V2
+  - id: 10
+    start_block: 105896852  # Velodrome V2 PoolFactory deployment block
+    contracts:
+      - name: PoolFactory
+        address:
+          - 0xF1046053aa5682b4F9a81b5481394DA16BE5FF5a  # Velodrome V2 PoolFactory on Optimism
+      - name: Pool
+        address: []  # Registered dynamically via context.addPool() in PoolFactory.PoolCreated.contractRegister
+
+  # Base mainnet — Aerodrome
+  - id: 8453
+    start_block: 3200559  # Aerodrome PoolFactory deployment block
+    contracts:
+      - name: PoolFactory
+        address:
+          - 0x420DD381b31aEf6683db6B902084cB0FFECe40Da  # Aerodrome PoolFactory on Base
+      - name: Pool
+        address: []  # Registered dynamically
