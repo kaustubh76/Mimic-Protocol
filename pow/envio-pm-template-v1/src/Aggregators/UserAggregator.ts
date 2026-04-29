@@ -9,6 +9,7 @@
 
 import type { handlerContext, UserAggregator } from "generated";
 import { UserId } from "../Constants";
+import { recordTraderState } from "../Snapshots/LeaderboardSnapshot";
 
 function freshUser(args: {
   chainId: number;
@@ -61,9 +62,15 @@ export async function upsertUserOnPosition(
     positionCount: u.positionCount + 1,
     lastActiveTimestamp: args.timestamp,
   };
-  context.UserAggregator.set({
-    ...updated,
-    realisedPnL: recomputePnL(updated),
+  const finalUser = { ...updated, realisedPnL: recomputePnL(updated) };
+  context.UserAggregator.set(finalUser);
+  // Mirror into the in-memory leaderboard accumulator so the next epoch
+  // boundary can sort + emit top-N without a DB scan.
+  recordTraderState(args.chainId, {
+    trader: finalUser.trader,
+    realisedPnL: finalUser.realisedPnL,
+    totalCollateralIn: finalUser.totalCollateralIn,
+    marketsParticipated: finalUser.marketsParticipated,
   });
 }
 
@@ -94,9 +101,13 @@ export async function upsertUserOnClose(
     totalCollateralOut: u.totalCollateralOut + args.collateralOut,
     lastActiveTimestamp: args.timestamp,
   };
-  context.UserAggregator.set({
-    ...updated,
-    realisedPnL: recomputePnL(updated),
+  const finalUser = { ...updated, realisedPnL: recomputePnL(updated) };
+  context.UserAggregator.set(finalUser);
+  recordTraderState(args.chainId, {
+    trader: finalUser.trader,
+    realisedPnL: finalUser.realisedPnL,
+    totalCollateralIn: finalUser.totalCollateralIn,
+    marketsParticipated: finalUser.marketsParticipated,
   });
 }
 
@@ -122,8 +133,12 @@ export async function upsertUserOnPayout(
     totalPayouts: u.totalPayouts + args.payout,
     lastActiveTimestamp: args.timestamp,
   };
-  context.UserAggregator.set({
-    ...updated,
-    realisedPnL: recomputePnL(updated),
+  const finalUser = { ...updated, realisedPnL: recomputePnL(updated) };
+  context.UserAggregator.set(finalUser);
+  recordTraderState(args.chainId, {
+    trader: finalUser.trader,
+    realisedPnL: finalUser.realisedPnL,
+    totalCollateralIn: finalUser.totalCollateralIn,
+    marketsParticipated: finalUser.marketsParticipated,
   });
 }

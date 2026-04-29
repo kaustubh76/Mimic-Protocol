@@ -7,19 +7,26 @@
  * top-N scan over all UserAggregators on every page load, the front-end
  * reads the latest LeaderboardEpochSnapshot rows for the current epoch.
  *
- * Postgres handles modest N (<10,000 active users). For high-cardinality
- * leaderboards (Polymarket-scale: 4B events, ~hundreds of thousands of
- * active traders), the same snapshot writes flip to ClickHouse Sink in
- * the Dedicated tier — schema and writes don't change, only the
- * destination. This is the "leaderboard tier" tier-up positioning
- * proposed in ENVIO_PREDICTION_MARKETS_POSITIONING_AUDIT.md.
+ * IMPLEMENTATION NOTE — why an in-memory accumulator:
  *
- * Production note: the in-line scan-and-sort below is fine for small N
- * and short epochs but is NOT what production deploys at scale. For
- * production, this is the moment ClickHouse Sink earns its keep — a
- * native sorted-aggregation query on append-only history outperforms
- * Postgres ORDER BY by an order of magnitude. See
- * ENVIO_CLICKHOUSE_TEARDOWN.md.
+ * Envio v2's handler context exposes per-entity get/set/getOrThrow but no
+ * scan-all-entities API. So instead of asking the DB on every epoch
+ * boundary "give me top-100 traders by realisedPnL", we maintain a
+ * per-chain in-memory map of (trader → realisedPnL) updated incrementally
+ * on every position-related event. At epoch boundary we sort the map and
+ * emit the top-N rows.
+ *
+ * This works at Production-tier scale (thousands of active traders per
+ * chain). Memory is O(active_traders × ~80 bytes/entry).
+ *
+ * For Polymarket-scale (4B events, hundreds of thousands of active
+ * traders): switch to ClickHouse Sink Dedicated tier. The same per-event
+ * trader updates flow into ClickHouse's append-only entity history table,
+ * and the per-epoch top-N becomes a native sorted-aggregation query —
+ * outperforming both this in-memory pass and Postgres ORDER BY by an
+ * order of magnitude. See ENVIO_CLICKHOUSE_TEARDOWN.md.
+ *
+ * The data layout doesn't change between tiers; only the query layer does.
  */
 
 import type { handlerContext } from "generated";
@@ -29,6 +36,46 @@ import {
   LeaderboardSnapshotId,
 } from "../Constants";
 
+// Minimal per-trader summary kept in memory. We track only the fields the
+// snapshot row writes — keeping the entry small (≈80 bytes per trader).
+type TraderSummary = {
+  trader: string;
+  realisedPnL: bigint;
+  totalCollateralIn: bigint;
+  marketsParticipated: number;
+};
+
+// Per-chain map: chainId → (trader address lowercased → summary).
+const _userPnLByChain = new Map<number, Map<string, TraderSummary>>();
+
+// Per-chain epoch tracker. Avoids redundant scans inside the same epoch.
+const _lastWrittenEpochPerChain = new Map<number, bigint>();
+
+function getChainMap(chainId: number): Map<string, TraderSummary> {
+  let m = _userPnLByChain.get(chainId);
+  if (!m) {
+    m = new Map();
+    _userPnLByChain.set(chainId, m);
+  }
+  return m;
+}
+
+/**
+ * Update the in-memory accumulator on every relevant event. Called from
+ * src/Aggregators/UserAggregator.ts after each upsertUserOn* runs, with
+ * the *post-update* user totals.
+ *
+ * This is the price of using an in-memory accumulator: every user-event
+ * site has to touch this. Cheap (Map.set, O(1)), but not free.
+ */
+export function recordTraderState(
+  chainId: number,
+  summary: TraderSummary,
+): void {
+  const m = getChainMap(chainId);
+  m.set(summary.trader.toLowerCase(), summary);
+}
+
 /**
  * Round timestamp down to the nearest leaderboard epoch.
  */
@@ -37,42 +84,47 @@ function getLeaderboardEpoch(timestamp: bigint): bigint {
   return (timestamp / interval) * interval;
 }
 
-// In-memory tracking of last epoch written per chain. Avoids a redundant
-// full scan on every event in the same epoch. Reset on indexer restart;
-// the next event after restart will detect the boundary and write.
-const lastWrittenEpochPerChain: Record<number, bigint> = {};
-
+/**
+ * On every event in src/EventHandlers/Market.ts, this is called. It checks
+ * the epoch boundary and — at most once per epoch per chain — emits the
+ * top-N snapshot rows.
+ */
 export async function maybeWriteLeaderboardSnapshot(
   context: handlerContext,
   chainId: number,
   timestamp: bigint,
 ): Promise<void> {
   const currentEpoch = getLeaderboardEpoch(timestamp);
-  const lastWritten = lastWrittenEpochPerChain[chainId] ?? 0n;
+  const lastWritten = _lastWrittenEpochPerChain.get(chainId) ?? -1n;
 
   if (currentEpoch <= lastWritten) {
-    return;  // Same epoch — already written.
+    return; // same epoch — nothing to do
   }
 
-  // Production fallback: at scale, this scan moves to ClickHouse Sink
-  // and becomes a native sorted-aggregation query. The Postgres-on-
-  // Production-tier path is the entry-level shape; the
-  // ClickHouse-on-Dedicated-tier path is the production target.
-  //
-  // The exact API for "scan all UserAggregator rows for this chain and
-  // return top-N by realisedPnL" depends on Envio's runtime context
-  // surface. The shape below assumes a `getAllForChain`-like reader; in
-  // practice you'd use a typed aggregator or flip to ClickHouse Sink.
-  //
-  // This is intentionally a shape-not-implementation — the production
-  // leaderboard architecture is the cited doc, not this stub.
-  const topN = await scanTopUsersByPnL(context, chainId, LEADERBOARD_TOP_N);
+  const chainMap = getChainMap(chainId);
+  if (chainMap.size === 0) {
+    _lastWrittenEpochPerChain.set(chainId, currentEpoch);
+    return;
+  }
+
+  // Sort by realisedPnL descending and slice top-N. For chainMap.size up
+  // to ~10k, the sort is sub-millisecond; above that the in-memory model
+  // starts to creak and ClickHouse Sink Dedicated tier is the right
+  // answer (see file-level comment).
+  const ranked = Array.from(chainMap.values())
+    .sort((a, b) => {
+      // Comparator handles signed bigint without precision loss.
+      if (a.realisedPnL > b.realisedPnL) return -1;
+      if (a.realisedPnL < b.realisedPnL) return 1;
+      return 0;
+    })
+    .slice(0, LEADERBOARD_TOP_N);
 
   // Write top-N rows for this epoch. The (chainId, hourEpoch, rank)
   // composite id makes the snapshot rows naturally idempotent — a re-run
   // of this writer for the same epoch overwrites the same rows.
-  for (let i = 0; i < topN.length; i++) {
-    const u = topN[i];
+  for (let i = 0; i < ranked.length; i++) {
+    const u = ranked[i];
     context.LeaderboardEpochSnapshot.set({
       id: LeaderboardSnapshotId(chainId, currentEpoch, i + 1),
       chainId,
@@ -85,38 +137,14 @@ export async function maybeWriteLeaderboardSnapshot(
     });
   }
 
-  lastWrittenEpochPerChain[chainId] = currentEpoch;
+  _lastWrittenEpochPerChain.set(chainId, currentEpoch);
 }
 
 /**
- * scanTopUsersByPnL — placeholder for the production query shape.
- *
- * In a real Envio indexer, you would:
- *   - For Production tier: rely on a periodic scan job emitting the snapshot,
- *     not a per-event scan (this is what the per-epoch interval enforces).
- *   - For Dedicated tier with ClickHouse Sink: this becomes a sorted query
- *     against the entity-history table — see ENVIO_LEADERBOARD_QUERY_ARCHITECTURE.md
- *     for the canonical query shapes (top-N, time-bucketed rollups,
- *     aggregate scans, user-cohort segmentation).
- *
- * This function is intentionally a shape-only stub so the template
- * compiles; the real implementation depends on which tier the customer
- * deploys on.
+ * Test-only reset hook. Vitest tests reset the accumulator between cases
+ * so leaderboard state doesn't leak across tests.
  */
-async function scanTopUsersByPnL(
-  context: handlerContext,
-  chainId: number,
-  topN: number,
-): Promise<
-  Array<{
-    trader: string;
-    realisedPnL: bigint;
-    totalCollateralIn: bigint;
-    marketsParticipated: number;
-  }>
-> {
-  context.log.debug(
-    `Leaderboard scan for chain ${chainId} top-${topN} — shape stub. Replace with ClickHouse query at Dedicated tier.`,
-  );
-  return [];
+export function _resetLeaderboardAccumulator(): void {
+  _userPnLByChain.clear();
+  _lastWrittenEpochPerChain.clear();
 }
