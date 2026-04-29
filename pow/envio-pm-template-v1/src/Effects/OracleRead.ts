@@ -18,9 +18,9 @@
  * reference.
  */
 
-import { experimental_createEffect, S } from "envio";
+import { createEffect, S } from "envio";
 
-export const getOracleResolution = experimental_createEffect(
+export const getOracleResolution = createEffect(
   {
     name: "getOracleResolution",
     input: {
@@ -39,6 +39,10 @@ export const getOracleResolution = experimental_createEffect(
       confirmedOutcome: S.number,
     },
     cache: true,
+    // Rate-limit oracle reads — production oracles (UMA, Pyth, etc) usually
+    // throttle aggressive callers. 30 calls/sec is a safe default for free
+    // public RPCs; tune up for paid endpoints.
+    rateLimit: { calls: 30, per: "second" },
   },
   async ({ input, context }) => {
     context.log.debug(
