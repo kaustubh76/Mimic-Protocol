@@ -1,0 +1,115 @@
+name: CI
+
+on:
+  push:
+    branches: [main, vertical-playbook-artifacts]
+  pull_request:
+    branches: [main, vertical-playbook-artifacts]
+  workflow_dispatch:
+
+jobs:
+  # -------------------------------------------------------------------
+  # Foundry: build + run PM contract tests.
+  # -------------------------------------------------------------------
+  contracts:
+    name: contracts (Foundry)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          # Brings in lib/openzeppelin-contracts (and its nested forge-std).
+          # Without this, `forge build` cannot resolve `forge-std/Test.sol`.
+          submodules: recursive
+
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: stable
+
+      - name: forge build
+        run: forge build
+
+      - name: forge test (PM only)
+        run: forge test --match-path "test/pm/*" -vv
+
+      - name: forge gas report (PM only)
+        run: forge test --match-path "test/pm/*" --gas-report > /tmp/gas-report.txt
+        continue-on-error: true
+
+      - name: Upload gas report
+        uses: actions/upload-artifact@v4
+        with:
+          name: gas-report
+          path: /tmp/gas-report.txt
+          if-no-files-found: ignore
+
+  # -------------------------------------------------------------------
+  # DeFi indexer template: install + codegen + tsc + vitest.
+  # -------------------------------------------------------------------
+  defi-template:
+    name: pow/envio-defi-template-v1
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: pow/envio-defi-template-v1
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 10
+
+      - name: pnpm install
+        run: pnpm install --frozen-lockfile=false
+
+      - name: pnpm codegen (envio)
+        run: pnpm codegen
+
+      - name: tsc --noEmit
+        run: npx tsc --noEmit
+
+      - name: pnpm test (vitest)
+        run: pnpm test
+
+  # -------------------------------------------------------------------
+  # PM indexer template: install + codegen + tsc + vitest.
+  # -------------------------------------------------------------------
+  pm-template:
+    name: pow/envio-pm-template-v1
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: pow/envio-pm-template-v1
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 10
+
+      - name: pnpm install
+        run: pnpm install --frozen-lockfile=false
+
+      - name: pnpm codegen (envio)
+        run: pnpm codegen
+
+      - name: tsc --noEmit
+        run: npx tsc --noEmit
+
+      - name: pnpm test (vitest)
+        run: pnpm test
