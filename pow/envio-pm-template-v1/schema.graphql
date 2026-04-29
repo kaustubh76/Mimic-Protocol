@@ -1,0 +1,126 @@
+# envio-pm-template-v1 schema
+#
+# Five PM-specific entity types organised in three layers:
+#   1. Market, Position           — raw entities written by EventHandlers
+#   2. MarketAggregator,
+#      UserAggregator             — derived state (open interest, P&L)
+#   3. LeaderboardEpochSnapshot   — top-N leaderboard per epoch
+#
+# The Market entity carries an explicit `state` enum that mirrors the
+# four-state settlement machine: OPEN → RESOLVING → SETTLED → CORRECTED.
+# State transitions are driven by events; see
+# src/EventHandlers/Settlement.ts and ENVIO_SETTLEMENT_HANDLER_REFERENCE.md.
+
+# ---------------------------------------------------------------------
+# Layer 1 — raw entities
+# ---------------------------------------------------------------------
+
+enum MarketState {
+  OPEN          # taking positions
+  RESOLVING     # locked, awaiting oracle
+  SETTLED       # oracle has reported
+  CORRECTED     # post-settlement correction applied
+}
+
+# Market type taxonomy — adding a new market category (sports, politics,
+# crypto-prices, custom) is a one-line addition here. This is the
+# intra-product expansion pattern named in §4 of ENVIO_VERTICAL_PLAYBOOK.md
+# as the PM-specific expansion mechanism (vs DeFi's multi-chain).
+enum MarketCategory {
+  BINARY_GENERIC
+  POLITICS
+  SPORTS
+  CRYPTO_PRICES
+  CUSTOM
+}
+
+type Market {
+  id: ID!                          # `${chainId}-${marketAddress}`
+  chainId: Int!
+  address: String!
+  questionId: String!              # bytes32 keccak of the question text
+  endTime: BigInt!                 # unix timestamp
+  outcomeCount: Int!
+  category: MarketCategory!
+  state: MarketState!
+
+  # Settlement state — populated as the four-state machine progresses.
+  winningOutcome: Int              # set when state >= SETTLED
+  oracleResolutionId: String       # set when state >= SETTLED
+  resolvedAt: BigInt               # set when state >= SETTLED
+  correctedAt: BigInt              # set when state == CORRECTED
+  previousWinningOutcome: Int      # set when state == CORRECTED, for audit
+
+  # Block-pointer for the last resolution event, used by the correction
+  # handler to detect races (see src/EventHandlers/Settlement.ts).
+  lastResolutionBlock: BigInt!
+
+  createdAtBlock: BigInt!
+  createdAtTimestamp: BigInt!
+}
+
+type Position {
+  id: ID!                          # `${marketId}-${trader}-${outcomeIndex}`
+  market_id: String!
+  trader: String!
+  outcomeIndex: Int!
+  shares: BigInt!                  # current share count (may be 0 after close)
+  cumulativeCollateralIn: BigInt!  # gross collateral spent on this outcome
+  cumulativeCollateralOut: BigInt! # gross collateral received from closes
+  realisedPnL: BigInt!             # collateralOut - collateralIn (signed)
+  payout: BigInt!                  # 0 until PayoutClaimed
+  lastUpdatedTimestamp: BigInt!
+}
+
+# ---------------------------------------------------------------------
+# Layer 2 — derived state (Aggregators)
+# ---------------------------------------------------------------------
+
+type MarketAggregator {
+  id: ID!                          # same id as Market — 1:1
+  chainId: Int!
+  marketAddress: String!
+  totalCollateralIn: BigInt!       # cumulative volume in
+  totalCollateralOut: BigInt!      # cumulative volume out
+  openInterest: BigInt!            # totalCollateralIn - totalCollateralOut
+  totalPositions: BigInt!
+  totalPayouts: BigInt!            # paid out post-settlement
+  uniqueTraders: Int!              # count of distinct traders
+  lastUpdatedTimestamp: BigInt!
+}
+
+# UserAggregator is the leaderboard source — every leaderboard query reads
+# from here and ranks. Keeping per-user totals here (vs computing them at
+# query time) is what makes top-N queries cheap.
+type UserAggregator {
+  id: ID!                          # `${chainId}-${trader}`
+  chainId: Int!
+  trader: String!
+  totalCollateralIn: BigInt!
+  totalCollateralOut: BigInt!
+  totalPayouts: BigInt!
+  realisedPnL: BigInt!             # totalCollateralOut + totalPayouts - totalCollateralIn
+  marketsParticipated: Int!
+  positionCount: Int!
+  lastActiveTimestamp: BigInt!
+}
+
+# ---------------------------------------------------------------------
+# Layer 3 — leaderboard snapshots
+# ---------------------------------------------------------------------
+
+# LeaderboardEpochSnapshot is the production shape — top-N rows per epoch,
+# computed once on epoch boundary, queried cheaply thereafter. Postgres
+# handles modest leaderboard sizes; ClickHouse Sink is the production
+# upgrade path for high-cardinality leaderboards. See
+# ENVIO_LEADERBOARD_QUERY_ARCHITECTURE.md.
+type LeaderboardEpochSnapshot {
+  id: ID!                          # `${chainId}-${hourEpoch}-${rank}`
+  chainId: Int!
+  hourEpoch: BigInt!
+  rank: Int!
+  trader: String!
+  realisedPnL: BigInt!
+  totalCollateralIn: BigInt!
+  marketsParticipated: Int!
+}

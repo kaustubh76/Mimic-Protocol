@@ -1,0 +1,14 @@
+[
+  {
+    "anonymous": false,
+    "inputs": [
+      { "indexed": true, "internalType": "address", "name": "market", "type": "address" },
+      { "indexed": true, "internalType": "bytes32", "name": "questionId", "type": "bytes32" },
+      { "indexed": false, "internalType": "uint256", "name": "endTime", "type": "uint256" },
+      { "indexed": false, "internalType": "uint8", "name": "outcomeCount", "type": "uint8" },
+      { "indexed": false, "internalType": "string", "name": "category", "type": "string" }
+    ],
+    "name": "MarketCreated",
+    "type": "event"
+  }
+]

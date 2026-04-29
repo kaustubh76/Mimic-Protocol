@@ -1,0 +1,28 @@
+{
+  "name": "envio-pm-template-v1",
+  "version": "0.1.0",
+  "description": "Production-grade prediction-markets indexer template — four-state settlement handler, leaderboard architecture, market-type taxonomy",
+  "type": "module",
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "scripts": {
+    "dev": "envio dev",
+    "codegen": "envio codegen",
+    "start": "envio start",
+    "build": "tsc --build",
+    "clean": "tsc --clean"
+  },
+  "dependencies": {
+    "envio": "3.0.0-alpha.20",
+    "viem": "2.24.3",
+    "dotenv": "^16.4.5"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.7.3"
+  },
+  "optionalDependencies": {
+    "generated": "link:generated"
+  }
+}
