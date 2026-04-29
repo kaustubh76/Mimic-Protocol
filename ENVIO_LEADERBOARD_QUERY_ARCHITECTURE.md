@@ -3,7 +3,9 @@
 **From:** Kaustubh Agrawal — Growth Engineer candidate
 **Companion docs:** [ENVIO_VERTICAL_PLAYBOOK.md](./ENVIO_VERTICAL_PLAYBOOK.md) · [ENVIO_CLICKHOUSE_TEARDOWN.md](./ENVIO_CLICKHOUSE_TEARDOWN.md) · [ENVIO_INDEXER_TEARDOWN.md](./ENVIO_INDEXER_TEARDOWN.md) · [ENVIO_PAIN_MAP_MATRIX.md](./ENVIO_PAIN_MAP_MATRIX.md)
 
-> *Architecture reference for the analytical query patterns prediction markets actually run: leaderboards, top-N queries, time-bucketed rollups, user-cohort segmentation. The Dedicated tier exists for this workload — this doc names the patterns and describes the data layout that makes them production-grade. Anchored to the ClickHouse teardown work; describes shape, not invented code.*
+> *Architecture reference for the analytical query patterns prediction markets actually run: leaderboards, top-N queries, time-bucketed rollups, user-cohort segmentation. The Dedicated tier exists for this workload — this doc names the patterns and describes the data layout that makes them production-grade. Anchored to the ClickHouse teardown work.*
+>
+> **Live reference code:** [`pow/envio-pm-template-v1/src/Aggregators/UserAggregator.ts`](./pow/envio-pm-template-v1/src/Aggregators/UserAggregator.ts) is the leaderboard source (per-user `realisedPnL`, `totalCollateralIn`, `marketsParticipated`). [`pow/envio-pm-template-v1/src/Snapshots/LeaderboardSnapshot.ts`](./pow/envio-pm-template-v1/src/Snapshots/LeaderboardSnapshot.ts) is the per-epoch top-N writer — Postgres-backed at small N, ClickHouse-Sink-shape-compatible at scale (the Dedicated "leaderboard tier" tier-up). The `LeaderboardEpochSnapshot` entity in [`pow/envio-pm-template-v1/schema.graphql`](./pow/envio-pm-template-v1/schema.graphql) carries the four canonical PM query shapes' source rows.
 
 ---
 

@@ -3,7 +3,9 @@
 **From:** Kaustubh Agrawal — Growth Engineer candidate
 **Companion docs:** [ENVIO_VERTICAL_PLAYBOOK.md](./ENVIO_VERTICAL_PLAYBOOK.md) · [ENVIO_INDEXER_TEARDOWN.md](./ENVIO_INDEXER_TEARDOWN.md) · [ENVIO_EFFECT_API_PATTERN.md](./ENVIO_EFFECT_API_PATTERN.md) · [ENVIO_PAIN_MAP_MATRIX.md](./ENVIO_PAIN_MAP_MATRIX.md)
 
-> *Reference for the trickiest event shape in the prediction-markets vertical: settlement, with multi-step state machine and correction handling for late or disputed oracle resolutions. Describes shape and location; does not invent code.*
+> *Reference for the trickiest event shape in the prediction-markets vertical: settlement, with multi-step state machine and correction handling for late or disputed oracle resolutions.*
+>
+> **Live reference code:** [`pow/envio-pm-template-v1/src/EventHandlers/Settlement.ts`](./pow/envio-pm-template-v1/src/EventHandlers/Settlement.ts) is the runnable four-state machine — `OPEN → RESOLVING → SETTLED → CORRECTED` with reorg-safe state transitions and race-safe correction handling via `lastResolutionBlock` block-pointer comparison. The schema-level `MarketState` enum lives at [`pow/envio-pm-template-v1/schema.graphql`](./pow/envio-pm-template-v1/schema.graphql). The Effect-cached oracle read pattern (1 RPC call per market, not N per holder) is at [`src/Effects/OracleRead.ts`](./pow/envio-pm-template-v1/src/Effects/OracleRead.ts).
 
 ---
 

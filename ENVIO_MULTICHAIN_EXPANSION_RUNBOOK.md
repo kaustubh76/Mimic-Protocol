@@ -3,7 +3,9 @@
 **From:** Kaustubh Agrawal — Growth Engineer candidate
 **Companion docs:** [ENVIO_VERTICAL_PLAYBOOK.md](./ENVIO_VERTICAL_PLAYBOOK.md) · [ENVIO_INDEXER_TEARDOWN.md](./ENVIO_INDEXER_TEARDOWN.md) · [ENVIO_DEFI_60MIN_TEMPLATE.md](./ENVIO_DEFI_60MIN_TEMPLATE.md) · [ENVIO_PAIN_MAP_MATRIX.md](./ENVIO_PAIN_MAP_MATRIX.md)
 
-> *Runbook spec for the expansion-stage tech artifact named in §3 of the playbook. Anchored to Sablier's `@sablier/devkit` codegen approach (27 contract deployments) and Velodrome+Aerodrome's 12-chain footprint. The atomic claim: with this runbook, adding chain #2 is a one-afternoon task instead of a one-week project. Describes shape and location; the runnable scripts live in customer repos.*
+> *Runbook spec for the expansion-stage tech artifact named in §3 of the playbook. Anchored to Sablier's `@sablier/devkit` codegen approach (27 contract deployments) and Velodrome+Aerodrome's 12-chain footprint. The atomic claim: with this runbook, adding chain #2 is a one-afternoon task instead of a one-week project.*
+>
+> **Live reference code:** [`pow/envio-defi-template-v1/src/Constants.ts`](./pow/envio-defi-template-v1/src/Constants.ts) shows the chain-keyed `CHAIN_CONFIG: Record<number, ChainConstants>` pattern (lines 28–46). [`pow/envio-defi-template-v1/config.yaml`](./pow/envio-defi-template-v1/config.yaml) shows the chain-list shape — adding chain #3 is one record in `CHAIN_CONFIG` plus one `networks:` entry in `config.yaml`. Handlers in [`src/EventHandlers/PoolFactory.ts`](./pow/envio-defi-template-v1/src/EventHandlers/PoolFactory.ts) read constants by `event.chainId` — there are no `if/else` chains across event handlers.
 
 ---
 

@@ -3,7 +3,9 @@
 **From:** Kaustubh Agrawal — Growth Engineer candidate
 **Companion docs:** [ENVIO_VERTICAL_PLAYBOOK.md](./ENVIO_VERTICAL_PLAYBOOK.md) · [ENVIO_INDEXER_TEARDOWN.md](./ENVIO_INDEXER_TEARDOWN.md) · [ENVIO_ONBOARDING_FORENSIC.md](./ENVIO_ONBOARDING_FORENSIC.md) · [ENVIO_PAIN_MAP_MATRIX.md](./ENVIO_PAIN_MAP_MATRIX.md)
 
-> *This is a pattern reference, not a finished tutorial. The pattern is real and load-bearing in production at Sablier and Velodrome+Aerodrome — it is documented in Envio's docs, but only as an advanced footnote on the first-30-minutes path. The Growth-Engineering play is **promoting it to canonical production default** so the next customer inherits it instead of rediscovering it. This doc describes shape and location; the forkable code lives in customer repos and the official docs.*
+> *This is a pattern reference, not a finished tutorial. The pattern is real and load-bearing in production at Sablier and Velodrome+Aerodrome — it is documented in Envio's docs, but only as an advanced footnote on the first-30-minutes path. The Growth-Engineering play is **promoting it to canonical production default** so the next customer inherits it instead of rediscovering it.*
+>
+> **Live reference code:** [`pow/envio-defi-template-v1/src/Effects/TokenMetadata.ts`](./pow/envio-defi-template-v1/src/Effects/TokenMetadata.ts) (the Effect definition) and [`pow/envio-defi-template-v1/src/EventHandlers/PoolFactory.ts`](./pow/envio-defi-template-v1/src/EventHandlers/PoolFactory.ts) (the `Promise.all`-of-entity-and-Effect-reads at the top of the handler). The PM template has the same pattern at [`pow/envio-pm-template-v1/src/Effects/OracleRead.ts`](./pow/envio-pm-template-v1/src/Effects/OracleRead.ts) and [`pow/envio-pm-template-v1/src/EventHandlers/Settlement.ts`](./pow/envio-pm-template-v1/src/EventHandlers/Settlement.ts).
 
 ---
 

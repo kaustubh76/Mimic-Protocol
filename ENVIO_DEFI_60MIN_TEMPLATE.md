@@ -3,7 +3,9 @@
 **From:** Kaustubh Agrawal — Growth Engineer candidate
 **Companion docs:** [ENVIO_VERTICAL_PLAYBOOK.md](./ENVIO_VERTICAL_PLAYBOOK.md) · [ENVIO_INDEXER_TEARDOWN.md](./ENVIO_INDEXER_TEARDOWN.md) · [ENVIO_ONBOARDING_FORENSIC.md](./ENVIO_ONBOARDING_FORENSIC.md) · [ENVIO_EFFECT_API_PATTERN.md](./ENVIO_EFFECT_API_PATTERN.md) · [ENVIO_PAIN_MAP_MATRIX.md](./ENVIO_PAIN_MAP_MATRIX.md)
 
-> *Spec for the activation-stage flagship template named in §3 of the playbook. Bridges the Greeter-tutorial gap to a Velodrome-shaped Aggregators+Snapshots layout. Anchored to patterns visible in the indexer-teardown work; describes shape and location, not invented code.*
+> *Spec for the activation-stage flagship template named in §3 of the playbook. Bridges the Greeter-tutorial gap to a Velodrome-shaped Aggregators+Snapshots layout. Anchored to patterns visible in the indexer-teardown work.*
+>
+> **Live reference code:** [`pow/envio-defi-template-v1/`](./pow/envio-defi-template-v1/) — the runnable scaffold with real Velodrome ABIs (`abis/PoolFactory.json`, `abis/Pool.json`), real factory addresses (Velodrome V2 on Optimism `0xF1046053aa5682b4F9a81b5481394DA16BE5FF5a`, Aerodrome on Base `0x420DD381b31aEf6683db6B902084cB0FFECe40Da`), and the three-layer architecture mirrored from `velodrome-finance/indexer`.
 
 ---
 

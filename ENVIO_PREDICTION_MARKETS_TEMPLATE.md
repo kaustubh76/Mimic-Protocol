@@ -3,7 +3,9 @@
 **From:** Kaustubh Agrawal — Growth Engineer candidate
 **Companion docs:** [ENVIO_VERTICAL_PLAYBOOK.md](./ENVIO_VERTICAL_PLAYBOOK.md) · [ENVIO_INDEXER_TEARDOWN.md](./ENVIO_INDEXER_TEARDOWN.md) · [ENVIO_SETTLEMENT_HANDLER_REFERENCE.md](./ENVIO_SETTLEMENT_HANDLER_REFERENCE.md) · [ENVIO_LEADERBOARD_QUERY_ARCHITECTURE.md](./ENVIO_LEADERBOARD_QUERY_ARCHITECTURE.md) · [ENVIO_PAIN_MAP_MATRIX.md](./ENVIO_PAIN_MAP_MATRIX.md)
 
-> *Capstone artifact for the Prediction Markets vertical. Spec for a forkable indexer template with all five PM event shapes baked in: market creation, position taking, settlement, oracle resolution, payout, leaderboard rollups. Pulls in the settlement handler reference and the leaderboard query architecture as composable pieces. Describes shape and location; does not invent code.*
+> *Capstone artifact for the Prediction Markets vertical. Spec for a forkable indexer template with all five PM event shapes baked in: market creation, position taking, settlement, oracle resolution, payout, leaderboard rollups. Pulls in the settlement handler reference and the leaderboard query architecture as composable pieces.*
+>
+> **Live reference code:** [`pow/envio-pm-template-v1/`](./pow/envio-pm-template-v1/) — the runnable scaffold with the four-state settlement machine in [`src/EventHandlers/Settlement.ts`](./pow/envio-pm-template-v1/src/EventHandlers/Settlement.ts), market-type taxonomy in [`schema.graphql`](./pow/envio-pm-template-v1/schema.graphql) (`MarketCategory` enum + `parseMarketCategory()` parser in [`src/Constants.ts`](./pow/envio-pm-template-v1/src/Constants.ts)), per-user leaderboard source in [`src/Aggregators/UserAggregator.ts`](./pow/envio-pm-template-v1/src/Aggregators/UserAggregator.ts), and per-epoch top-N writer in [`src/Snapshots/LeaderboardSnapshot.ts`](./pow/envio-pm-template-v1/src/Snapshots/LeaderboardSnapshot.ts).
 
 ---
 
