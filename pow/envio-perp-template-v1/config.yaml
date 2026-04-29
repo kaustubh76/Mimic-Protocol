@@ -1,0 +1,62 @@
+# yaml-language-server: $schema=./node_modules/envio/evm.schema.json
+#
+# envio-perp-template-v1
+# Production-grade perp-protocol indexer scaffold. Mirrors the architecture
+# patterns of the DEX template (EventHandlers → Aggregators → Snapshots) but
+# with perp-specific event shapes:
+#   - MarketCreated, PositionIncrease, PositionDecrease, Liquidation, FundingFeeAmountPerSizeUpdated
+#
+# Event signatures and naming conventions are adapted from
+# gmx-io/gmx-synthetics (https://github.com/gmx-io/gmx-synthetics) — the
+# canonical perp protocol on Arbitrum. Field names (positionKey, sizeDeltaUsd,
+# fundingFeeAmountPerSize, etc) match GMX v2 semantics so a reviewer
+# familiar with the protocol can read this template fluently.
+#
+# We use FLAT typed events (positionKey, account, isLong, sizeDeltaUsd, ...)
+# instead of GMX v2's bytes-encoded EventLogData pattern. The bytes-encoded
+# shape is operationally efficient on-chain but hostile to typed indexer
+# bindings; the flat shape is what most third-party perp protocols ship.
+# A note on this simplification lives in the template README.
+
+name: envio-perp-template-v1
+description: Perp-protocol indexer template — GMX-v2-shaped event signatures, position lifecycle, funding rate tracking
+rollback_on_reorg: true
+raw_events: false
+
+field_selection:
+  transaction_fields:
+    - "hash"
+
+contracts:
+  # MarketFactory deploys new Market contracts (one per index/long/short
+  # token tuple in GMX v2 parlance). MarketCreated is the dynamic-
+  # registration trigger; same pattern as the DEX template's PoolFactory
+  # and PM template's MarketFactory.
+  - name: MarketFactory
+    abi_file_path: abis/MarketFactory.json
+    handler: src/EventHandlers/MarketFactory.ts
+    events:
+      - event: MarketCreated
+
+  # Market contracts emit position + funding events. Registered DYNAMICALLY
+  # via context.addMarket() in the MarketFactory handler. address: bare
+  # (no value) is the documented dynamic-contract pattern.
+  - name: Market
+    abi_file_path: abis/Market.json
+    handler: src/EventHandlers/Market.ts
+    events:
+      - event: PositionIncrease
+      - event: PositionDecrease
+      - event: Liquidation
+      - event: FundingFeeAmountPerSizeUpdated
+
+networks:
+  # Arbitrum One — GMX v2's home chain.
+  - id: 42161
+    start_block: 100000000  # placeholder; set to your protocol's MarketFactory deploy block
+    contracts:
+      - name: MarketFactory
+        address:
+          - 0xdEaDbeefDEaDbeefDeAdBEefdEadbEEFdeadbeef  # PLACEHOLDER — replace with your protocol's MarketFactory
+      - name: Market
+        address:  # registered dynamically via MarketCreated handler

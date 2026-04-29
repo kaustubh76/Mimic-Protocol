@@ -1,0 +1,110 @@
+# envio-perp-template-v1 schema
+#
+# Perp-protocol entity model. Three layers, same shape as the DEX and PM
+# templates but with perp-specific entities:
+#
+#   1. PerpMarket, Position, Liquidation  — raw entities written by handlers
+#   2. PerpAggregator, PositionAggregator — derived per-market and per-trader state
+#   3. FundingSnapshot                    — periodic funding-rate captures
+#
+# The funding-rate distinction from spot DEXes is the biggest analytical-
+# tier difference: every open position's PnL is continuously affected by
+# the funding rate, so the indexer needs both per-position state AND a
+# periodic funding curve. See ENVIO_LEADERBOARD_QUERY_ARCHITECTURE.md for
+# how this composes with the leaderboard tier (perp leaderboards rank by
+# funding-adjusted PnL, not raw realised).
+
+# ---------------------------------------------------------------------
+# Layer 1 — raw entities
+# ---------------------------------------------------------------------
+
+type PerpMarket {
+  id: ID!                          # `${chainId}-${marketAddress}`
+  chainId: Int!
+  address: String!
+  salt: String!                    # bytes32 unique seed for this market deployment
+  indexToken: String!              # the asset whose price the market tracks
+  longToken: String!               # collateral token for longs
+  shortToken: String!              # collateral token for shorts
+  createdAtBlock: BigInt!
+  createdAtTimestamp: BigInt!
+}
+
+type Position {
+  id: ID!                          # positionKey (bytes32) — globally unique
+  market_id: String!
+  account: String!
+  isLong: Boolean!
+  sizeInUsd: BigInt!               # current notional position size (zeroed on full close)
+  sizeInTokens: BigInt!            # current size in indexToken units
+  collateralAmount: BigInt!        # collateral committed in long/short token units
+  cumulativeSizeIncreaseUsd: BigInt!
+  cumulativeSizeDecreaseUsd: BigInt!
+  cumulativeRealizedPnl: BigInt!   # signed: positive winners, negative losers
+  fundingFeeAmountPerSizeAtEntry: BigInt!  # snapshot at last increase, used to compute pending funding
+  isLiquidated: Boolean!           # latched true on Liquidation event
+  liquidator: String               # populated when isLiquidated = true
+  lastUpdatedTimestamp: BigInt!
+}
+
+type Liquidation {
+  id: ID!                          # `${positionKey}-${block.number}-${logIndex}`
+  position_id: String!
+  market_id: String!
+  account: String!
+  liquidator: String!
+  isLong: Boolean!
+  sizeUsd: BigInt!
+  collateralAmount: BigInt!
+  blockNumber: BigInt!
+  timestamp: BigInt!
+}
+
+# ---------------------------------------------------------------------
+# Layer 2 — derived state (aggregators)
+# ---------------------------------------------------------------------
+
+type PerpAggregator {
+  id: ID!                          # same id as PerpMarket — 1:1
+  chainId: Int!
+  marketAddress: String!
+  longOpenInterestUsd: BigInt!     # sum of all long position sizeInUsd
+  shortOpenInterestUsd: BigInt!    # sum of all short position sizeInUsd
+  totalRealizedPnlUsd: BigInt!     # signed cumulative
+  totalCollateralLong: BigInt!
+  totalCollateralShort: BigInt!
+  totalPositions: Int!
+  totalLiquidations: Int!
+  uniqueTraders: Int!
+  lastUpdatedTimestamp: BigInt!
+}
+
+type PositionAggregator {
+  id: ID!                          # `${chainId}-${account}`
+  chainId: Int!
+  account: String!
+  cumulativeSizeIncreaseUsd: BigInt!
+  cumulativeSizeDecreaseUsd: BigInt!
+  cumulativeRealizedPnlUsd: BigInt!
+  cumulativeCollateralIn: BigInt!
+  cumulativeCollateralOut: BigInt!
+  liquidationCount: Int!
+  marketsTraded: Int!
+  positionCount: Int!
+  lastActiveTimestamp: BigInt!
+}
+
+# ---------------------------------------------------------------------
+# Layer 3 — funding-rate snapshots
+# ---------------------------------------------------------------------
+
+# Snapshots of fundingFeeAmountPerSize per market/side. Front-end queries
+# join these against open positions to compute pending funding fees.
+type FundingSnapshot {
+  id: ID!                          # `${marketId}-${isLong}-${updatedAt}`
+  market_id: String!
+  isLong: Boolean!
+  fundingFeeAmountPerSize: BigInt!
+  updatedAt: BigInt!
+  blockNumber: BigInt!
+}
