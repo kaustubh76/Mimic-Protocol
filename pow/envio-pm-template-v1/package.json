@@ -13,7 +13,8 @@
     "build": "tsc --build",
     "clean": "tsc --clean",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "add-chain": "tsx scripts/add-chain.ts"
   },
   "dependencies": {
     "envio": "^2.32.12",
@@ -22,6 +23,7 @@
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
+    "tsx": "^4.0.0",
     "typescript": "^5.7.3",
     "vitest": "^3.0.0"
   },
