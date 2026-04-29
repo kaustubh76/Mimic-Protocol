@@ -9,49 +9,13 @@
  * Production reference: velodrome-finance/indexer/src/Effects/Token.ts
  * Sablier's `0`-alias optimisation for unknown metadata is a one-line
  * extension of this pattern; documented in ENVIO_EFFECT_API_PATTERN.md §2.4.
+ *
+ * The RPC body lives in ./TokenMetadataFetcher so vitest can spy on it
+ * via the module namespace — see test/EffectCache.test.ts.
  */
 
 import { createEffect, S } from "envio";
-import { createPublicClient, http, parseAbi, type PublicClient } from "viem";
-import { optimism, base } from "viem/chains";
-
-// Minimal ERC-20 ABI for the two reads we care about. parseAbi is viem's
-// human-readable ABI parser — same hashes as the canonical JSON ABI but
-// drastically less code.
-const erc20Abi = parseAbi([
-  "function symbol() view returns (string)",
-  "function decimals() view returns (uint8)",
-]);
-
-// One viem client per supported chain. Created lazily on first use and
-// memoised; the Envio runtime keeps the indexer process long-lived, so
-// client construction is amortised across the entire indexing session.
-//
-// The Map is typed as `PublicClient` (the unparameterised base type) so
-// instantiations for Optimism and Base — which produce structurally
-// different generic types — can coexist. We only call .readContract() on
-// these, which is on the base type, so this widening is sound.
-const _clientCache = new Map<number, PublicClient>();
-
-function getClient(chainId: number): PublicClient | undefined {
-  const cached = _clientCache.get(chainId);
-  if (cached) return cached;
-
-  let client: PublicClient | undefined;
-  if (chainId === 10) {
-    client = createPublicClient({
-      chain: optimism,
-      transport: http(process.env.ENVIO_OPTIMISM_RPC_URL),
-    }) as PublicClient;
-  } else if (chainId === 8453) {
-    client = createPublicClient({
-      chain: base,
-      transport: http(process.env.ENVIO_BASE_RPC_URL),
-    }) as PublicClient;
-  }
-  if (client) _clientCache.set(chainId, client);
-  return client;
-}
+import * as TokenMetadataFetcher from "./TokenMetadataFetcher";
 
 /**
  * The Effect signature: input shape -> output shape.
@@ -85,51 +49,12 @@ export const getTokenMetadata = createEffect(
     rateLimit: { calls: 50, per: "second" },
   },
   async ({ input, context }) => {
-    const client = getClient(input.chainId);
-
-    if (!client) {
-      // Chain not configured — surface a debug log and fall back to safe
-      // defaults rather than failing the handler. The defaults match
-      // Sablier's `0`-alias pattern: unknown metadata encoded as a known
-      // sentinel ("UNKNOWN", 18 decimals) that downstream entities can
-      // detect and special-case if needed.
-      context.log.debug(
-        `getTokenMetadata: no viem client configured for chain ${input.chainId}; returning fallback metadata.`,
-      );
-      return { symbol: "UNKNOWN", decimals: 18 };
-    }
-
-    try {
-      // Parallel multicall-style reads. viem batches these automatically
-      // when the underlying transport supports it.
-      const [symbol, decimals] = await Promise.all([
-        client.readContract({
-          address: input.address as `0x${string}`,
-          abi: erc20Abi,
-          functionName: "symbol",
-        }),
-        client.readContract({
-          address: input.address as `0x${string}`,
-          abi: erc20Abi,
-          functionName: "decimals",
-        }),
-      ]);
-
-      return {
-        symbol: symbol as string,
-        decimals: Number(decimals),
-      };
-    } catch (err) {
-      // Some tokens don't implement symbol() (notably MKR, which returns a
-      // bytes32 instead of a string), or are deployed at addresses that
-      // aren't valid ERC-20s (proxy contracts mid-upgrade, etc). Sablier's
-      // `0`-alias optimisation handles this: encode unknown tokens with a
-      // sentinel value and continue. The cache stores the sentinel so the
-      // next handler doesn't re-hit the RPC for the same broken token.
-      context.log.debug(
-        `getTokenMetadata: RPC read failed for ${input.address} on chain ${input.chainId}: ${err instanceof Error ? err.message : String(err)}. Returning fallback.`,
-      );
-      return { symbol: "UNKNOWN", decimals: 18 };
-    }
+    context.log.debug(
+      `getTokenMetadata: Effect dispatch for ${input.address} on chain ${input.chainId}`,
+    );
+    // Resolve through the module namespace so vitest can spy on
+    // `TokenMetadataFetcher.fetchErc20Metadata`. Direct named-import calls
+    // bypass the spy due to ESM closure semantics.
+    return TokenMetadataFetcher.fetchErc20Metadata(input.chainId, input.address);
   },
 );
