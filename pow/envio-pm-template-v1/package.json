@@ -14,7 +14,7 @@
     "clean": "tsc --clean"
   },
   "dependencies": {
-    "envio": "3.0.0-alpha.20",
+    "envio": "^2.32.12",
     "viem": "2.24.3",
     "dotenv": "^16.4.5"
   },

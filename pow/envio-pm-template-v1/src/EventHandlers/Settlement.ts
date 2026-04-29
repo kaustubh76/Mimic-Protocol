@@ -103,10 +103,15 @@ Market.OracleResolved.handler(async ({ event, context }) => {
     return;
   }
 
+  // Solidity uint8 maps to bigint in generated bindings; cast to number
+  // for schema fields typed as Int! (winningOutcome, previousWinningOutcome).
+  // Outcome indexes are bounded by outcomeCount (small), so Number() is safe.
+  const winningOutcomeNum = Number(event.params.winningOutcome);
+
   context.Market.set({
     ...market,
     state: "SETTLED",
-    winningOutcome: event.params.winningOutcome,
+    winningOutcome: winningOutcomeNum,
     oracleResolutionId: event.params.oracleResolutionId,
     resolvedAt: BigInt(event.params.resolvedAt),
     lastResolutionBlock: BigInt(event.block.number),
@@ -114,7 +119,7 @@ Market.OracleResolved.handler(async ({ event, context }) => {
 
   // Aggregator updates — open interest closes, payout pool tracked.
   await applyResolution(context, marketId, {
-    winningOutcome: event.params.winningOutcome,
+    winningOutcome: winningOutcomeNum,
     timestamp: BigInt(event.block.timestamp),
   });
 
@@ -160,11 +165,14 @@ Market.MarketCorrected.handler(async ({ event, context }) => {
     return;
   }
 
+  const previousOutcomeNum = Number(event.params.previousWinningOutcome);
+  const correctedOutcomeNum = Number(event.params.correctedWinningOutcome);
+
   context.Market.set({
     ...market,
     state: "CORRECTED",
-    previousWinningOutcome: event.params.previousWinningOutcome,
-    winningOutcome: event.params.correctedWinningOutcome,
+    previousWinningOutcome: previousOutcomeNum,
+    winningOutcome: correctedOutcomeNum,
     correctedAt: BigInt(event.params.correctedAt),
     lastResolutionBlock: BigInt(event.block.number),
   });
@@ -175,8 +183,8 @@ Market.MarketCorrected.handler(async ({ event, context }) => {
   // correction is visible to end users. See
   // ENVIO_SETTLEMENT_HANDLER_REFERENCE.md §2 (State 4).
   await applyCorrection(context, marketId, {
-    previousWinningOutcome: event.params.previousWinningOutcome,
-    correctedWinningOutcome: event.params.correctedWinningOutcome,
+    previousWinningOutcome: previousOutcomeNum,
+    correctedWinningOutcome: correctedOutcomeNum,
     timestamp: BigInt(event.block.timestamp),
   });
 
