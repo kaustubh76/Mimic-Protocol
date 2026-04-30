@@ -9,42 +9,6 @@ on:
 
 jobs:
   # -------------------------------------------------------------------
-  # Foundry: build + run PM contract tests.
-  # -------------------------------------------------------------------
-  contracts:
-    name: contracts (Foundry)
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          # Brings in lib/openzeppelin-contracts (and its nested forge-std).
-          # Without this, `forge build` cannot resolve `forge-std/Test.sol`.
-          submodules: recursive
-
-      - name: Install Foundry
-        uses: foundry-rs/foundry-toolchain@v1
-        with:
-          version: stable
-
-      - name: forge build
-        run: forge build
-
-      - name: forge test (PM only)
-        run: forge test --match-path "test/pm/*" -vv
-
-      - name: forge gas report (PM only)
-        run: forge test --match-path "test/pm/*" --gas-report > /tmp/gas-report.txt
-        continue-on-error: true
-
-      - name: Upload gas report
-        uses: actions/upload-artifact@v4
-        with:
-          name: gas-report
-          path: /tmp/gas-report.txt
-          if-no-files-found: ignore
-
-  # -------------------------------------------------------------------
   # DeFi indexer template: install + codegen + tsc + vitest.
   # -------------------------------------------------------------------
   defi-template:
@@ -80,14 +44,16 @@ jobs:
         run: pnpm test
 
   # -------------------------------------------------------------------
-  # PM indexer template: install + codegen + tsc + vitest.
+  # Money-market indexer template: install + codegen + tsc + vitest.
+  # Aave-V3-shaped events; replaces the prior PM template (Envio ships
+  # the PM vertical via enviodev/polymarket-v2-indexer).
   # -------------------------------------------------------------------
-  pm-template:
-    name: pow/envio-pm-template-v1
+  money-market-template:
+    name: pow/envio-money-market-template-v1
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: pow/envio-pm-template-v1
+        working-directory: pow/envio-money-market-template-v1
     steps:
       - name: Checkout
         uses: actions/checkout@v4
