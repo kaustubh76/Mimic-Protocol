@@ -1,0 +1,23 @@
+{
+  "title": "Top 10 liquidators (liquidations as liquidator)",
+  "query": "query {\n  UserAggregator(\n    where: {liquidationsAsLiquidator: {_gt: 0}}\n    order_by: {liquidationsAsLiquidator: desc}\n    limit: 10\n  ) {\n    user\n    liquidationsAsLiquidator\n    totalSuppliedAcrossReserves\n    totalBorrowedAcrossReserves\n  }\n}",
+  "response": {
+    "data": {
+      "UserAggregator": [
+        {
+          "user": "0x0000000eb7d8244007da6cd63a512ec69494b231",
+          "liquidationsAsLiquidator": 99,
+          "totalSuppliedAcrossReserves": "0",
+          "totalBorrowedAcrossReserves": "0"
+        },
+        {
+          "user": "0x36d43ccbf4cb6a9c93cea60c93a89b3a38d256c4",
+          "liquidationsAsLiquidator": 28,
+          "totalSuppliedAcrossReserves": "0",
+          "totalBorrowedAcrossReserves": "0"
+        }
+      ]
+    }
+  },
+  "capturedAt": "2026-04-30T08:37:35.719Z"
+}

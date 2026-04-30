@@ -1,0 +1,111 @@
+{
+  "title": "Top 10 reserves by total supplied",
+  "query": "query {\n  ReserveAggregator(order_by: {totalSupplied: desc}, limit: 10) {\n    asset\n    totalSupplied\n    totalBorrowed\n    totalLiquidations\n    uniqueSuppliers\n    uniqueBorrowers\n    currentLiquidityRate\n    currentVariableBorrowRate\n  }\n}",
+  "response": {
+    "data": {
+      "ReserveAggregator": [
+        {
+          "asset": "0x8f3cf7ad23cd3cadbd9735aff958023239c6a063",
+          "totalSupplied": "6800462798591026044993346",
+          "totalBorrowed": "42925593301851711048089034",
+          "totalLiquidations": 22,
+          "uniqueSuppliers": 711,
+          "uniqueBorrowers": 630,
+          "currentLiquidityRate": "28021794914170738014170711",
+          "currentVariableBorrowRate": "37390122811652981829528276"
+        },
+        {
+          "asset": "0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270",
+          "totalSupplied": "5085209712716190344297225",
+          "totalBorrowed": "38895853820443367770988622",
+          "totalLiquidations": 47,
+          "uniqueSuppliers": 2194,
+          "uniqueBorrowers": 285,
+          "currentLiquidityRate": "11365341644338572281508882",
+          "currentVariableBorrowRate": "47009866432002573687882324"
+        },
+        {
+          "asset": "0xe0b52e49357fd4daf2c15e02058dce6bc0057db4",
+          "totalSupplied": "1297290117309711664765895",
+          "totalBorrowed": "623328141797658536453819",
+          "totalLiquidations": 6,
+          "uniqueSuppliers": 17,
+          "uniqueBorrowers": 132,
+          "currentLiquidityRate": "2406866796257329681913092",
+          "currentVariableBorrowRate": "11563512529257539289364396"
+        },
+        {
+          "asset": "0x4e3decbb3645551b8a19f0ea1678079fcb33fb4c",
+          "totalSupplied": "896987610861931336188242",
+          "totalBorrowed": "749368804358782176999698",
+          "totalLiquidations": 0,
+          "uniqueSuppliers": 32,
+          "uniqueBorrowers": 118,
+          "currentLiquidityRate": "10879717641121599548305771",
+          "currentVariableBorrowRate": "24585132861957221153510869"
+        },
+        {
+          "asset": "0x172370d5cd63279efa6d502dab29171933a610af",
+          "totalSupplied": "335001091148537377587221",
+          "totalBorrowed": "229319727645584428300641",
+          "totalLiquidations": 10,
+          "uniqueSuppliers": 638,
+          "uniqueBorrowers": 51,
+          "currentLiquidityRate": "52537928958852601134257678",
+          "currentVariableBorrowRate": "68181945868887763801515718"
+        },
+        {
+          "asset": "0x385eeac5cb85a38a9a07a70c73e0a3271cfb54a7",
+          "totalSupplied": "153655412837984306404424",
+          "totalBorrowed": "3738905873816444648331644",
+          "totalLiquidations": 1,
+          "uniqueSuppliers": 206,
+          "uniqueBorrowers": 34,
+          "currentLiquidityRate": "94900809899323441843295566",
+          "currentVariableBorrowRate": "245978027215043994447116620"
+        },
+        {
+          "asset": "0x53e0bca35ec356bd5dddfebbd1fc0fd03fabad39",
+          "totalSupplied": "51842958992223845673585",
+          "totalBorrowed": "239284625571985387175256",
+          "totalLiquidations": 4,
+          "uniqueSuppliers": 161,
+          "uniqueBorrowers": 35,
+          "currentLiquidityRate": "1648381779536460446474767",
+          "currentVariableBorrowRate": "17903035478775987542189313"
+        },
+        {
+          "asset": "0x9a71012b13ca4d3d0cdc72a177df3ef03b0e76a3",
+          "totalSupplied": "32121908619306893032237",
+          "totalBorrowed": "17113815078704089361198",
+          "totalLiquidations": 0,
+          "uniqueSuppliers": 128,
+          "uniqueBorrowers": 47,
+          "currentLiquidityRate": "14052655895215219799045046",
+          "currentVariableBorrowRate": "52272945856475991384547564"
+        },
+        {
+          "asset": "0xd6df932a45c0f255f85145f286ea0b292b21c90b",
+          "totalSupplied": "26504572364842531241093",
+          "totalBorrowed": "0",
+          "totalLiquidations": 5,
+          "uniqueSuppliers": 341,
+          "uniqueBorrowers": 0,
+          "currentLiquidityRate": "0",
+          "currentVariableBorrowRate": "0"
+        },
+        {
+          "asset": "0x0b3f868e0be5597d5db7feb59e1cadbb0fdda50a",
+          "totalSupplied": "21025885813442134362415",
+          "totalBorrowed": "19007480456115267352175",
+          "totalLiquidations": 0,
+          "uniqueSuppliers": 123,
+          "uniqueBorrowers": 24,
+          "currentLiquidityRate": "111526827530229240750723034",
+          "currentVariableBorrowRate": "284861133927555268240733734"
+        }
+      ]
+    }
+  },
+  "capturedAt": "2026-04-30T08:37:35.642Z"
+}

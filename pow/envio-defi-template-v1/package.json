@@ -2,7 +2,6 @@
   "name": "envio-defi-template-v1",
   "version": "0.1.0",
   "description": "Production-grade DeFi indexer template — Aggregators+Snapshots architecture mirrored from velodrome-finance/indexer",
-  "type": "module",
   "engines": {
     "node": ">=22.0.0"
   },

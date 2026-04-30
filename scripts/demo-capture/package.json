@@ -1,0 +1,13 @@
+{
+  "name": "envio-aave-demo-capture",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Playwright + GraphQL capture script for the money-market template's live Polygon Aave V3 demo run. Lives separately from pow/envio-money-market-template-v1/ so the template's pnpm install stays lean — playwright is ~150MB.",
+  "type": "module",
+  "scripts": {
+    "capture": "node capture.mjs"
+  },
+  "dependencies": {
+    "playwright": "^1.49.0"
+  }
+}

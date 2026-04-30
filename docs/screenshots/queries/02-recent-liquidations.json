@@ -1,0 +1,121 @@
+{
+  "title": "10 most recent liquidations",
+  "query": "query {\n  Liquidation(order_by: {blockNumber: desc}, limit: 10) {\n    user\n    liquidator\n    collateralAsset\n    debtAsset\n    debtToCover\n    liquidatedCollateralAmount\n    receiveAToken\n    blockNumber\n    timestamp\n  }\n}",
+  "response": {
+    "data": {
+      "Liquidation": [
+        {
+          "user": "0x8a20b1d0d707452ec245c0597c81e9fe00e09272",
+          "liquidator": "0x36d43ccbf4cb6a9c93cea60c93a89b3a38d256c4",
+          "collateralAsset": "0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270",
+          "debtAsset": "0x172370d5cd63279efa6d502dab29171933a610af",
+          "debtToCover": "1191199500649175047",
+          "liquidatedCollateralAmount": "2101122920414211136",
+          "receiveAToken": false,
+          "blockNumber": "27336964",
+          "timestamp": "1650400958"
+        },
+        {
+          "user": "0x0d9b1d7c409151d29341f6f5320781418bceadac",
+          "liquidator": "0x0000000eb7d8244007da6cd63a512ec69494b231",
+          "collateralAsset": "0x2791bca1f2de4661ed88a30c99a7a9449aa84174",
+          "debtAsset": "0xc2132d05d31c914a87c6611c10748aeb04b58e8f",
+          "debtToCover": "60413104",
+          "liquidatedCollateralAmount": "62606966",
+          "receiveAToken": false,
+          "blockNumber": "27326051",
+          "timestamp": "1650377013"
+        },
+        {
+          "user": "0x93f61efb6c7bb56c9df5a7b1a8f88ced22f4c33a",
+          "liquidator": "0x36d43ccbf4cb6a9c93cea60c93a89b3a38d256c4",
+          "collateralAsset": "0x2791bca1f2de4661ed88a30c99a7a9449aa84174",
+          "debtAsset": "0xe0b52e49357fd4daf2c15e02058dce6bc0057db4",
+          "debtToCover": "223727958505698018240",
+          "liquidatedCollateralAmount": "243593149",
+          "receiveAToken": false,
+          "blockNumber": "27315318",
+          "timestamp": "1650353439"
+        },
+        {
+          "user": "0xe7f52bef76175ca878856b0c912c8d2e8e703ecc",
+          "liquidator": "0x0000000eb7d8244007da6cd63a512ec69494b231",
+          "collateralAsset": "0x53e0bca35ec356bd5dddfebbd1fc0fd03fabad39",
+          "debtAsset": "0x2791bca1f2de4661ed88a30c99a7a9449aa84174",
+          "debtToCover": "342278199",
+          "liquidatedCollateralAmount": "25941732330558466926",
+          "receiveAToken": false,
+          "blockNumber": "27304633",
+          "timestamp": "1650329516"
+        },
+        {
+          "user": "0x8e2b0ab3cc0c2626b79f00bc53b9ac5658ea560d",
+          "liquidator": "0x0000000eb7d8244007da6cd63a512ec69494b231",
+          "collateralAsset": "0xd6df932a45c0f255f85145f286ea0b292b21c90b",
+          "debtAsset": "0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270",
+          "debtToCover": "43532343491560176112",
+          "liquidatedCollateralAmount": "397823936881644813",
+          "receiveAToken": false,
+          "blockNumber": "27288989",
+          "timestamp": "1650295005"
+        },
+        {
+          "user": "0xf5b0616d5ea863a010f5602ebc740c04b77df1fd",
+          "liquidator": "0x36d43ccbf4cb6a9c93cea60c93a89b3a38d256c4",
+          "collateralAsset": "0x7ceb23fd6bc0add59e62ac25578270cff1b9f619",
+          "debtAsset": "0x8f3cf7ad23cd3cadbd9735aff958023239c6a063",
+          "debtToCover": "2501639299678907251",
+          "liquidatedCollateralAmount": "904321914660044",
+          "receiveAToken": false,
+          "blockNumber": "27276692",
+          "timestamp": "1650268296"
+        },
+        {
+          "user": "0x26f3aa57692bb523e5dc5caca0ff331da30a77ef",
+          "liquidator": "0x0000000eb7d8244007da6cd63a512ec69494b231",
+          "collateralAsset": "0x7ceb23fd6bc0add59e62ac25578270cff1b9f619",
+          "debtAsset": "0x2791bca1f2de4661ed88a30c99a7a9449aa84174",
+          "debtToCover": "889168536",
+          "liquidatedCollateralAmount": "320949825020739273",
+          "receiveAToken": false,
+          "blockNumber": "27276678",
+          "timestamp": "1650268268"
+        },
+        {
+          "user": "0x46a2a7a3e0a7cdb8713523923bae435abef31d5f",
+          "liquidator": "0x36d43ccbf4cb6a9c93cea60c93a89b3a38d256c4",
+          "collateralAsset": "0x2791bca1f2de4661ed88a30c99a7a9449aa84174",
+          "debtAsset": "0xc2132d05d31c914a87c6611c10748aeb04b58e8f",
+          "debtToCover": "7329281",
+          "liquidatedCollateralAmount": "7601913",
+          "receiveAToken": false,
+          "blockNumber": "27274503",
+          "timestamp": "1650263522"
+        },
+        {
+          "user": "0x353b3bedcd49e80e9ce99fb4e029bf4b1d42a459",
+          "liquidator": "0x0000000eb7d8244007da6cd63a512ec69494b231",
+          "collateralAsset": "0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270",
+          "debtAsset": "0x2791bca1f2de4661ed88a30c99a7a9449aa84174",
+          "debtToCover": "451308157",
+          "liquidatedCollateralAmount": "378108071320748234742",
+          "receiveAToken": false,
+          "blockNumber": "27272023",
+          "timestamp": "1650258260"
+        },
+        {
+          "user": "0xdee5bacafda6ce834b9a62f0e73c32c2068dea52",
+          "liquidator": "0x36d43ccbf4cb6a9c93cea60c93a89b3a38d256c4",
+          "collateralAsset": "0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270",
+          "debtAsset": "0x8f3cf7ad23cd3cadbd9735aff958023239c6a063",
+          "debtToCover": "5015041941870933637",
+          "liquidatedCollateralAmount": "4200916078831165923",
+          "receiveAToken": false,
+          "blockNumber": "27271222",
+          "timestamp": "1650256586"
+        }
+      ]
+    }
+  },
+  "capturedAt": "2026-04-30T08:37:35.648Z"
+}

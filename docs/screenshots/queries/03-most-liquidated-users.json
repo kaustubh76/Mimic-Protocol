@@ -1,0 +1,91 @@
+{
+  "title": "Top 10 most-liquidated users (liquidations as borrower)",
+  "query": "query {\n  UserAggregator(order_by: {liquidationsAsBorrower: desc}, limit: 10) {\n    user\n    liquidationsAsBorrower\n    liquidationsAsLiquidator\n    totalSuppliedAcrossReserves\n    totalBorrowedAcrossReserves\n    reservesParticipated\n  }\n}",
+  "response": {
+    "data": {
+      "UserAggregator": [
+        {
+          "user": "0x0d9b1d7c409151d29341f6f5320781418bceadac",
+          "liquidationsAsBorrower": 14,
+          "liquidationsAsLiquidator": 0,
+          "totalSuppliedAcrossReserves": "3499043072057954430797",
+          "totalBorrowedAcrossReserves": "1278694546331343549932",
+          "reservesParticipated": 5
+        },
+        {
+          "user": "0xc122ba2feae1413a5152338d19357a46535dceff",
+          "liquidationsAsBorrower": 9,
+          "liquidationsAsLiquidator": 0,
+          "totalSuppliedAcrossReserves": "726795992551156620109",
+          "totalBorrowedAcrossReserves": "500000000010303897337",
+          "reservesParticipated": 6
+        },
+        {
+          "user": "0xc47be98ea56717efc15d45bd2d066c49221de772",
+          "liquidationsAsBorrower": 9,
+          "liquidationsAsLiquidator": 0,
+          "totalSuppliedAcrossReserves": "379616668899841169579",
+          "totalBorrowedAcrossReserves": "1180302351570841758257",
+          "reservesParticipated": 5
+        },
+        {
+          "user": "0x44b59a700cc20452e24008d03ba7c40e9cd8b9c5",
+          "liquidationsAsBorrower": 7,
+          "liquidationsAsLiquidator": 0,
+          "totalSuppliedAcrossReserves": "79376674879076046200",
+          "totalBorrowedAcrossReserves": "1569241874678453775474",
+          "reservesParticipated": 8
+        },
+        {
+          "user": "0xb5deb87020e048ff2ef1e9b861885b966844a286",
+          "liquidationsAsBorrower": 3,
+          "liquidationsAsLiquidator": 0,
+          "totalSuppliedAcrossReserves": "2815162791232830573",
+          "totalBorrowedAcrossReserves": "12690549578",
+          "reservesParticipated": 3
+        },
+        {
+          "user": "0x371b983c7ddf96603e65ede6c5345e114bd92152",
+          "liquidationsAsBorrower": 3,
+          "liquidationsAsLiquidator": 0,
+          "totalSuppliedAcrossReserves": "100500000000000000000",
+          "totalBorrowedAcrossReserves": "12000000000020000000",
+          "reservesParticipated": 2
+        },
+        {
+          "user": "0xe22baa68c965ec761ff26ac974d3b990b0e435fe",
+          "liquidationsAsBorrower": 2,
+          "liquidationsAsLiquidator": 0,
+          "totalSuppliedAcrossReserves": "790988970117282153950",
+          "totalBorrowedAcrossReserves": "430169536351786869013",
+          "reservesParticipated": 6
+        },
+        {
+          "user": "0xbedfcb11db95708b978d199b2264c524e08b294b",
+          "liquidationsAsBorrower": 2,
+          "liquidationsAsLiquidator": 0,
+          "totalSuppliedAcrossReserves": "400000000",
+          "totalBorrowedAcrossReserves": "21370000000000000000",
+          "reservesParticipated": 2
+        },
+        {
+          "user": "0xe7f52bef76175ca878856b0c912c8d2e8e703ecc",
+          "liquidationsAsBorrower": 2,
+          "liquidationsAsLiquidator": 0,
+          "totalSuppliedAcrossReserves": "738489600404354084071",
+          "totalBorrowedAcrossReserves": "1272835560",
+          "reservesParticipated": 3
+        },
+        {
+          "user": "0x497fb5527aed1fa545c91586fd848a4c3e91ee8b",
+          "liquidationsAsBorrower": 2,
+          "liquidationsAsLiquidator": 0,
+          "totalSuppliedAcrossReserves": "135690125891648916235",
+          "totalBorrowedAcrossReserves": "276509467",
+          "reservesParticipated": 3
+        }
+      ]
+    }
+  },
+  "capturedAt": "2026-04-30T08:37:35.675Z"
+}

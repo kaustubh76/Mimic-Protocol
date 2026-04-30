@@ -2,7 +2,6 @@
   "name": "envio-perp-template-v1",
   "version": "0.1.0",
   "description": "Perp-protocol indexer template — GMX-v2-shaped event signatures, position lifecycle, funding-rate tracking",
-  "type": "module",
   "engines": {
     "node": ">=22.0.0"
   },

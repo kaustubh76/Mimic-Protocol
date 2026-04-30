@@ -2,7 +2,6 @@
   "name": "envio-money-market-template-v1",
   "version": "0.1.0",
   "description": "Money-market indexer template — Aave-V3-shaped events, per-reserve and per-user aggregators, rate-snapshot time series",
-  "type": "module",
   "engines": {
     "node": ">=22.0.0"
   },

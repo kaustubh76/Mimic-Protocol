@@ -1,0 +1,101 @@
+{
+  "title": "10 most recent rate snapshots (across reserves)",
+  "query": "query {\n  ReserveRateSnapshot(order_by: {blockNumber: desc}, limit: 10) {\n    reserve_id\n    liquidityRate\n    variableBorrowRate\n    liquidityIndex\n    variableBorrowIndex\n    blockNumber\n    timestamp\n  }\n}",
+  "response": {
+    "data": {
+      "ReserveRateSnapshot": [
+        {
+          "reserve_id": "137-0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270",
+          "liquidityRate": "11365341644338572281508882",
+          "variableBorrowRate": "47009866432002573687882324",
+          "liquidityIndex": "1000440731345656403588784902",
+          "variableBorrowIndex": "1002573565631799834753558869",
+          "blockNumber": "27355420",
+          "timestamp": "1650443487"
+        },
+        {
+          "reserve_id": "137-0x1bfd67037b42cf73acf2047067bd4f2c47d9bfd6",
+          "liquidityRate": "47447752242455981301495",
+          "variableBorrowRate": "3037425196596945342164738",
+          "liquidityIndex": "1000024681197334008712204343",
+          "variableBorrowIndex": "1000176039053385046903837883",
+          "blockNumber": "27355383",
+          "timestamp": "1650443409"
+        },
+        {
+          "reserve_id": "137-0x8f3cf7ad23cd3cadbd9735aff958023239c6a063",
+          "liquidityRate": "28021794914170738014170711",
+          "variableBorrowRate": "37390122811652981829528276",
+          "liquidityIndex": "1002758812914928540352881179",
+          "variableBorrowIndex": "1003947387111444601619861808",
+          "blockNumber": "27355383",
+          "timestamp": "1650443409"
+        },
+        {
+          "reserve_id": "137-0x7ceb23fd6bc0add59e62ac25578270cff1b9f619",
+          "liquidityRate": "144282944382033298001738",
+          "variableBorrowRate": "4993775411064648926331231",
+          "liquidityIndex": "1000021532766551970454779725",
+          "variableBorrowIndex": "1000448991975279338345175355",
+          "blockNumber": "27355382",
+          "timestamp": "1650443407"
+        },
+        {
+          "reserve_id": "137-0x8f3cf7ad23cd3cadbd9735aff958023239c6a063",
+          "liquidityRate": "28016914069451077564173105",
+          "variableBorrowRate": "37386475707561852548421314",
+          "liquidityIndex": "1002758793315976460702841438",
+          "variableBorrowIndex": "1003947360927109557852146611",
+          "blockNumber": "27355372",
+          "timestamp": "1650443387"
+        },
+        {
+          "reserve_id": "137-0x2791bca1f2de4661ed88a30c99a7a9449aa84174",
+          "liquidityRate": "26080196189519239450282836",
+          "variableBorrowRate": "35042259213360318839465819",
+          "liquidityIndex": "1003098376429312043646263155",
+          "variableBorrowIndex": "1003932489488825281320811243",
+          "blockNumber": "27355357",
+          "timestamp": "1650443357"
+        },
+        {
+          "reserve_id": "137-0x8f3cf7ad23cd3cadbd9735aff958023239c6a063",
+          "liquidityRate": "28016639485728004791275979",
+          "variableBorrowRate": "37386270647879664526097594",
+          "liquidityIndex": "1002758736301405164669023149",
+          "variableBorrowIndex": "1003947284754920200774560995",
+          "blockNumber": "27355340",
+          "timestamp": "1650443323"
+        },
+        {
+          "reserve_id": "137-0x8f3cf7ad23cd3cadbd9735aff958023239c6a063",
+          "liquidityRate": "28016515994625277110712257",
+          "variableBorrowRate": "37386172839890960810145193",
+          "liquidityIndex": "1002758716702733051669757983",
+          "variableBorrowIndex": "1003947258570799945761869903",
+          "blockNumber": "27355329",
+          "timestamp": "1650443301"
+        },
+        {
+          "reserve_id": "137-0xc2132d05d31c914a87c6611c10748aeb04b58e8f",
+          "liquidityRate": "32792228434291291746654470",
+          "variableBorrowRate": "38153250425584972537873149",
+          "liquidityIndex": "1004843896026788522839045968",
+          "variableBorrowIndex": "1006311906883657533862006474",
+          "blockNumber": "27355308",
+          "timestamp": "1650443255"
+        },
+        {
+          "reserve_id": "137-0x172370d5cd63279efa6d502dab29171933a610af",
+          "liquidityRate": "52537928958852601134257678",
+          "variableBorrowRate": "68181945868887763801515718",
+          "liquidityIndex": "1005844114603731971212343005",
+          "variableBorrowIndex": "1043601588475089261817813731",
+          "blockNumber": "27355223",
+          "timestamp": "1650443080"
+        }
+      ]
+    }
+  },
+  "capturedAt": "2026-04-30T08:37:35.905Z"
+}
