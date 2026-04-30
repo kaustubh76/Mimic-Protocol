@@ -6,7 +6,7 @@
 
 ## 🟢 Live on Envio hosted service
 
-The money-market template (Aave V3, Polygon) is **deployed and queryable right now** on Envio's hosted indexing service:
+The money-market template (Aave V3, Polygon + Arbitrum + Base) is **deployed and queryable right now** on Envio's hosted indexing service:
 
 **GraphQL endpoint:** [`https://indexer.dev.hyperindex.xyz/8fc0607/v1/graphql`](https://indexer.dev.hyperindex.xyz/8fc0607/v1/graphql)
 
@@ -17,6 +17,26 @@ curl -sX POST https://indexer.dev.hyperindex.xyz/8fc0607/v1/graphql \
 ```
 
 Deployed from branch [`envio-deploy-money-market`](https://github.com/kaustubh76/Growth_Engineer_at_ENVIO/tree/envio-deploy-money-market) — pushes to that branch trigger redeploys. See [`DEPLOY.md`](https://github.com/kaustubh76/Growth_Engineer_at_ENVIO/blob/envio-deploy-money-market/DEPLOY.md) on that branch for sample queries.
+
+---
+
+## 📊 The consumer surface — risk dashboard
+
+A polished Next.js dashboard that **consumes the live indexer above** and renders it as a real risk-monitoring product. Six pages, statically pre-rendered, multi-chain. Forkable as a GitHub Template — point at any Aave-shape Envio indexer.
+
+🟢 **Live demo:** [envio-risk-dashboard.vercel.app](https://envio-risk-dashboard.vercel.app)
+🍴 **Use this template:** [github.com/kaustubh76/envio-risk-dashboard](https://github.com/kaustubh76/envio-risk-dashboard)
+
+| Page | What it proves |
+|---|---|
+| `/` | KPI tiles · all-time + 24h liquidations + top reserve, multi-chain |
+| `/reserves` | ~200 reserves sortable; supply/borrow APR; supplier/borrower counts |
+| `/reserves/[id]` | 168-point rate-history sparkline + recent liquidations strip |
+| `/liquidations` | Paginated feed of real liquidation events with explorer links |
+| `/leaderboards/liquidators` | Top liquidators in a single GraphQL hop via `UserAggregator` |
+| `/leaderboards/at-risk` | Heuristic risk-score using prior liquidations + active debt |
+
+The dashboard is the **growth motion**: fork → change one env var → ship a risk dashboard for *your* protocol tonight. The same pattern scales to any Aave-fork (Spark, Radiant, Seamless, ZeroLend, Sonne, ...). Per [`ENVIO_REVENUE_MATH_V2.md`](./ENVIO_REVENUE_MATH_V2.md), one converted protocol pays for the entire build cost in week one.
 
 ---
 
