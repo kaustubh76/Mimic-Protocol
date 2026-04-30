@@ -1,0 +1,129 @@
+# envio-money-market-template-v1 schema
+#
+# Aave-V3-shaped money-market entity model. Three layers, same architecture
+# as the DEX and perp templates:
+#
+#   1. Reserve, UserReserve, Liquidation        — raw entities written by handlers
+#   2. ReserveAggregator, UserAggregator        — derived per-reserve and per-user state
+#   3. ReserveRateSnapshot                      — time-series rate captures
+#
+# Two design notes that differ from the DEX/perp templates:
+#
+# (1) NO health-factor entity. Aave's HF = (collateralUSD × liquidationThreshold) / debtUSD
+#     requires oracle prices, which would need an Effect-API oracle reader. The
+#     template stores enough data for HF to be computed at QUERY TIME (scaled
+#     balances + latest indices + asset prices joined externally). This is the
+#     same "store raw, compute on query" tradeoff the DEX template makes for
+#     volume aggregation. See README.md §Why-no-health-factor.
+#
+# (2) Scaled balances, not aToken/debtToken balances. Aave V3 stores user
+#     balances as `scaledBalance × index / RAY` where RAY = 1e27 and the
+#     index updates per-block. We store the SCALED balance (a fixed value
+#     once supplied) plus the LATEST index (in ReserveAggregator.currentLiquidityIndex)
+#     so balances can be derived at query time without re-running RAY math
+#     in handlers. See README.md §Scaled-balance-convention.
+
+# ---------------------------------------------------------------------
+# Layer 1 — raw entities
+# ---------------------------------------------------------------------
+
+# Reserve: one per (chainId, asset). Created lazily on first event for a
+# previously-unseen reserve.
+type Reserve {
+  id: ID!                                # `${chainId}-${assetAddress}`
+  chainId: Int!
+  asset: String!                         # underlying token address
+  firstSeenBlock: BigInt!
+  firstSeenTimestamp: BigInt!
+}
+
+# UserReserve: one per (chainId, asset, user). Tracks a user's position
+# in a single reserve. Aggregates across (Supply, Withdraw, Borrow, Repay)
+# events for that user+asset.
+type UserReserve {
+  id: ID!                                # `${chainId}-${assetAddress}-${userAddress}`
+  chainId: Int!
+  asset: String!
+  user: String!
+  cumulativeSupplied: BigInt!            # gross collateral committed
+  cumulativeWithdrawn: BigInt!           # gross collateral withdrawn
+  cumulativeBorrowed: BigInt!            # gross debt opened
+  cumulativeRepaid: BigInt!              # gross debt repaid
+  netSupplyPosition: BigInt!             # cumulativeSupplied - cumulativeWithdrawn (signed; negative if "more out than in" via interest)
+  netDebtPosition: BigInt!               # cumulativeBorrowed - cumulativeRepaid (signed)
+  positionCount: Int!                    # total of (Supply + Borrow) events
+  lastUpdatedTimestamp: BigInt!
+}
+
+# Liquidation: one entity per LiquidationCall event. Preserved for
+# liquidator-leaderboard and risk-history queries.
+type Liquidation {
+  id: ID!                                # `${chainId}-${blockNumber}-${logIndex}`
+  chainId: Int!
+  collateralAsset: String!
+  debtAsset: String!
+  user: String!                          # the liquidatee
+  liquidator: String!
+  debtToCover: BigInt!                   # debt being repaid by the liquidator
+  liquidatedCollateralAmount: BigInt!    # collateral the liquidator seizes
+  receiveAToken: Boolean!                # if true, liquidator receives aTokens; if false, underlying
+  blockNumber: BigInt!
+  timestamp: BigInt!
+}
+
+# ---------------------------------------------------------------------
+# Layer 2 — derived state (Aggregators)
+# ---------------------------------------------------------------------
+
+type ReserveAggregator {
+  id: ID!                                # same id as Reserve — 1:1
+  chainId: Int!
+  asset: String!
+  totalSupplied: BigInt!                 # cumulative across all users
+  totalWithdrawn: BigInt!
+  totalBorrowed: BigInt!
+  totalRepaid: BigInt!
+  totalLiquidations: Int!                # count of LiquidationCall events where this is collateral OR debt asset
+  uniqueSuppliers: Int!                  # distinct users who've ever supplied
+  uniqueBorrowers: Int!                  # distinct users who've ever borrowed
+  # Latest rate state — updated on ReserveDataUpdated.
+  currentLiquidityRate: BigInt!          # supply APY, RAY-encoded
+  currentVariableBorrowRate: BigInt!     # borrow APY, RAY-encoded
+  currentLiquidityIndex: BigInt!         # cumulative supply index, RAY-encoded
+  currentVariableBorrowIndex: BigInt!    # cumulative borrow index, RAY-encoded
+  lastUpdatedTimestamp: BigInt!
+}
+
+# UserAggregator: per-user across all reserves on a chain. Source for the
+# "top suppliers" / "top borrowers" / "most-liquidated users" leaderboards.
+type UserAggregator {
+  id: ID!                                # `${chainId}-${userAddress}`
+  chainId: Int!
+  user: String!
+  reservesParticipated: Int!             # distinct reserves the user has touched
+  totalSuppliedAcrossReserves: BigInt!   # gross
+  totalBorrowedAcrossReserves: BigInt!   # gross
+  liquidationsAsBorrower: Int!           # times this user was liquidated
+  liquidationsAsLiquidator: Int!         # times this user was the liquidator
+  lastActiveTimestamp: BigInt!
+}
+
+# ---------------------------------------------------------------------
+# Layer 3 — rate snapshots (time-series)
+# ---------------------------------------------------------------------
+
+# ReserveRateSnapshot: one per ReserveDataUpdated event. Powers the
+# historical rate-curve dashboards every Aave-shape protocol ships.
+# Append-only; reorg-safe via Envio's checkpoint deletion.
+type ReserveRateSnapshot {
+  id: ID!                                # `${reserveId}-${blockNumber}`
+  reserve_id: String!
+  chainId: Int!
+  liquidityRate: BigInt!                 # RAY-encoded
+  stableBorrowRate: BigInt!              # RAY-encoded; deprecated in V3.2 but kept for completeness
+  variableBorrowRate: BigInt!            # RAY-encoded
+  liquidityIndex: BigInt!                # RAY-encoded cumulative supply factor
+  variableBorrowIndex: BigInt!           # RAY-encoded cumulative borrow factor
+  blockNumber: BigInt!
+  timestamp: BigInt!
+}

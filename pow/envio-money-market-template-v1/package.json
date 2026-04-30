@@ -1,0 +1,33 @@
+{
+  "name": "envio-money-market-template-v1",
+  "version": "0.1.0",
+  "description": "Money-market indexer template — Aave-V3-shaped events, per-reserve and per-user aggregators, rate-snapshot time series",
+  "type": "module",
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "scripts": {
+    "dev": "envio dev",
+    "codegen": "envio codegen",
+    "start": "envio start",
+    "build": "tsc --build",
+    "clean": "tsc --clean",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "add-chain": "tsx scripts/add-chain.ts"
+  },
+  "dependencies": {
+    "envio": "^2.32.12",
+    "viem": "2.24.3",
+    "dotenv": "^16.4.5"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "tsx": "^4.0.0",
+    "typescript": "^5.7.3",
+    "vitest": "^3.0.0"
+  },
+  "optionalDependencies": {
+    "generated": "link:generated"
+  }
+}

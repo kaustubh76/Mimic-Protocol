@@ -1,0 +1,72 @@
+# yaml-language-server: $schema=./node_modules/envio/evm.schema.json
+#
+# envio-money-market-template-v1
+# Production-grade money-market indexer scaffold. Aave-V3-shaped events,
+# three-layer architecture (EventHandlers → Aggregators → Snapshots) — same
+# pattern as the DEX and perp templates in this candidate package.
+#
+# Event signatures are taken DIRECTLY from aave-dao/aave-v3-origin's
+# IPool.sol (six lifecycle events: Supply, Withdraw, Borrow, Repay,
+# LiquidationCall, ReserveDataUpdated). Aave's Pool contract is a
+# singleton per chain — there's no factory/dynamic-registration pattern
+# here. Instead, each chain has one well-known Pool address; new chains
+# are added by appending a `networks:` entry below.
+#
+# Chains shipped in this template:
+#   - Ethereum mainnet (1):  Aave V3 Pool at 0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2
+#   - Polygon (137):          Aave V3 Pool at 0x794a61358D6845594F94dc1DB02A252b5b4814aD
+#   - Arbitrum (42161):       Aave V3 Pool at 0x794a61358D6845594F94dc1DB02A252b5b4814aD
+#   - Optimism (10):          Aave V3 Pool at 0x794a61358D6845594F94dc1DB02A252b5b4814aD
+#   - Base (8453):            Aave V3 Pool at 0xA238Dd80C259a72e81d7e4664a9801593F98d1c5
+#
+# (Polygon, Arbitrum, Optimism share the same canonical Pool address —
+# Aave's deterministic deployment.)
+
+name: envio-money-market-template-v1
+description: Money-market indexer template — Aave-V3-shaped events, per-reserve and per-user aggregators, rate-snapshot time series
+rollback_on_reorg: true
+raw_events: false
+
+field_selection:
+  transaction_fields:
+    - "hash"
+
+contracts:
+  # Aave V3 Pool — singleton per chain. Hardcoded addresses per network
+  # below; no factory pattern (Aave's Pool is upgradable but the proxy
+  # address is stable per chain).
+  - name: Pool
+    abi_file_path: abis/Pool.json
+    handler: src/EventHandlers/Pool.ts
+    events:
+      - event: Supply
+      - event: Withdraw
+      - event: Borrow
+      - event: Repay
+      - event: LiquidationCall
+      - event: ReserveDataUpdated
+
+networks:
+  # Polygon — Aave's largest L2 deployment by TVL historically.
+  - id: 137
+    start_block: 25826028  # Aave V3 Polygon deployment block
+    contracts:
+      - name: Pool
+        address:
+          - 0x794a61358D6845594F94dc1DB02A252b5b4814aD
+
+  # Arbitrum One — same canonical address as Polygon.
+  - id: 42161
+    start_block: 7742429
+    contracts:
+      - name: Pool
+        address:
+          - 0x794a61358D6845594F94dc1DB02A252b5b4814aD
+
+  # Base — distinct deployment address.
+  - id: 8453
+    start_block: 2357480
+    contracts:
+      - name: Pool
+        address:
+          - 0xA238Dd80C259a72e81d7e4664a9801593F98d1c5
