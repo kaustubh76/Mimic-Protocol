@@ -1,0 +1,82 @@
+{
+  "title": "01-top-markets-by-positions",
+  "response": {
+    "data": {
+      "PerpAggregator": [
+        {
+          "id": "42161-0x70d95587d40a2caf56bd97485ab3eec10bee6336",
+          "marketAddress": "0x70d95587d40a2caf56bd97485ab3eec10bee6336",
+          "longOpenInterestUsd": "13394680605222654636510118856626693920",
+          "shortOpenInterestUsd": "14286403772584664785963792019011738950",
+          "totalPositions": 491,
+          "uniqueTraders": 491
+        },
+        {
+          "id": "42161-0x47c031236e19d024b42f8ae6780e44a573170703",
+          "marketAddress": "0x47c031236e19d024b42f8ae6780e44a573170703",
+          "longOpenInterestUsd": "8307083955445548999820090000000000000",
+          "shortOpenInterestUsd": "7065033883029341842241100000000000000",
+          "totalPositions": 482,
+          "uniqueTraders": 482
+        },
+        {
+          "id": "42161-0xc25cef6061cf5de5eb761b50e4743c1f5d7e5407",
+          "marketAddress": "0xc25cef6061cf5de5eb761b50e4743c1f5d7e5407",
+          "longOpenInterestUsd": "1812591684544652294654687373931183841",
+          "shortOpenInterestUsd": "1899081877750004580485506523481966546",
+          "totalPositions": 251,
+          "uniqueTraders": 251
+        },
+        {
+          "id": "42161-0x7f1fa204bb700853d36994da19f830b6ad18455c",
+          "marketAddress": "0x7f1fa204bb700853d36994da19f830b6ad18455c",
+          "longOpenInterestUsd": "2942654544707529975571857626119603521",
+          "shortOpenInterestUsd": "2856327792404329883727757936461780690",
+          "totalPositions": 159,
+          "uniqueTraders": 159
+        },
+        {
+          "id": "42161-0x09400d9db990d5ed3f35d7be61dfaeb900af03c9",
+          "marketAddress": "0x09400d9db990d5ed3f35d7be61dfaeb900af03c9",
+          "longOpenInterestUsd": "170754481450718473300000000000000000",
+          "shortOpenInterestUsd": "589703864351651529300000000000000000",
+          "totalPositions": 129,
+          "uniqueTraders": 129
+        },
+        {
+          "id": "42161-0x6853ea96ff216fab11d2d930ce3c508556a4bdc4",
+          "marketAddress": "0x6853ea96ff216fab11d2d930ce3c508556a4bdc4",
+          "longOpenInterestUsd": "344656411825368627724679377468987830",
+          "shortOpenInterestUsd": "58458720267722967750000000000000000",
+          "totalPositions": 106,
+          "uniqueTraders": 106
+        },
+        {
+          "id": "42161-0xc7abb2c5f3bf3ceb389df0eecd6120d451170b50",
+          "marketAddress": "0xc7abb2c5f3bf3ceb389df0eecd6120d451170b50",
+          "longOpenInterestUsd": "800600268318482695909842345106360000",
+          "shortOpenInterestUsd": "1024354683470807803106068492696120000",
+          "totalPositions": 96,
+          "uniqueTraders": 96
+        },
+        {
+          "id": "42161-0x0ccb4faa6f1f1b30911619f1184082ab4e25813c",
+          "marketAddress": "0x0ccb4faa6f1f1b30911619f1184082ab4e25813c",
+          "longOpenInterestUsd": "258183329001580967797328049276250000",
+          "shortOpenInterestUsd": "34190892309977032000000000000000000",
+          "totalPositions": 80,
+          "uniqueTraders": 80
+        },
+        {
+          "id": "42161-0xd9535bb5f58a1a75032416f2dfe7880c30575a41",
+          "marketAddress": "0xd9535bb5f58a1a75032416f2dfe7880c30575a41",
+          "longOpenInterestUsd": "62174489619818228210000000000000000",
+          "shortOpenInterestUsd": "15562598776625040000000000000000000",
+          "totalPositions": 36,
+          "uniqueTraders": 36
+        }
+      ]
+    }
+  },
+  "capturedAt": "2026-04-30T11:56:45Z"
+}

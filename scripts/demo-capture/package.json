@@ -6,7 +6,9 @@
   "type": "module",
   "scripts": {
     "capture": "node capture.mjs",
-    "assert": "node assertions.mjs"
+    "assert": "node assertions.mjs",
+    "assert:defi": "node assertions-defi.mjs",
+    "assert:perp": "node assertions-perp.mjs"
   },
   "dependencies": {
     "playwright": "^1.49.0"

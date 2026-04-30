@@ -1,0 +1,52 @@
+{
+  "title": "05-long-vs-short-distribution",
+  "response": {
+    "data": {
+      "longs": [
+        {
+          "id": "0x1b3a38428e286a393b12cd8b8a591cd05c1b15480cb235a46185fe0fd8dbd765",
+          "sizeInUsd": "3826551600000000000000000000000"
+        },
+        {
+          "id": "0x36f7a77eb15f3006aaacbf18549a3ff282820ed6af4642e52fe2222fbbaabcd5",
+          "sizeInUsd": "3795372600000000000000000000000"
+        },
+        {
+          "id": "0x765d0c809a31df017cb11561ef09147d0f6ff125e3792fa38943d7bc87dca0bf",
+          "sizeInUsd": "576945909422203625000000000000000"
+        },
+        {
+          "id": "0x75fd8b1d65d909681bc199f02d84d7cc668b9b5a71be2b42ee313cbbc4552fc6",
+          "sizeInUsd": "58687082263878000000000000000000000"
+        },
+        {
+          "id": "0x202fbfa308620f51cdd5fd7a9f2a7ab8b58385bea5ac5d1da3ccff5d25584ad6",
+          "sizeInUsd": "435024472534270000000000000000000"
+        }
+      ],
+      "shorts": [
+        {
+          "id": "0xb8b8d9f420d1c5dd2478e5a46b292a747b8622eab0e30ac27adf515c945f8b73",
+          "sizeInUsd": "4725134500000000000000000000000"
+        },
+        {
+          "id": "0xd8390bbefcb4cf4a1d69e89b1ebc88c4730d63b53aec15e1248356682d3260da",
+          "sizeInUsd": "435469690400000000000000000000000"
+        },
+        {
+          "id": "0xf86b0fb9970a6346020b43ec33bc655a2ce22d89377c4a4f5c6f6956de54b0fa",
+          "sizeInUsd": "6373810841500000000000000000000000"
+        },
+        {
+          "id": "0xa176d8494e75bbf1c609da79720ee21523513f6d3cc6f7e086a51dcb4ca886e3",
+          "sizeInUsd": "3706848000000000000000000000000"
+        },
+        {
+          "id": "0x7517436e20b76d846ef3c89c185f57c0ca6921b543778ba8d91c2159c35ef9ff",
+          "sizeInUsd": "99762500000000000000000000000000"
+        }
+      ]
+    }
+  },
+  "capturedAt": "2026-04-30T11:56:52Z"
+}

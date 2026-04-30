@@ -1,201 +1,203 @@
 /**
- * PerpAggregator + Position lifecycle tests.
+ * EventEmitter handler tests — GMX v2 PositionIncrease v1 scope.
  *
- * Drives the perp template's handlers through Envio's TestHelpers + MockDb.
- * Covers:
- * - PositionIncrease creates a Position + grows long open interest
- * - PositionDecrease shrinks open interest + accumulates realized PnL
- * - Liquidation latches isLiquidated and writes a Liquidation entity
- * - FundingFeeAmountPerSizeUpdated writes a FundingSnapshot
+ * The previous version of this test suite covered 4 event types
+ * (PositionIncrease, PositionDecrease, Liquidation, FundingFeeAmountPerSizeUpdated)
+ * against a synthesised flat-event ABI shape.
  *
- * Same MockDb pattern as the PM template's Settlement.test.ts.
+ * After the GMX v2 pivot (April 2026), the perp template subscribes to a
+ * single `EventEmitter.EventLog1(string eventName, ..., EventLogData eventData)`
+ * generic event and routes on `eventName`. v1 scope is `PositionIncrease` only;
+ * the other 3 tests are kept as `it.skip` referencing the v2 follow-up.
+ *
+ * The active test mocks an EventLog1 with:
+ *   - eventName = "PositionIncrease"
+ *   - eventData containing the typed dictionary fields the
+ *     decodePositionIncrease helper expects (positionKey, account, market,
+ *     isLong, sizeDeltaUsd, etc)
+ * and asserts the handler:
+ *   - lazy-creates the PerpMarket entity
+ *   - lazy-creates the PerpAggregator
+ *   - creates the Position entity with correct fields
+ *   - increments PerpAggregator.longOpenInterestUsd / uniqueTraders
+ *   - upserts the per-trader PositionAggregator
  */
 
 import { describe, expect, it } from "vitest";
 import { TestHelpers } from "generated";
 
-// Register handlers with the runtime before processEvent calls.
-import "../src/EventHandlers/MarketFactory";
-import "../src/EventHandlers/Market";
+import "../src/EventHandlers/EventEmitter";
 
 const CHAIN_ID = 42161; // Arbitrum
-const MARKET = "0x1111111111111111111111111111111111111111";
-const FACTORY = "0x2222222222222222222222222222222222222222";
+const EVENT_EMITTER = "0xC8ee91A54287DB53897056e12D9819156D3822Fb";
+const MARKET_ETH_USD = "0x70d95587d40A2caf56bd97485aB3Eec10Bee6336";
 const ALICE = "0xa11ce0000000000000000000000000000000a11c";
-const BOB = "0xb0b00000000000000000000000000000000000b0";
-const LIQUIDATOR = "0x11c1da70110000000000000000000000000c1da7";
-
 const POSITION_KEY_ALICE_LONG = "0x" + "a1".repeat(32);
-const POSITION_KEY_BOB_SHORT = "0x" + "b0".repeat(32);
 
 function freshDb() {
   return TestHelpers.MockDb.createMockDb();
 }
 
-async function bootstrapMarket(mockDb: ReturnType<typeof freshDb>) {
-  const created = TestHelpers.MarketFactory.MarketCreated.createMockEvent({
-    market: MARKET,
-    salt: "0x" + "01".repeat(32),
-    indexToken: "0x4200000000000000000000000000000000000006", // WETH-shape
-    longToken: "0x4200000000000000000000000000000000000006",
-    shortToken: "0xff970a61a04b1ca14834a43f5de4533ebddb5cc8", // USDC-shape
-    mockEventData: { srcAddress: FACTORY, chainId: CHAIN_ID },
-  });
-  return await TestHelpers.MarketFactory.MarketCreated.processEvent({
-    event: created,
-    mockDb,
-  });
+/**
+ * Build a synthetic EventLogData payload for PositionIncrease.
+ *
+ * Shape: tuple of 7 sections (Address, Uint, Int, Bool, Bytes32, Bytes, String),
+ * each [items, arrayItems] where items = Array<[key, value]>.
+ *
+ * Field values populated here mirror what GMX v2 actually emits via
+ * PositionEventUtils.emitPositionIncrease — see the decode helper at
+ * src/Effects/decodeEventLogData.ts for the full key inventory.
+ */
+function buildPositionIncreaseEventData(opts: {
+  positionKey: string;
+  account: string;
+  market: string;
+  isLong: boolean;
+  sizeInUsd: bigint;
+  sizeInTokens: bigint;
+  collateralAmount: bigint;
+  sizeDeltaUsd: bigint;
+  collateralDeltaAmount: bigint;
+}) {
+  return [
+    // addressItems: { items, arrayItems }
+    [
+      [
+        ["account", opts.account],
+        ["market", opts.market],
+      ] as Array<[string, string]>,
+      [] as Array<[string, string[]]>,
+    ],
+    // uintItems
+    [
+      [
+        ["sizeInUsd", opts.sizeInUsd],
+        ["sizeInTokens", opts.sizeInTokens],
+        ["collateralAmount", opts.collateralAmount],
+        ["sizeDeltaUsd", opts.sizeDeltaUsd],
+        ["collateralDeltaAmount", opts.collateralDeltaAmount],
+      ] as Array<[string, bigint]>,
+      [] as Array<[string, bigint[]]>,
+    ],
+    // intItems
+    [[] as Array<[string, bigint]>, [] as Array<[string, bigint[]]>],
+    // boolItems
+    [
+      [["isLong", opts.isLong]] as Array<[string, boolean]>,
+      [] as Array<[string, boolean[]]>,
+    ],
+    // bytes32Items
+    [
+      [["positionKey", opts.positionKey]] as Array<[string, string]>,
+      [] as Array<[string, string[]]>,
+    ],
+    // bytesItems
+    [[] as Array<[string, string]>, [] as Array<[string, string[]]>],
+    // stringItems
+    [[] as Array<[string, string]>, [] as Array<[string, string[]]>],
+  ];
 }
 
-describe("PerpMarket — position lifecycle", () => {
-  it("PositionIncrease creates Position + grows long open interest", async () => {
-    let mockDb = await bootstrapMarket(freshDb());
+describe("EventEmitter — PositionIncrease v1", () => {
+  it("lazy-creates PerpMarket + PerpAggregator + Position on first sighting", async () => {
+    const mockDb = freshDb();
 
-    const inc = TestHelpers.Market.PositionIncrease.createMockEvent({
+    const eventData = buildPositionIncreaseEventData({
       positionKey: POSITION_KEY_ALICE_LONG,
       account: ALICE,
+      market: MARKET_ETH_USD,
       isLong: true,
-      sizeDeltaUsd: 10_000n * 10n ** 30n, // 10k USD with GMX's 30-decimal convention
-      collateralDeltaAmount: 1_000n * 10n ** 6n, // 1k USDC (6 decimals)
-      executionPrice: 3_000n * 10n ** 30n,
-      sizeInUsdAfter: 10_000n * 10n ** 30n,
-      sizeInTokensAfter: 333n * 10n ** 16n, // ~3.33 ETH at $3k
-      mockEventData: { srcAddress: MARKET, chainId: CHAIN_ID },
+      sizeInUsd: 10_000n * 10n ** 30n, // 10k USD with GMX v2's 30-decimal convention
+      sizeInTokens: 333n * 10n ** 16n, // ~3.33 ETH at $3k
+      collateralAmount: 1_000n * 10n ** 6n, // 1k USDC (6 decimals)
+      sizeDeltaUsd: 10_000n * 10n ** 30n,
+      collateralDeltaAmount: 1_000n * 10n ** 6n,
     });
-    mockDb = await TestHelpers.Market.PositionIncrease.processEvent({
-      event: inc,
+
+    const event = TestHelpers.EventEmitter.EventLog1.createMockEvent({
+      msgSender: EVENT_EMITTER,
+      eventName: "PositionIncrease",
+      eventNameHash: "PositionIncrease",
+      topic1: "0x" + "00".repeat(32),
+      // biome-ignore lint/suspicious/noExplicitAny: deeply-nested tuple type from codegen
+      eventData: eventData as any,
+      mockEventData: { srcAddress: EVENT_EMITTER, chainId: CHAIN_ID },
+    });
+
+    const result = await TestHelpers.EventEmitter.EventLog1.processEvent({
+      event,
       mockDb,
     });
 
-    const position = mockDb.entities.Position.get(POSITION_KEY_ALICE_LONG.toLowerCase());
+    const marketId = `${CHAIN_ID}-${MARKET_ETH_USD.toLowerCase()}`;
+
+    // Lazy-create: PerpMarket + PerpAggregator both exist.
+    const perpMarket = result.entities.PerpMarket.get(marketId);
+    expect(perpMarket?.address).toBe(MARKET_ETH_USD.toLowerCase());
+
+    const agg = result.entities.PerpAggregator.get(marketId);
+    expect(agg?.longOpenInterestUsd).toBe(10_000n * 10n ** 30n);
+    expect(agg?.shortOpenInterestUsd).toBe(0n);
+    expect(agg?.totalCollateralLong).toBe(1_000n * 10n ** 6n);
+    expect(agg?.uniqueTraders).toBe(1);
+    expect(agg?.totalPositions).toBe(1);
+
+    // Position entity created.
+    const position = result.entities.Position.get(POSITION_KEY_ALICE_LONG.toLowerCase());
     expect(position?.account).toBe(ALICE.toLowerCase());
+    expect(position?.market_id).toBe(marketId);
     expect(position?.isLong).toBe(true);
     expect(position?.sizeInUsd).toBe(10_000n * 10n ** 30n);
     expect(position?.cumulativeSizeIncreaseUsd).toBe(10_000n * 10n ** 30n);
-    expect(position?.isLiquidated).toBe(false);
 
-    const agg = mockDb.entities.PerpAggregator.get(`${CHAIN_ID}-${MARKET.toLowerCase()}`);
-    expect(agg?.longOpenInterestUsd).toBe(10_000n * 10n ** 30n);
-    expect(agg?.shortOpenInterestUsd).toBe(0n);
-    expect(agg?.uniqueTraders).toBe(1);
+    // PositionAggregator (per-trader, cross-market).
+    const userAgg = result.entities.PositionAggregator.get(`${CHAIN_ID}-${ALICE.toLowerCase()}`);
+    expect(userAgg?.cumulativeSizeIncreaseUsd).toBe(10_000n * 10n ** 30n);
+    expect(userAgg?.cumulativeCollateralIn).toBe(1_000n * 10n ** 6n);
+    expect(userAgg?.positionCount).toBe(1);
+    expect(userAgg?.marketsTraded).toBe(1);
   });
 
-  it("PositionDecrease shrinks open interest + accumulates realized PnL", async () => {
-    let mockDb = await bootstrapMarket(freshDb());
+  it("ignores EventLog1 with non-PositionIncrease eventName (v1 scope)", async () => {
+    const mockDb = freshDb();
 
-    // Open 10k.
-    const inc = TestHelpers.Market.PositionIncrease.createMockEvent({
-      positionKey: POSITION_KEY_ALICE_LONG,
-      account: ALICE,
-      isLong: true,
-      sizeDeltaUsd: 10_000n * 10n ** 30n,
-      collateralDeltaAmount: 1_000n * 10n ** 6n,
-      executionPrice: 3_000n * 10n ** 30n,
-      sizeInUsdAfter: 10_000n * 10n ** 30n,
-      sizeInTokensAfter: 333n * 10n ** 16n,
-      mockEventData: { srcAddress: MARKET, chainId: CHAIN_ID },
+    const event = TestHelpers.EventEmitter.EventLog1.createMockEvent({
+      msgSender: EVENT_EMITTER,
+      eventName: "OrderExecuted", // not PositionIncrease — should be skipped
+      eventNameHash: "OrderExecuted",
+      topic1: "0x" + "00".repeat(32),
+      // biome-ignore lint/suspicious/noExplicitAny: deeply-nested tuple type from codegen
+      eventData: [
+        [[], []],
+        [[], []],
+        [[], []],
+        [[], []],
+        [[], []],
+        [[], []],
+        [[], []],
+      ] as any,
+      mockEventData: { srcAddress: EVENT_EMITTER, chainId: CHAIN_ID },
     });
-    mockDb = await TestHelpers.Market.PositionIncrease.processEvent({ event: inc, mockDb });
 
-    // Close half at +20% PnL = +1k USD profit.
-    const dec = TestHelpers.Market.PositionDecrease.createMockEvent({
-      positionKey: POSITION_KEY_ALICE_LONG,
-      account: ALICE,
-      isLong: true,
-      sizeDeltaUsd: 5_000n * 10n ** 30n,
-      collateralDeltaAmount: 500n * 10n ** 6n,
-      executionPrice: 3_600n * 10n ** 30n,
-      realizedPnl: 1_000n * 10n ** 30n, // +$1k
-      sizeInUsdAfter: 5_000n * 10n ** 30n,
-      mockEventData: { srcAddress: MARKET, chainId: CHAIN_ID },
-    });
-    mockDb = await TestHelpers.Market.PositionDecrease.processEvent({ event: dec, mockDb });
-
-    const position = mockDb.entities.Position.get(POSITION_KEY_ALICE_LONG.toLowerCase());
-    expect(position?.sizeInUsd).toBe(5_000n * 10n ** 30n);
-    expect(position?.cumulativeSizeDecreaseUsd).toBe(5_000n * 10n ** 30n);
-    expect(position?.cumulativeRealizedPnl).toBe(1_000n * 10n ** 30n);
-
-    const agg = mockDb.entities.PerpAggregator.get(`${CHAIN_ID}-${MARKET.toLowerCase()}`);
-    expect(agg?.longOpenInterestUsd).toBe(5_000n * 10n ** 30n);
-    expect(agg?.totalRealizedPnlUsd).toBe(1_000n * 10n ** 30n); // signed accumulator
-  });
-
-  it("Liquidation latches isLiquidated + writes a separate Liquidation entity", async () => {
-    let mockDb = await bootstrapMarket(freshDb());
-
-    const inc = TestHelpers.Market.PositionIncrease.createMockEvent({
-      positionKey: POSITION_KEY_BOB_SHORT,
-      account: BOB,
-      isLong: false,
-      sizeDeltaUsd: 5_000n * 10n ** 30n,
-      collateralDeltaAmount: 500n * 10n ** 6n,
-      executionPrice: 3_000n * 10n ** 30n,
-      sizeInUsdAfter: 5_000n * 10n ** 30n,
-      sizeInTokensAfter: 166n * 10n ** 16n,
-      mockEventData: { srcAddress: MARKET, chainId: CHAIN_ID },
-    });
-    mockDb = await TestHelpers.Market.PositionIncrease.processEvent({ event: inc, mockDb });
-
-    const liq = TestHelpers.Market.Liquidation.createMockEvent({
-      positionKey: POSITION_KEY_BOB_SHORT,
-      account: BOB,
-      liquidator: LIQUIDATOR,
-      isLong: false,
-      sizeUsd: 5_000n * 10n ** 30n,
-      collateralAmount: 500n * 10n ** 6n,
-      mockEventData: {
-        srcAddress: MARKET,
-        chainId: CHAIN_ID,
-        block: { number: 100, timestamp: 1_700_000_000, hash: "0xabc" },
-        logIndex: 7,
-      },
-    });
-    mockDb = await TestHelpers.Market.Liquidation.processEvent({ event: liq, mockDb });
-
-    const position = mockDb.entities.Position.get(POSITION_KEY_BOB_SHORT.toLowerCase());
-    expect(position?.isLiquidated).toBe(true);
-    expect(position?.liquidator).toBe(LIQUIDATOR.toLowerCase());
-
-    const agg = mockDb.entities.PerpAggregator.get(`${CHAIN_ID}-${MARKET.toLowerCase()}`);
-    expect(agg?.totalLiquidations).toBe(1);
-    expect(agg?.shortOpenInterestUsd).toBe(0n); // liquidation closed all of Bob's 5k
-
-    // The Liquidation entity uses positionKey-blocknumber-logIndex as id.
-    const liqId = `${POSITION_KEY_BOB_SHORT.toLowerCase()}-100-7`;
-    const liqEntity = mockDb.entities.Liquidation.get(liqId);
-    expect(liqEntity?.account).toBe(BOB.toLowerCase());
-    expect(liqEntity?.liquidator).toBe(LIQUIDATOR.toLowerCase());
-    expect(liqEntity?.sizeUsd).toBe(5_000n * 10n ** 30n);
-  });
-
-  it("FundingFeeAmountPerSizeUpdated writes a FundingSnapshot", async () => {
-    let mockDb = await bootstrapMarket(freshDb());
-
-    const updatedAt = 1_700_001_000n;
-    const fundingValue = 12_345_678n;
-
-    const fundingEvent = TestHelpers.Market.FundingFeeAmountPerSizeUpdated.createMockEvent({
-      isLong: true,
-      fundingFeeAmountPerSize: fundingValue,
-      updatedAt,
-      mockEventData: {
-        srcAddress: MARKET,
-        chainId: CHAIN_ID,
-        block: { number: 200, timestamp: 1_700_001_000, hash: "0xdef" },
-      },
-    });
-    mockDb = await TestHelpers.Market.FundingFeeAmountPerSizeUpdated.processEvent({
-      event: fundingEvent,
+    const result = await TestHelpers.EventEmitter.EventLog1.processEvent({
+      event,
       mockDb,
     });
 
-    const marketId = `${CHAIN_ID}-${MARKET.toLowerCase()}`;
-    const snapshotId = `${marketId}-long-${updatedAt.toString()}`;
-    const snapshot = mockDb.entities.FundingSnapshot.get(snapshotId);
-    expect(snapshot?.fundingFeeAmountPerSize).toBe(fundingValue);
-    expect(snapshot?.isLong).toBe(true);
-    expect(snapshot?.updatedAt).toBe(updatedAt);
-    expect(snapshot?.blockNumber).toBe(200n);
+    // No entities should be created.
+    const marketId = `${CHAIN_ID}-${MARKET_ETH_USD.toLowerCase()}`;
+    expect(result.entities.PerpMarket.get(marketId)).toBeUndefined();
+    expect(result.entities.Position.get(POSITION_KEY_ALICE_LONG.toLowerCase())).toBeUndefined();
   });
+
+  // -----------------------------------------------------------------
+  // Pre-pivot tests (v1 scope deferred): the 4 original tests covered
+  // PositionDecrease, Liquidation, FundingFeeAmountPerSizeUpdated. These
+  // events DO exist in GMX v2's EventEmitter — adding them is mechanical
+  // (route on eventName, decode the payload, update entities). They're
+  // marked it.skip pending v2 follow-up.
+  // -----------------------------------------------------------------
+  it.skip("PositionDecrease shrinks open interest + accumulates realized PnL — TODO v2", () => {});
+  it.skip("Liquidation event marks Position liquidated + writes Liquidation entity — TODO v2", () => {});
+  it.skip("FundingFeeAmountPerSizeUpdated writes a FundingSnapshot — TODO v2", () => {});
 });

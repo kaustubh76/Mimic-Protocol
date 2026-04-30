@@ -1,0 +1,100 @@
+{
+  "title": "04-recent-snapshots",
+  "response": {
+    "data": {
+      "PoolHourSnapshot": [
+        {
+          "id": "10-0x8f47041adbef5bf321c9f63a0660326614ab6b60-1690761600",
+          "pool_id": "10-0x8f47041adbef5bf321c9f63a0660326614ab6b60",
+          "hourEpoch": "1690761600",
+          "reserve0": "523014292334868923438",
+          "cumulativeVolume0": "1920378556209136955472",
+          "hourlyVolume0": "162637782258929437",
+          "swapCount": "4306"
+        },
+        {
+          "id": "10-0x0df083de449f75691fc5a36477a6f3284c269108-1690761600",
+          "pool_id": "10-0x0df083de449f75691fc5a36477a6f3284c269108",
+          "hourEpoch": "1690761600",
+          "reserve0": "3371821419602859924570798",
+          "cumulativeVolume0": "16412757241585814481316618",
+          "hourlyVolume0": "80837473436364288840348",
+          "swapCount": "22455"
+        },
+        {
+          "id": "10-0x2b47c794c3789f499d8a54ec12f949eecce8ba16-1690761600",
+          "pool_id": "10-0x2b47c794c3789f499d8a54ec12f949eecce8ba16",
+          "hourEpoch": "1690761600",
+          "reserve0": "816345090454",
+          "cumulativeVolume0": "4422063031403",
+          "hourlyVolume0": "50852402726",
+          "swapCount": "5703"
+        },
+        {
+          "id": "10-0x8134a2fdc127549480865fb8e5a9e8a8a95a54c5-1690761600",
+          "pool_id": "10-0x8134a2fdc127549480865fb8e5a9e8a8a95a54c5",
+          "hourEpoch": "1690761600",
+          "reserve0": "5859496245541",
+          "cumulativeVolume0": "30969279819896",
+          "hourlyVolume0": "98475208788",
+          "swapCount": "102123"
+        },
+        {
+          "id": "10-0xd25711edfbf747efce181442cc1d8f5f8fc8a0d3-1690761600",
+          "pool_id": "10-0xd25711edfbf747efce181442cc1d8f5f8fc8a0d3",
+          "hourEpoch": "1690761600",
+          "reserve0": "2820842385180237692298",
+          "cumulativeVolume0": "8218731242103274118540",
+          "hourlyVolume0": "56392851937263890884",
+          "swapCount": "46840"
+        },
+        {
+          "id": "10-0xe9581d0f1a628b038fc8b2a7f5a7d904f0e2f937-1690761600",
+          "pool_id": "10-0xe9581d0f1a628b038fc8b2a7f5a7d904f0e2f937",
+          "hourEpoch": "1690761600",
+          "reserve0": "1547640377983675977226480",
+          "cumulativeVolume0": "5636418175682758291111858",
+          "hourlyVolume0": "8371547250250025459875",
+          "swapCount": "19281"
+        },
+        {
+          "id": "10-0x0493bf8b6dbb159ce2db2e0e8403e753abd1235b-1690761600",
+          "pool_id": "10-0x0493bf8b6dbb159ce2db2e0e8403e753abd1235b",
+          "hourEpoch": "1690761600",
+          "reserve0": "4707696905013693180445",
+          "cumulativeVolume0": "11111092169946909975319",
+          "hourlyVolume0": "21285526540690812261",
+          "swapCount": "37968"
+        },
+        {
+          "id": "10-0x7178f61694ba9109205b8d6f686282307625e62d-1690761600",
+          "pool_id": "10-0x7178f61694ba9109205b8d6f686282307625e62d",
+          "hourEpoch": "1690761600",
+          "reserve0": "246569464433696685965",
+          "cumulativeVolume0": "935747261148057258365",
+          "hourlyVolume0": "3621152186919900211",
+          "swapCount": "10683"
+        },
+        {
+          "id": "10-0x2fe304b407c7fab2a3c10962f14db751468a4f5b-1690761600",
+          "pool_id": "10-0x2fe304b407c7fab2a3c10962f14db751468a4f5b",
+          "hourEpoch": "1690761600",
+          "reserve0": "45627717659371764295365",
+          "cumulativeVolume0": "80126166249501971417033",
+          "hourlyVolume0": "739646808242164707731",
+          "swapCount": "2908"
+        },
+        {
+          "id": "10-0x9c78da24f2843ccdd02085bdec2484106554ca48-1690761600",
+          "pool_id": "10-0x9c78da24f2843ccdd02085bdec2484106554ca48",
+          "hourEpoch": "1690761600",
+          "reserve0": "8239839025519754034048997",
+          "cumulativeVolume0": "17585053352323220703413077",
+          "hourlyVolume0": "219409732533629114627054",
+          "swapCount": "25801"
+        }
+      ]
+    }
+  },
+  "capturedAt": "2026-04-30T11:46:56Z"
+}

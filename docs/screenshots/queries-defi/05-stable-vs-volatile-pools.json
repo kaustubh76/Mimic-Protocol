@@ -1,0 +1,52 @@
+{
+  "title": "05-stable-vs-volatile-pools",
+  "response": {
+    "data": {
+      "stable": [
+        {
+          "id": "10-0x904f14f9ed81d0b0a40d8169b28592aac5687158",
+          "address": "0x904f14f9ed81d0b0a40d8169b28592aac5687158"
+        },
+        {
+          "id": "10-0x1ad06ca54de04dbe9e2817f4c13ecb406dcbeaf0",
+          "address": "0x1ad06ca54de04dbe9e2817f4c13ecb406dcbeaf0"
+        },
+        {
+          "id": "10-0x0d0f65c63e379263f7ce2713dd012180681d0dc5",
+          "address": "0x0d0f65c63e379263f7ce2713dd012180681d0dc5"
+        },
+        {
+          "id": "10-0x5e4a183fa83c52b1c55b11f2682f6a8421206633",
+          "address": "0x5e4a183fa83c52b1c55b11f2682f6a8421206633"
+        },
+        {
+          "id": "10-0x537cb4d4fe1a9df1e295872f2b82c1da9df7500f",
+          "address": "0x537cb4d4fe1a9df1e295872f2b82c1da9df7500f"
+        }
+      ],
+      "volatile": [
+        {
+          "id": "10-0x585af0b397ac42dbef7f18395426bf878634f18d",
+          "address": "0x585af0b397ac42dbef7f18395426bf878634f18d"
+        },
+        {
+          "id": "10-0x7a7f1187c4710010db17d0a9ad3fce85e6ecd90a",
+          "address": "0x7a7f1187c4710010db17d0a9ad3fce85e6ecd90a"
+        },
+        {
+          "id": "10-0x8134a2fdc127549480865fb8e5a9e8a8a95a54c5",
+          "address": "0x8134a2fdc127549480865fb8e5a9e8a8a95a54c5"
+        },
+        {
+          "id": "10-0x6e6046e9b5e3d90eac2abba610bca725834ca5b3",
+          "address": "0x6e6046e9b5e3d90eac2abba610bca725834ca5b3"
+        },
+        {
+          "id": "10-0x58e6433a6903886e440ddf519ecc573c4046a6b2",
+          "address": "0x58e6433a6903886e440ddf519ecc573c4046a6b2"
+        }
+      ]
+    }
+  },
+  "capturedAt": "2026-04-30T11:46:56Z"
+}

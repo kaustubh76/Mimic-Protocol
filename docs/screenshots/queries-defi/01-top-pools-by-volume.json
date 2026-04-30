@@ -1,0 +1,100 @@
+{
+  "title": "01-top-pools-by-volume",
+  "response": {
+    "data": {
+      "PoolAggregator": [
+        {
+          "id": "10-0xb1786ddd79752969660e2d8f1faa9df2c88f5a3e",
+          "poolAddress": "0xb1786ddd79752969660e2d8f1faa9df2c88f5a3e",
+          "reserve0": "47407799383617640077602393",
+          "reserve1": "12403338495988495717289",
+          "cumulativeVolume0": "504446579084730713991615489",
+          "cumulativeVolume1": "145664284103029448332906",
+          "swapCount": "793"
+        },
+        {
+          "id": "10-0x4baea65c4646459b3574424bc4f2513526b6794a",
+          "poolAddress": "0x4baea65c4646459b3574424bc4f2513526b6794a",
+          "reserve0": "26449395",
+          "reserve1": "1",
+          "cumulativeVolume0": "468644332449818960685030068",
+          "cumulativeVolume1": "1589166642240663851",
+          "swapCount": "14"
+        },
+        {
+          "id": "10-0x72aba20779797904bd395b7c69b4f9fb29cbb653",
+          "poolAddress": "0x72aba20779797904bd395b7c69b4f9fb29cbb653",
+          "reserve0": "16953170026552774844247761",
+          "reserve1": "383880553511243209257",
+          "cumulativeVolume0": "320729561082472774559394246",
+          "cumulativeVolume1": "8664845622435016366480",
+          "swapCount": "710"
+        },
+        {
+          "id": "10-0x0af32614eea68b8d2232b9592fbdb6512ab6da73",
+          "poolAddress": "0x0af32614eea68b8d2232b9592fbdb6512ab6da73",
+          "reserve0": "80067447728245775269846772",
+          "reserve1": "2864806791446813260018760",
+          "cumulativeVolume0": "106629772334523549620068100",
+          "cumulativeVolume1": "5214044547576764137352717",
+          "swapCount": "1118"
+        },
+        {
+          "id": "10-0x477fa18b063b7728409570d274f7a055e3da0d6e",
+          "poolAddress": "0x477fa18b063b7728409570d274f7a055e3da0d6e",
+          "reserve0": "18760645988050305112558723",
+          "reserve1": "673379742965",
+          "cumulativeVolume0": "81383958857856868393034375",
+          "cumulativeVolume1": "2309492495473",
+          "swapCount": "6749"
+        },
+        {
+          "id": "10-0x0a53f5ede53f4d75a5df9d8f1e3c23e2672ebda7",
+          "poolAddress": "0x0a53f5ede53f4d75a5df9d8f1e3c23e2672ebda7",
+          "reserve0": "38012252615175272257645897",
+          "reserve1": "725833568046739115",
+          "cumulativeVolume0": "55010040444885880003532036",
+          "cumulativeVolume1": "1000006677713337979",
+          "swapCount": "194"
+        },
+        {
+          "id": "10-0x4e60495550071693bc8bdffc40033d278157eac7",
+          "poolAddress": "0x4e60495550071693bc8bdffc40033d278157eac7",
+          "reserve0": "7167250127714829158197540",
+          "reserve1": "1102156257485",
+          "cumulativeVolume0": "29006719354862591422730636",
+          "cumulativeVolume1": "4243369366688",
+          "swapCount": "11692"
+        },
+        {
+          "id": "10-0x4ec77c33bd56d2151ace9f28f6ca27601410e858",
+          "poolAddress": "0x4ec77c33bd56d2151ace9f28f6ca27601410e858",
+          "reserve0": "226807001565995985091977949",
+          "reserve1": "3908188404047177735187703",
+          "cumulativeVolume0": "24875506316045826415628881",
+          "cumulativeVolume1": "440396665221568764386668",
+          "swapCount": "41"
+        },
+        {
+          "id": "10-0x9c78da24f2843ccdd02085bdec2484106554ca48",
+          "poolAddress": "0x9c78da24f2843ccdd02085bdec2484106554ca48",
+          "reserve0": "8240224593812670170117919",
+          "reserve1": "589199363884",
+          "cumulativeVolume0": "17583813785452410525680116",
+          "cumulativeVolume1": "1224410341953",
+          "swapCount": "25781"
+        },
+        {
+          "id": "10-0x0df083de449f75691fc5a36477a6f3284c269108",
+          "poolAddress": "0x0df083de449f75691fc5a36477a6f3284c269108",
+          "reserve0": "3377152949046263537534588",
+          "reserve1": "5452802323910",
+          "cumulativeVolume0": "16407375098085845980988865",
+          "cumulativeVolume1": "23384120392034",
+          "swapCount": "22449"
+        }
+      ]
+    }
+  },
+  "capturedAt": "2026-04-30T11:46:55Z"
+}

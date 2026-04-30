@@ -1,25 +1,28 @@
 # yaml-language-server: $schema=./node_modules/envio/evm.schema.json
 #
 # envio-perp-template-v1
-# Production-grade perp-protocol indexer scaffold. Mirrors the architecture
-# patterns of the DEX template (EventHandlers → Aggregators → Snapshots) but
-# with perp-specific event shapes:
-#   - MarketCreated, PositionIncrease, PositionDecrease, Liquidation, FundingFeeAmountPerSizeUpdated
+# Perp-protocol indexer scaffold targeting GMX v2's REAL EventEmitter
+# pattern on Arbitrum.
 #
-# Event signatures and naming conventions are adapted from
-# gmx-io/gmx-synthetics (https://github.com/gmx-io/gmx-synthetics) — the
-# canonical perp protocol on Arbitrum. Field names (positionKey, sizeDeltaUsd,
-# fundingFeeAmountPerSize, etc) match GMX v2 semantics so a reviewer
-# familiar with the protocol can read this template fluently.
+# Architecture choice — and why this template differs from the DEX template:
 #
-# We use FLAT typed events (positionKey, account, isLong, sizeDeltaUsd, ...)
-# instead of GMX v2's bytes-encoded EventLogData pattern. The bytes-encoded
-# shape is operationally efficient on-chain but hostile to typed indexer
-# bindings; the flat shape is what most third-party perp protocols ship.
-# A note on this simplification lives in the template README.
+# GMX v2 uses a single global `EventEmitter` contract that emits generic
+# `EventLog1` / `EventLog2` events with bytes-encoded `EventLogData`
+# payloads + a string `eventName` field for routing. NOT a factory +
+# per-market events pattern. So:
+#   - One contract entry below (EventEmitter), not factory + dynamic
+#   - Handler routes on `event.params.eventName` rather than per-event
+#   - `EventLogData` is a nested struct of typed dictionaries (Address,
+#     Uint, Int, Bool, Bytes32, Bytes, String items) — Envio's codegen
+#     produces typed accessors but the data is sparse and keyed by string.
+#
+# v1 scope: handle ONE event type (`PositionIncrease`) end-to-end as
+# proof the architecture works against real GMX v2 data. PositionDecrease,
+# Liquidation, FundingFeeAmountPerSizeUpdated, plus the dozens of other
+# events GMX emits, are mechanical follow-ups documented in README.md.
 
 name: envio-perp-template-v1
-description: Perp-protocol indexer template — GMX-v2-shaped event signatures, position lifecycle, funding rate tracking
+description: GMX-v2-shaped perp indexer — EventEmitter on Arbitrum (PositionIncrease v1)
 rollback_on_reorg: true
 raw_events: false
 
@@ -28,35 +31,22 @@ field_selection:
     - "hash"
 
 contracts:
-  # MarketFactory deploys new Market contracts (one per index/long/short
-  # token tuple in GMX v2 parlance). MarketCreated is the dynamic-
-  # registration trigger; same pattern as the DEX template's PoolFactory
-  # and PM template's MarketFactory.
-  - name: MarketFactory
-    abi_file_path: abis/MarketFactory.json
-    handler: src/EventHandlers/MarketFactory.ts
+  # Single global EventEmitter on Arbitrum. Address from
+  # gmx-io/gmx-synthetics/deployments/arbitrum/EventEmitter.json.
+  # Handler routes on `eventName` to choose which path to take.
+  - name: EventEmitter
+    abi_file_path: abis/EventEmitter.json
+    handler: src/EventHandlers/EventEmitter.ts
     events:
-      - event: MarketCreated
-
-  # Market contracts emit position + funding events. Registered DYNAMICALLY
-  # via context.addMarket() in the MarketFactory handler. address: bare
-  # (no value) is the documented dynamic-contract pattern.
-  - name: Market
-    abi_file_path: abis/Market.json
-    handler: src/EventHandlers/Market.ts
-    events:
-      - event: PositionIncrease
-      - event: PositionDecrease
-      - event: Liquidation
-      - event: FundingFeeAmountPerSizeUpdated
+      - event: EventLog1
+      # EventLog and EventLog2 also exist on the contract; v1 only handles
+      # EventLog1 (which is what PositionIncrease is emitted as). Adding
+      # the others is mechanical.
 
 networks:
-  # Arbitrum One — GMX v2's home chain.
   - id: 42161
-    start_block: 100000000  # placeholder; set to your protocol's MarketFactory deploy block
+    start_block: 107737756  # GMX v2 EventEmitter deployment block on Arbitrum
     contracts:
-      - name: MarketFactory
+      - name: EventEmitter
         address:
-          - 0xdEaDbeefDEaDbeefDeAdBEefdEadbEEFdeadbeef  # PLACEHOLDER — replace with your protocol's MarketFactory
-      - name: Market
-        address:  # registered dynamically via MarketCreated handler
+          - 0xC8ee91A54287DB53897056e12D9819156D3822Fb

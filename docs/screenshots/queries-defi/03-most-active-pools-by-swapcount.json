@@ -1,0 +1,80 @@
+{
+  "title": "03-most-active-pools-by-swapcount",
+  "response": {
+    "data": {
+      "PoolAggregator": [
+        {
+          "id": "10-0x8134a2fdc127549480865fb8e5a9e8a8a95a54c5",
+          "poolAddress": "0x8134a2fdc127549480865fb8e5a9e8a8a95a54c5",
+          "swapCount": "102275",
+          "cumulativeFees0": "135375221778",
+          "cumulativeFees1": "1109499477923112292078152"
+        },
+        {
+          "id": "10-0xd25711edfbf747efce181442cc1d8f5f8fc8a0d3",
+          "poolAddress": "0xd25711edfbf747efce181442cc1d8f5f8fc8a0d3",
+          "swapCount": "46858",
+          "cumulativeFees0": "12784870055774938726",
+          "cumulativeFees1": "15509356041020427641236"
+        },
+        {
+          "id": "10-0x0493bf8b6dbb159ce2db2e0e8403e753abd1235b",
+          "poolAddress": "0x0493bf8b6dbb159ce2db2e0e8403e753abd1235b",
+          "swapCount": "37998",
+          "cumulativeFees0": "13791247870004449187",
+          "cumulativeFees1": "25855305595"
+        },
+        {
+          "id": "10-0x9c78da24f2843ccdd02085bdec2484106554ca48",
+          "poolAddress": "0x9c78da24f2843ccdd02085bdec2484106554ca48",
+          "swapCount": "25835",
+          "cumulativeFees0": "26113454151183260363060",
+          "cumulativeFees1": "1860865053"
+        },
+        {
+          "id": "10-0x0df083de449f75691fc5a36477a6f3284c269108",
+          "poolAddress": "0x0df083de449f75691fc5a36477a6f3284c269108",
+          "swapCount": "22473",
+          "cumulativeFees0": "24137772360265987928801",
+          "cumulativeFees1": "35955345091"
+        },
+        {
+          "id": "10-0xe9581d0f1a628b038fc8b2a7f5a7d904f0e2f937",
+          "poolAddress": "0xe9581d0f1a628b038fc8b2a7f5a7d904f0e2f937",
+          "swapCount": "19297",
+          "cumulativeFees0": "24299267726015933444678",
+          "cumulativeFees1": "292386495037666845993651"
+        },
+        {
+          "id": "10-0x4e60495550071693bc8bdffc40033d278157eac7",
+          "poolAddress": "0x4e60495550071693bc8bdffc40033d278157eac7",
+          "swapCount": "11698",
+          "cumulativeFees0": "43016740631498046932198",
+          "cumulativeFees1": "6454088457"
+        },
+        {
+          "id": "10-0x7178f61694ba9109205b8d6f686282307625e62d",
+          "poolAddress": "0x7178f61694ba9109205b8d6f686282307625e62d",
+          "swapCount": "10712",
+          "cumulativeFees0": "1465581155592146420",
+          "cumulativeFees1": "2094605988080476359176"
+        },
+        {
+          "id": "10-0x71d53b5b7141e1ec9a3fc9cc48b4766102d14a4a",
+          "poolAddress": "0x71d53b5b7141e1ec9a3fc9cc48b4766102d14a4a",
+          "swapCount": "10694",
+          "cumulativeFees0": "13602068515",
+          "cumulativeFees1": "4638948794210012139449"
+        },
+        {
+          "id": "10-0xda0253a7cdccc4b4defbbef863dba1294bf5e3b1",
+          "poolAddress": "0xda0253a7cdccc4b4defbbef863dba1294bf5e3b1",
+          "swapCount": "10200",
+          "cumulativeFees0": "13841150618054274286092",
+          "cumulativeFees1": "636714125324585350001"
+        }
+      ]
+    }
+  },
+  "capturedAt": "2026-04-30T11:46:56Z"
+}

@@ -1,0 +1,90 @@
+{
+  "title": "02-largest-positions",
+  "response": {
+    "data": {
+      "Position": [
+        {
+          "id": "0xa0692f72a9c3d8174310ca72976956ef9c3b865abe084374751fb49cd3bc1609",
+          "account": "0xf748879edbe8cca140940788163d7be4d2a2e46a",
+          "market_id": "42161-0x47c031236e19d024b42f8ae6780e44a573170703",
+          "isLong": true,
+          "sizeInUsd": "950650249467600000000000000000000000",
+          "cumulativeSizeIncreaseUsd": "1836387771964658244000000000000000000"
+        },
+        {
+          "id": "0x49ffd30b0863a5d3671e0e4631449413e836dc76aa4dea12a87fc16a68ccd7c3",
+          "account": "0x7af4ca674c86ac74d15ae668ae7ffbe4f7ddafbf",
+          "market_id": "42161-0x70d95587d40a2caf56bd97485ab3eec10bee6336",
+          "isLong": true,
+          "sizeInUsd": "764111233732080000000000000000000000",
+          "cumulativeSizeIncreaseUsd": "3225570177459039050000000000000000000"
+        },
+        {
+          "id": "0xeab54caae7430a878dae7e027b0d95722cf48ae9728e150a889d290a870088ca",
+          "account": "0x5b16557f1b63f981d1b4cfad18e7a4d5283fefc6",
+          "market_id": "42161-0x70d95587d40a2caf56bd97485ab3eec10bee6336",
+          "isLong": true,
+          "sizeInUsd": "720490365950961565800000000000000000",
+          "cumulativeSizeIncreaseUsd": "720490365950961565800000000000000000"
+        },
+        {
+          "id": "0x267b724c2f3f13541a29324f6e698ffda935074a74da252777b445dfc7a7bfad",
+          "account": "0x7af4ca674c86ac74d15ae668ae7ffbe4f7ddafbf",
+          "market_id": "42161-0x47c031236e19d024b42f8ae6780e44a573170703",
+          "isLong": true,
+          "sizeInUsd": "671928914968750000000000000000000000",
+          "cumulativeSizeIncreaseUsd": "671928914968750000000000000000000000"
+        },
+        {
+          "id": "0x2abf211a53ad744e192a6b95be03d36e250b34c68cebd16f64488f83528ef307",
+          "account": "0x5f94d32058fc8067018e94e508ef48c1135e53fd",
+          "market_id": "42161-0x70d95587d40a2caf56bd97485ab3eec10bee6336",
+          "isLong": true,
+          "sizeInUsd": "501961570441511315700000000000000000",
+          "cumulativeSizeIncreaseUsd": "887530295583459259700000000000000000"
+        },
+        {
+          "id": "0x740fd82bdc1007c91182579d446c0b3b2ccca9d7d11c9d916598c0f1c26ec76b",
+          "account": "0x5f94d32058fc8067018e94e508ef48c1135e53fd",
+          "market_id": "42161-0x47c031236e19d024b42f8ae6780e44a573170703",
+          "isLong": true,
+          "sizeInUsd": "478687575692700000000000000000000000",
+          "cumulativeSizeIncreaseUsd": "478687575692700000000000000000000000"
+        },
+        {
+          "id": "0xed49cbbb517d5572c9a090811dd02c9156fb86c9a24d6e5f4425fcd7c0f9bd74",
+          "account": "0xc4c8410c03edba8694d229bae3c74401dc1a9346",
+          "market_id": "42161-0x70d95587d40a2caf56bd97485ab3eec10bee6336",
+          "isLong": false,
+          "sizeInUsd": "399761794600000000000000000000000000",
+          "cumulativeSizeIncreaseUsd": "399761794600000000000000000000000000"
+        },
+        {
+          "id": "0x61e2070453c279e904d1a647122f0f2a3f11c8fe79a70323154a1f678b1b7d64",
+          "account": "0xb183142d33a2641233b608f3648e81e6a2ef257c",
+          "market_id": "42161-0x70d95587d40a2caf56bd97485ab3eec10bee6336",
+          "isLong": false,
+          "sizeInUsd": "385595180518984150000000000000000000",
+          "cumulativeSizeIncreaseUsd": "586885946198333242800000000000000000"
+        },
+        {
+          "id": "0x1e5645bf4cf36b6f42cd65ba0b51ab592af6040fba4780b8d6998b9c5a26e796",
+          "account": "0x11d67fa925877813b744abc0917900c2b1d6eb81",
+          "market_id": "42161-0x70d95587d40a2caf56bd97485ab3eec10bee6336",
+          "isLong": false,
+          "sizeInUsd": "343636617454850499750000000000000000",
+          "cumulativeSizeIncreaseUsd": "343636617454850499750000000000000000"
+        },
+        {
+          "id": "0xf2f1b90f72cb74c9a818574c050ee3621769c16f10bca0bfeaad8c91566e5132",
+          "account": "0x48c6f2f2a7ea9383da894ec6cc4da46360ccaa29",
+          "market_id": "42161-0x47c031236e19d024b42f8ae6780e44a573170703",
+          "isLong": false,
+          "sizeInUsd": "302958299785065960000000000000000000",
+          "cumulativeSizeIncreaseUsd": "302958299785065960000000000000000000"
+        }
+      ]
+    }
+  },
+  "capturedAt": "2026-04-30T11:56:47Z"
+}

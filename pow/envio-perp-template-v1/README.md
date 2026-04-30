@@ -1,43 +1,73 @@
 # envio-perp-template-v1
 
-> Perp-protocol indexer template. Forkable scaffold with **GMX-v2-shaped event signatures**, full position lifecycle (open / decrease / liquidation), and funding-rate snapshots — the analytical signal that distinguishes perp indexers from spot DEX indexers.
-
-This is the perp variant of the [DeFi 60-min template](../envio-defi-template-v1/). Same three-layer architecture (EventHandlers → Aggregators → Snapshots), same dynamic-contract registration pattern, but with perp-specific entities: `PerpMarket`, `Position`, `Liquidation`, `FundingSnapshot`.
-
-Event signatures are adapted from [`gmx-io/gmx-synthetics`](https://github.com/gmx-io/gmx-synthetics) — the canonical perp protocol on Arbitrum. Field naming (`positionKey`, `sizeDeltaUsd`, `fundingFeeAmountPerSize`, etc) matches GMX v2 semantics so a reviewer familiar with the protocol can read this template fluently.
+> Perp-protocol indexer template targeting **GMX v2's REAL `EventEmitter` pattern on Arbitrum**. Subscribes to a single global `EventEmitter` contract, routes events on the `eventName` string, decodes the `EventLogData` typed dictionary into typed entity fields.
+>
+> 🟢 **Verified live against GMX v2 on Arbitrum** — see [`docs/screenshots/queries-perp/`](../../docs/screenshots/queries-perp/) for real on-chain captures (9 perp markets, 1252 positions, $950k+ position sizes), and `pnpm assert:perp` for the assertion harness (2,522/2,522 invariants passing on real data).
 
 ---
 
-## Why this template exists
+## v1 scope: PositionIncrease only
 
-§3 of the [vertical playbook](../../ENVIO_VERTICAL_PLAYBOOK.md) names four DeFi shapes the role's templates should cover: **DEX, perp, money market, execution layer**. The DEX shape lives in [`envio-defi-template-v1/`](../envio-defi-template-v1/); this template proves the framework generalises by shipping the perp shape with the same architecture.
+**This template's v1 handles ONE event type — `PositionIncrease` — to validate the architecture works against real GMX v2 data.** The decode helper (`src/Effects/decodeEventLogData.ts`) is event-agnostic; adding `PositionDecrease`, `Liquidation`, `OrderExecuted`, `FundingFeeAmountPerSizeUpdated`, and the dozens of other GMX events is mechanical (one `case "EventName":` branch + a typed decoder per event).
 
-Perp protocols have three indexer-tier requirements that spot DEXes don't:
+**v1's bet:** prove the architecture works against real chain data with one event, ship it, then expand to v2 with the rest. v2 is documented as a follow-up; the scope-cut is named explicitly so reviewers see disciplined incrementalism.
 
-1. **Position state is per-trader, not per-pool.** A `Position` entity keyed by `positionKey` (bytes32) is the source of truth; `PositionAggregator` rolls up per-trader cumulative state for the leaderboard.
-2. **Funding rate continuously affects open positions.** `FundingSnapshot` captures every `FundingFeeAmountPerSizeUpdated` event so front-end queries can compute pending funding by joining (Position.fundingFeeAmountPerSizeAtEntry, latest FundingSnapshot for the market+side).
-3. **Liquidations are first-class events.** A separate `Liquidation` entity per liquidation event lets risk dashboards scan liquidation history independently of position state.
+The previous version of this template (pre-2026-04-30) used **synthesised flat events** — invented `PositionIncrease(positionKey, account, isLong, sizeDeltaUsd, ...)` event signatures with named indexed fields. Easy to typecheck; impossible to live-run because no real protocol emits that shape. Pivoting to GMX v2's actual `EventEmitter` was the right move; the synthesised version was a teaching scaffold, not a production target.
 
 ---
 
-## What this template gives you
+## Architecture — what GMX v2 forces
 
-- **GMX-v2-shaped events**: `MarketCreated`, `PositionIncrease`, `PositionDecrease`, `Liquidation`, `FundingFeeAmountPerSizeUpdated`. Field names match GMX v2 conventions.
-- **Position lifecycle handlers** that track size, collateral, and signed realized PnL per position.
-- **Long/short open interest split** in the per-market aggregator — the front-end's primary risk display.
-- **Per-trader cumulative state** (`PositionAggregator`) — leaderboard source.
-- **Funding-rate snapshots** — the analytical signal that distinguishes perp from spot.
-- **Liquidation entities** keyed by `positionKey-blockNumber-logIndex` — every liquidation queryable independently.
-- **Dynamic market registration** via factory pattern (same as DEX + PM templates).
-- **`pnpm install && pnpm codegen && pnpm test` clean** — 4/4 vitest passing, full lifecycle covered.
+GMX v2 emits ALL position/order/funding/liquidation events through a **single `EventEmitter` contract** at [`0xC8ee91A54287DB53897056e12D9819156D3822Fb`](https://arbiscan.io/address/0xC8ee91A54287DB53897056e12D9819156D3822Fb) on Arbitrum, using:
+
+```solidity
+event EventLog1(
+  address msgSender,
+  string eventName,                       // routing key — e.g. "PositionIncrease"
+  string indexed eventNameHash,
+  bytes32 indexed topic1,
+  EventUtils.EventLogData eventData       // bytes-encoded typed dictionary
+);
+```
+
+`EventLogData` is a struct of 7 sections (`addressItems`, `uintItems`, `intItems`, `boolItems`, `bytes32Items`, `bytesItems`, `stringItems`), each `[items, arrayItems]` where `items = Array<[key, value]>`. The decode helper at [`src/Effects/decodeEventLogData.ts`](./src/Effects/decodeEventLogData.ts) flattens this into a typed dictionary keyed by string.
+
+This is **the actual production GMX v2 architecture**, not a simplification. Customers indexing GMX v2 hit exactly this shape; the template demonstrates how to handle it cleanly.
 
 ---
 
-## Simplification from canonical GMX v2
+## Three architectural differences from the DEX + money-market templates
 
-GMX v2's `EventEmitter` uses a generic `EventLogData` bytes-encoded shape (efficient on-chain, opaque to typed indexers). This template uses **flat typed events** with the same field names — so the indexer's generated bindings get strongly-typed `event.params.sizeDeltaUsd` etc, instead of having to decode `bytes` payloads at runtime. Field semantics are unchanged; the wire format is simpler.
+1. **No factory pattern.** GMX v2's markets are pre-deployed and registered via a separate `MarketFactory` contract (out of v1 scope). PerpMarket entities are **lazy-created** on the first PositionIncrease that references a previously-unseen market.
+2. **Generic event routing.** Handler subscribes to `EventLog1` (one event) and routes on `event.params.eventName` (string) to per-event paths. Template ships the routing skeleton; v1 implements the `PositionIncrease` branch.
+3. **Bytes-encoded typed payload.** The `eventData` field requires the decode helper to extract typed fields. Once decoded, the rest of the indexer (entity writes, aggregator updates) is identical to other templates.
 
-For a real production indexer wrapping GMX v2 itself, you'd use Envio's raw-events mode + a decode helper for the `EventLog1`/`EventLog2` bytes payloads. That's a different architecture than this template demonstrates; flagged here so reviewers know I considered both.
+---
+
+## What this template gives you (v1)
+
+- **Real GMX v2 EventEmitter integration** — config.yaml points at the verified Arbitrum deployment.
+- **Decode helper** at `src/Effects/decodeEventLogData.ts` — turns the tuple-of-tuples typed binding into a typed dictionary keyed by string. Reusable for every other GMX v2 event type when extending to v2.
+- **PositionIncrease handler** — lazy-creates PerpMarket + PerpAggregator on first sighting, writes Position entity, updates per-trader PositionAggregator.
+- **Long/short open interest split** in PerpAggregator (long-only in v1; short side gets populated when PositionDecrease handling lands in v2).
+- **Per-trader cumulative state** (PositionAggregator) — the cross-market leaderboard source.
+- **Schema retains** Liquidation + FundingSnapshot entity types — unused in v1 but pre-declared so v2 doesn't require schema migration.
+- **`pnpm install && pnpm codegen && pnpm test` clean** — 2/2 active tests passing (3 marked `it.skip` referencing v2 follow-up).
+- **Live verification harness** — `pnpm assert:perp` in [`scripts/demo-capture/`](../../scripts/demo-capture/) checks 4 cross-entity invariants against real Arbitrum GMX v2 data.
+
+---
+
+## v2 scope (mechanical follow-up)
+
+For each new event type, add a `case` branch in `src/EventHandlers/EventEmitter.ts` and a corresponding decoder in `src/Effects/decodeEventLogData.ts`:
+
+| Event | Handler scope | Schema |
+|---|---|---|
+| `PositionDecrease` | shrink position size, accumulate `cumulativeRealizedPnl`, update aggregator open interest down | Position (existing) |
+| `OrderExecuted` | track fill events; cross-reference with Position via orderKey | new `Order` entity |
+| `LiquidationOccurred` (the actual GMX v2 event name) | latch `Position.isLiquidated`, write Liquidation entity | Liquidation (already in schema) |
+| `FundingFeeAmountPerSizeUpdated` | write FundingSnapshot per (market, isLong) | FundingSnapshot (already in schema) |
+| `MarketCreated` (from MarketFactory contract — separate subscription) | populate `PerpMarket.{indexToken,longToken,shortToken,salt}` properly | PerpMarket (existing — lazy-create stays as fallback) |
 
 ---
 

@@ -1,0 +1,70 @@
+{
+  "title": "04-most-active-traders",
+  "response": {
+    "data": {
+      "PositionAggregator": [
+        {
+          "account": "0x196a492f60696930d6ee0551d3f4ed56b668aa00",
+          "positionCount": 20,
+          "cumulativeSizeIncreaseUsd": "45224320158238349133530629188050000",
+          "marketsTraded": 20
+        },
+        {
+          "account": "0xb38302e27bae8932536a84ab362c3d1013420cb4",
+          "positionCount": 18,
+          "cumulativeSizeIncreaseUsd": "3067377575737167979914408081152000",
+          "marketsTraded": 18
+        },
+        {
+          "account": "0x998c4581457e61b265f41e955360667de803b7be",
+          "positionCount": 18,
+          "cumulativeSizeIncreaseUsd": "510484520723375000000000000000000",
+          "marketsTraded": 18
+        },
+        {
+          "account": "0x03fed09a02c73747e62eacd8119fabae7ac16923",
+          "positionCount": 15,
+          "cumulativeSizeIncreaseUsd": "117919886582773726000000000000000000",
+          "marketsTraded": 15
+        },
+        {
+          "account": "0x0b49f8f8ec743b76fea08b4c8f3077f7ffe1a0fd",
+          "positionCount": 14,
+          "cumulativeSizeIncreaseUsd": "2259688087627233525354451220170000",
+          "marketsTraded": 14
+        },
+        {
+          "account": "0x7d45db4ceb3516703b85a3c29811323308424450",
+          "positionCount": 13,
+          "cumulativeSizeIncreaseUsd": "6252154772395203278200000000000000000",
+          "marketsTraded": 13
+        },
+        {
+          "account": "0x5c6515d427856135de8ed570e69caa535116d316",
+          "positionCount": 12,
+          "cumulativeSizeIncreaseUsd": "45368093181237389800000000000000000",
+          "marketsTraded": 12
+        },
+        {
+          "account": "0x5f799f365fa8a2b60ac0429c48b153ca5a6f0cf8",
+          "positionCount": 12,
+          "cumulativeSizeIncreaseUsd": "160363503270372566942173011520000",
+          "marketsTraded": 12
+        },
+        {
+          "account": "0xd0fa2ebeac5e1b5876ce2754100e9009fc0bd4fc",
+          "positionCount": 11,
+          "cumulativeSizeIncreaseUsd": "2727133256965587983315096300000000",
+          "marketsTraded": 11
+        },
+        {
+          "account": "0xa22edf91ae53e19dc8f8a2ad5a176236d8f03267",
+          "positionCount": 10,
+          "cumulativeSizeIncreaseUsd": "103485220755517717900000000000000000",
+          "marketsTraded": 10
+        }
+      ]
+    }
+  },
+  "capturedAt": "2026-04-30T11:56:50Z"
+}

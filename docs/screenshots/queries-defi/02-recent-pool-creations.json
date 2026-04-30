@@ -1,0 +1,100 @@
+{
+  "title": "02-recent-pool-creations",
+  "response": {
+    "data": {
+      "Pool": [
+        {
+          "id": "10-0x6102ca7475464553ac5d9360ae563a9852986406",
+          "address": "0x6102ca7475464553ac5d9360ae563a9852986406",
+          "token0_id": "10-0x67ccea5bb16181e7b4109c9c2143c24a1c2205be",
+          "token1_id": "10-0xab1047894da4ec207c71be0aef5c7885e07b2daf",
+          "isStable": false,
+          "createdAtBlock": "107582299",
+          "createdAtTimestamp": "1690763375"
+        },
+        {
+          "id": "10-0x3dd963f72b52182ec2894a07b85b00977d40d048",
+          "address": "0x3dd963f72b52182ec2894a07b85b00977d40d048",
+          "token0_id": "10-0x1f32b1c2345538c0c6f582fcb022739c4a194ebb",
+          "token1_id": "10-0xab1047894da4ec207c71be0aef5c7885e07b2daf",
+          "isStable": false,
+          "createdAtBlock": "107582214",
+          "createdAtTimestamp": "1690763205"
+        },
+        {
+          "id": "10-0xf1c89b2f2a74676c0ea908d3e98bece604bcb00e",
+          "address": "0xf1c89b2f2a74676c0ea908d3e98bece604bcb00e",
+          "token0_id": "10-0x4200000000000000000000000000000000000042",
+          "token1_id": "10-0xab1047894da4ec207c71be0aef5c7885e07b2daf",
+          "isStable": false,
+          "createdAtBlock": "107582167",
+          "createdAtTimestamp": "1690763111"
+        },
+        {
+          "id": "10-0x5675c7dd1708cdbc6124c05e988b0def9cdf3dff",
+          "address": "0x5675c7dd1708cdbc6124c05e988b0def9cdf3dff",
+          "token0_id": "10-0xa50b23cdfb2ec7c590e84f403256f67ce6dffb84",
+          "token1_id": "10-0xab1047894da4ec207c71be0aef5c7885e07b2daf",
+          "isStable": false,
+          "createdAtBlock": "107582072",
+          "createdAtTimestamp": "1690762921"
+        },
+        {
+          "id": "10-0x17547215d96696de1e1c8a9791d6da18f92045af",
+          "address": "0x17547215d96696de1e1c8a9791d6da18f92045af",
+          "token0_id": "10-0x4200000000000000000000000000000000000006",
+          "token1_id": "10-0x68f180fcce6836688e9084f035309e29bf0a2095",
+          "isStable": false,
+          "createdAtBlock": "107579384",
+          "createdAtTimestamp": "1690757545"
+        },
+        {
+          "id": "10-0x97203c53daf858ce36d95997fbfafa8e29122230",
+          "address": "0x97203c53daf858ce36d95997fbfafa8e29122230",
+          "token0_id": "10-0x4200000000000000000000000000000000000006",
+          "token1_id": "10-0xf9e1f4eede806fda20f4084d9f9c4c2b36e38e77",
+          "isStable": false,
+          "createdAtBlock": "107573599",
+          "createdAtTimestamp": "1690745975"
+        },
+        {
+          "id": "10-0x7764f2cbb8f165eb430af14568e6970a4e23369f",
+          "address": "0x7764f2cbb8f165eb430af14568e6970a4e23369f",
+          "token0_id": "10-0x88a89866439f4c2830986b79cbe6f69d1bd548bb",
+          "token1_id": "10-0xab1047894da4ec207c71be0aef5c7885e07b2daf",
+          "isStable": false,
+          "createdAtBlock": "107548675",
+          "createdAtTimestamp": "1690696127"
+        },
+        {
+          "id": "10-0xdfdd0b190adf296bb0162d19c2e0206db68fe475",
+          "address": "0xdfdd0b190adf296bb0162d19c2e0206db68fe475",
+          "token0_id": "10-0x9560e827af36c94d2ac33a39bce1fe78631088db",
+          "token1_id": "10-0xab1047894da4ec207c71be0aef5c7885e07b2daf",
+          "isStable": false,
+          "createdAtBlock": "107547974",
+          "createdAtTimestamp": "1690694725"
+        },
+        {
+          "id": "10-0xf2d42c46528116362aca448837a0236459b53c63",
+          "address": "0xf2d42c46528116362aca448837a0236459b53c63",
+          "token0_id": "10-0x1f514a61bcde34f94bc39731235690ab9da737f7",
+          "token1_id": "10-0x4200000000000000000000000000000000000042",
+          "isStable": false,
+          "createdAtBlock": "107541535",
+          "createdAtTimestamp": "1690681847"
+        },
+        {
+          "id": "10-0x2e931de1fcb2681dc98601e0b513308da9c5ceae",
+          "address": "0x2e931de1fcb2681dc98601e0b513308da9c5ceae",
+          "token0_id": "10-0x1f514a61bcde34f94bc39731235690ab9da737f7",
+          "token1_id": "10-0x7f5c764cbc14f9669b88837ca1490cca17c31607",
+          "isStable": false,
+          "createdAtBlock": "107541422",
+          "createdAtTimestamp": "1690681621"
+        }
+      ]
+    }
+  },
+  "capturedAt": "2026-04-30T11:46:56Z"
+}
