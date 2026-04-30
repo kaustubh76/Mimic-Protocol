@@ -1,0 +1,61 @@
+Perp template — `pnpm assert:perp` (live Arbitrum GMX v2, v1 scope)
+===================================================================
+
+Source        : scripts/demo-capture/assertions-perp.mjs
+Chain         : Arbitrum (chainId 42161)
+EventEmitter  : 0xC8ee91A54287DB53897056e12D9819156D3822Fb  (GMX v2)
+Run date      : 2026-04-30
+Indexed range : GMX v2 EventEmitter deploy block (107,737,756) → live tip
+Scope         : v1 = PositionIncrease only. PositionDecrease, Liquidation,
+                Funding follow up in v2 (see pow/envio-perp-template-v1/README.md)
+
+This file is the literal stdout from `pnpm assert:perp` against a `pnpm dev`
+indexer running with Arbitrum-only config. Sample data backing the run is
+in this directory (queries-perp/01-…json through 06-sample-counts.json).
+Re-run `pnpm assert:perp` for fresh numbers.
+
+--------------------------------------------------------------------------
+
+[harness] GraphQL: http://localhost:8080/v1/graphql
+[harness] Loading entity sets...
+
+  PerpMarkets:      9
+  PerpAggregators:  9
+  Positions:        1252 (sampled, may be partial)
+
+[harness] Running invariants...
+
+========================================================================
+Perp invariant report (GMX v2, v1 scope: PositionIncrease only)
+========================================================================
+✓ PASS  P1: every Position.market_id has a PerpMarket
+        checked 1252, passed 1252, failed 0
+✓ PASS  P2: every PerpMarket has a PerpAggregator (1:1)
+        checked 9, passed 9, failed 0
+✓ PASS  P3: PerpAggregator.totalPositions >= distinct Positions seen in sample
+        checked 9, passed 9, failed 0
+✓ PASS  P4: every Position has sizeInUsd > 0 (no zero-sized positions inserted)
+        checked 1252, passed 1252, failed 0
+========================================================================
+Summary: 2522/2522 checks passed across 4 invariants
+
+PASS — all invariants hold on live data.
+
+--------------------------------------------------------------------------
+
+Markets indexed (all 9 from queries-perp/06-sample-counts.json):
+
+  42161-0x70d95587d40a2caf56bd97485ab3eec10bee6336  (ETH/USD)
+  42161-0x47c031236e19d024b42f8ae6780e44a573170703  (BTC/USD)
+  42161-0x6853ea96ff216fab11d2d930ce3c508556a4bdc4
+  42161-0xc25cef6061cf5de5eb761b50e4743c1f5d7e5407
+  42161-0xc7abb2c5f3bf3ceb389df0eecd6120d451170b50
+  42161-0x0ccb4faa6f1f1b30911619f1184082ab4e25813c
+  42161-0x09400d9db990d5ed3f35d7be61dfaeb900af03c9
+  42161-0xd9535bb5f58a1a75032416f2dfe7880c30575a41
+  42161-0x7f1fa204bb700853d36994da19f830b6ad18455c
+
+The handler routes on `eventName` from EventLog1; only "PositionIncrease"
+fires entity writes in v1. Other event names (PositionDecrease, Liquidation,
+FundingFeeAmountPerSizeUpdated, etc.) are observed and skipped — they're
+the v2 follow-up scope.

@@ -1,0 +1,53 @@
+Money-market template — `pnpm assert` (live Polygon Aave V3)
+==============================================================
+
+Source        : scripts/demo-capture/assertions.mjs
+Chain         : Polygon (chainId 137)
+Pool address  : 0x794a61358D6845594F94dc1DB02A252b5b4814aD  (Aave V3 Pool)
+Run date      : 2026-04-30
+Indexed range : Aave V3 deploy block (25,826,028) → ~27,336,964 (≈1.5M blocks)
+
+This file is the literal stdout from `pnpm assert` against a `pnpm dev`
+indexer running with Polygon-only config. Sample data backing the run is
+in this directory (queries/01-…json through 06-sample-counts.json).
+Re-run `pnpm assert` for fresh numbers — values change as the indexer
+keeps syncing.
+
+--------------------------------------------------------------------------
+
+[harness] GraphQL: http://localhost:8080/v1/graphql
+[harness] Loading entity sets...
+
+  Reserves:           16
+  ReserveAggregators: 16
+  Liquidations:       1089
+  UserReserves:       5000 (sampled, may be partial)
+  UserAggregators:    9990
+
+[harness] Running invariants...
+
+========================================================================
+Invariant report
+========================================================================
+✓ PASS  L1: every Liquidation.collateralAsset has a Reserve
+        checked 1089, passed 1089, failed 0
+✓ PASS  L2: every Liquidation.debtAsset has a Reserve
+        checked 1089, passed 1089, failed 0
+✓ PASS  L3: every Liquidation.user has UserAggregator with liquidationsAsBorrower >= 1
+        checked 1089, passed 1089, failed 0
+✓ PASS  L4: every Liquidation.liquidator has UserAggregator with liquidationsAsLiquidator >= 1
+        checked 1089, passed 1089, failed 0
+✓ PASS  L5: ReserveAggregator.totalLiquidations >= count of liquidations touching this reserve
+        checked 13, passed 13, failed 0
+✓ PASS  L6: ReserveAggregator with totalSupplied > 0 has uniqueSuppliers >= 1
+        checked 16, passed 16, failed 0
+✓ PASS  L7: ReserveAggregator with totalBorrowed > 0 has uniqueBorrowers >= 1
+        checked 16, passed 16, failed 0
+✓ PASS  L8: UserReserve.netSupplyPosition == cumulativeSupplied - cumulativeWithdrawn
+        checked 5000, passed 5000, failed 0
+✓ PASS  L9: UserReserve.netDebtPosition == cumulativeBorrowed - cumulativeRepaid
+        checked 5000, passed 5000, failed 0
+========================================================================
+Summary: 14401/14401 checks passed across 9 invariants
+
+PASS — all invariants hold on live data.

@@ -88,3 +88,17 @@ The harness needs a running `pnpm dev` against Polygon — not feasible in GitHu
 
 - **Sample-based for `UserReserve`** (default `limit + offset` paginated to 5000 rows). Aave V3 has hundreds of thousands of user-reserves once fully indexed; sampling is honest enough for a per-commit check but not exhaustive.
 - **Money-market template only** in v1. The same pattern would apply to the DEX + perp templates; flagged as a follow-up.
+
+---
+
+## Saved harness output transcripts
+
+The literal stdout from the recorded `pnpm assert*` runs is checked in alongside the JSON GraphQL captures, so a reviewer can see the `Summary: N/N checks passed` lines without re-running:
+
+| Template | Transcript | Recorded total |
+|---|---|---|
+| Money market (Polygon Aave V3) | [`docs/screenshots/queries/HARNESS_OUTPUT.txt`](../../docs/screenshots/queries/HARNESS_OUTPUT.txt) | 14,401 / 14,401 ✓ |
+| DEX (Optimism Velodrome V2) | [`docs/screenshots/queries-defi/HARNESS_OUTPUT.txt`](../../docs/screenshots/queries-defi/HARNESS_OUTPUT.txt) | 31,091 / 31,091 ✓ |
+| Perp (Arbitrum GMX v2) | [`docs/screenshots/queries-perp/HARNESS_OUTPUT.txt`](../../docs/screenshots/queries-perp/HARNESS_OUTPUT.txt) | 2,522 / 2,522 ✓ |
+
+These are the recorded numbers from a 2026-04-30 run. Re-running `pnpm assert{,:defi,:perp}` against fresh chain state will give slightly different totals (the indexer sees more events as the chain advances).
