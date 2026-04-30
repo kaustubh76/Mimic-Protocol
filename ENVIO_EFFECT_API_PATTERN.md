@@ -92,7 +92,7 @@ The conversion event is qualitative for #1 (link share frequency in support), me
 
 ## §6 What This Doc Doesn't Cover
 
-ClickHouse Sink, leaderboard query architecture, settlement handlers — all out of scope. The Effect API pattern is the pre-Postgres optimization; the analytics-tier patterns are downstream. See [ENVIO_LEADERBOARD_QUERY_ARCHITECTURE.md](./ENVIO_LEADERBOARD_QUERY_ARCHITECTURE.md) for the analytics layer.
+ClickHouse Sink, risk-dashboard query architecture, liquidation handlers — all out of scope. The Effect API pattern is the pre-Postgres optimization; the analytics-tier patterns are downstream. See [ENVIO_RISK_DASHBOARD_QUERY_ARCHITECTURE.md](./ENVIO_RISK_DASHBOARD_QUERY_ARCHITECTURE.md) for the money-market analytics layer and [ENVIO_LIQUIDATION_HANDLER_REFERENCE.md](./ENVIO_LIQUIDATION_HANDLER_REFERENCE.md) for the trickiest event in that vertical.
 
 ---
 

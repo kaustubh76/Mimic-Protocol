@@ -104,8 +104,10 @@ The conversion mechanism: the template is the call-to-action on the DeFi-vertica
 ## §7 What This Template Doesn't Cover
 
 - **Per-protocol-shape variants.** The template is DEX-shaped. Perp, money market, and execution-layer variants are flagged for follow-up.
-- **Analytics tier.** ClickHouse Sink + leaderboard architecture is downstream — see [ENVIO_LEADERBOARD_QUERY_ARCHITECTURE.md](./ENVIO_LEADERBOARD_QUERY_ARCHITECTURE.md).
-- **Settlement events.** Settlement is a prediction-markets concern; see [ENVIO_SETTLEMENT_HANDLER_REFERENCE.md](./ENVIO_SETTLEMENT_HANDLER_REFERENCE.md).
+- **Analytics tier.** ClickHouse Sink + risk-dashboard architecture is downstream — see [ENVIO_RISK_DASHBOARD_QUERY_ARCHITECTURE.md](./ENVIO_RISK_DASHBOARD_QUERY_ARCHITECTURE.md).
+- **Liquidation events.** Liquidation is a money-market concern (the trickiest event in that vertical); see [ENVIO_LIQUIDATION_HANDLER_REFERENCE.md](./ENVIO_LIQUIDATION_HANDLER_REFERENCE.md).
+- **Money-market shape variant.** See [ENVIO_MONEY_MARKET_TEMPLATE.md](./ENVIO_MONEY_MARKET_TEMPLATE.md) for the Aave-V3-shaped variant — different per-(asset, user) entity model, different aggregator pattern.
+- **Perp shape variant.** See [`pow/envio-perp-template-v1/`](./pow/envio-perp-template-v1/) for the GMX-V2-shaped variant.
 
 ---
 

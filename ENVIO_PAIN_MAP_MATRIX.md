@@ -119,118 +119,121 @@ Anchor accounts on the customer wall: Sablier (3 indexers, 27 deployments, `@sab
 
 ---
 
-## §3 The Prediction Markets Vertical Matrix
+## §3 The Money-Market Vertical Matrix
 
-Anchor accounts on the customer wall: Polymarket (4B events on Polygon — the largest single indexed event volume Envio publicly cites), Limitless (daily prediction market on Base). Wave-2: ~10 prediction-market builders identified from publicly visible deployments — daily-market platforms, sports-prediction protocols, opinion markets, governance markets.
+Anchor accounts (acquisition targets — vertical newly seeded): **Aave V3** (multi-chain TVL >$10B; mainnet, Polygon, Arbitrum, Base, Optimism, Avalanche), **Compound V3 (Comet)** (per-base-asset architecture on mainnet/L2s), **Spark** (Aave V3 fork), **Morpho** (multi-protocol consumer of Aave + Compound). Wave-2 outreach: ~10 money-market builders including Aave-fork protocols (Hyperdrive, dForce), Compound-fork protocols (Sonne, Moonwell), and L2-native money markets (Aurelius, Sturdy).
 
-### Acquisition × Tech root cause — Prediction Markets
+The PM vertical previously occupied this slot was dropped after [`enviodev/polymarket-v2-indexer`](https://github.com/enviodev/polymarket-v2-indexer) was identified as Envio's production-shipped reference for that vertical. Money market is the third of four DeFi shapes named in the playbook §3, and is structurally the strongest replacement: comparable analytics-as-product properties (risk dashboards = leaderboards in PM terms), no current Envio production indexer, and a cleaner candidate-team opportunity.
 
-**Pain.** Prediction-market builders don't see themselves in the indexing-infrastructure conversation. The marketing language is DeFi-default.
+### Acquisition × Tech root cause — Money Market
 
-**Proposed dual-fix.** Tech: a prediction-markets indexer template with the right event shapes baked in (market creation, position taking, settlement, oracle resolution, payout, leaderboard rollups). Business: a prediction-markets-named landing page; a content track Googled by builders about to start building.
+**Pain.** Money-market protocol engineers don't see themselves in the indexing-infrastructure conversation. The marketing language is DeFi-default; "real-time data" doesn't speak to liquidator leaderboards or utilization curves.
 
-**Named accounts impacted.** Wave-2 (10 builders).
+**Proposed dual-fix.** Tech: a money-market indexer template with all six Aave V3 lifecycle events baked in (Supply, Withdraw, Borrow, Repay, LiquidationCall, ReserveDataUpdated). Business: a money-market-named landing page; content track Googled by Aave / Compound / Spark / Morpho engineers.
 
-**Owning artifact.** [ENVIO_PREDICTION_MARKETS_TEMPLATE.md](./ENVIO_PREDICTION_MARKETS_TEMPLATE.md), [ENVIO_PREDICTION_MARKETS_POSITIONING_AUDIT.md](./ENVIO_PREDICTION_MARKETS_POSITIONING_AUDIT.md).
+**Named accounts impacted.** Wave-2 (~10 protocols).
 
-### Acquisition × Business root cause — Prediction Markets
+**Owning artifact.** [ENVIO_MONEY_MARKET_TEMPLATE.md](./ENVIO_MONEY_MARKET_TEMPLATE.md), [ENVIO_MONEY_MARKET_POSITIONING_AUDIT.md](./ENVIO_MONEY_MARKET_POSITIONING_AUDIT.md).
 
-**Pain.** Prediction Markets is implicitly visible (Polymarket on the wall, Limitless case study) but not explicitly named as a target segment.
+### Acquisition × Business root cause — Money Market
 
-**Proposed dual-fix.** Tech: pin the Polymarket case study + Limitless case study as anchor evidence on the new landing page. Business: name prediction markets as a first-class vertical in customer-facing copy; ship a prediction-markets-content track.
+**Pain.** Money market is **invisible** as a target segment in current Envio marketing — even more so than PM was. No money-market protocols on the visible customer wall. Aave's TVL is multi-chain >$10B; the vertical is structurally major but unrepresented in customer-facing surfaces.
 
-**Named accounts impacted.** Polymarket (case study leverage), Limitless (case study leverage), wave-2 (acquisition target).
+**Proposed dual-fix.** Tech: pin the money-market template + the [`ENVIO_LIQUIDATION_HANDLER_REFERENCE.md`](./ENVIO_LIQUIDATION_HANDLER_REFERENCE.md) pattern doc as anchor evidence on the new landing page. Business: name money market as a first-class vertical in customer-facing copy; ship a money-market-content track.
 
-**Owning artifact.** [ENVIO_PREDICTION_MARKETS_POSITIONING_AUDIT.md](./ENVIO_PREDICTION_MARKETS_POSITIONING_AUDIT.md).
+**Named accounts impacted.** Aave (acquisition target, TVL leader), Compound V3, Spark, Morpho, wave-2.
 
-### Activation × Tech root cause — Prediction Markets
+**Owning artifact.** [ENVIO_MONEY_MARKET_POSITIONING_AUDIT.md](./ENVIO_MONEY_MARKET_POSITIONING_AUDIT.md).
 
-**Pain.** Prediction markets have specific event shapes (settlement, oracle resolution, payout, market creation) that don't show up in default templates. A builder hits the Greeter tutorial, sees a "transfer" event, and has to figure out market resolution from scratch.
+### Activation × Tech root cause — Money Market
 
-**Proposed dual-fix.** Tech: prediction-markets indexer template + a settlement-event handler reference for the trickiest event in the vertical. Business: a 2-month Production trial offer attached to the template for wave-2 builders.
+**Pain.** Money markets have specific event shapes (per-(asset, user) state, dual-reserve liquidation handling, RAY-precision rate indexes) that don't show up in default templates. A builder hits the Greeter tutorial, sees a "transfer" event, and has to figure out LiquidationCall affecting both reserves and both users from scratch.
 
-**Named accounts impacted.** Wave-2.
-
-**Owning artifact.** [ENVIO_PREDICTION_MARKETS_TEMPLATE.md](./ENVIO_PREDICTION_MARKETS_TEMPLATE.md), [ENVIO_SETTLEMENT_HANDLER_REFERENCE.md](./ENVIO_SETTLEMENT_HANDLER_REFERENCE.md).
-
-### Activation × Business root cause — Prediction Markets
-
-**Pain.** Generic onboarding doesn't acknowledge the vertical's distinct activation path (market shape modelling).
-
-**Proposed dual-fix.** Tech: route prediction-markets prospects to the vertical template from the docs entry-point. Business: a prediction-markets-shaped 2-month trial structure that converts to Production tier when leaderboard volume crosses a threshold.
+**Proposed dual-fix.** Tech: money-market indexer template + a liquidation-handler reference for the trickiest event in the vertical. Business: a 2-month Production trial offer attached to the template for wave-2 builders.
 
 **Named accounts impacted.** Wave-2.
 
-**Owning artifact.** [ENVIO_PREDICTION_MARKETS_POSITIONING_AUDIT.md](./ENVIO_PREDICTION_MARKETS_POSITIONING_AUDIT.md).
+**Owning artifact.** [ENVIO_MONEY_MARKET_TEMPLATE.md](./ENVIO_MONEY_MARKET_TEMPLATE.md), [ENVIO_LIQUIDATION_HANDLER_REFERENCE.md](./ENVIO_LIQUIDATION_HANDLER_REFERENCE.md).
 
-### Monetization × Tech root cause — Prediction Markets
+### Activation × Business root cause — Money Market
 
-**Pain.** Leaderboards, market analytics, and historical reporting are first-class product features in prediction markets — the analytics workload IS the product. The Postgres-backed default doesn't scale to leaderboard refresh-every-minute and top-N-by-7-day-fees query patterns ([ENVIO_CLICKHOUSE_TEARDOWN.md](./ENVIO_CLICKHOUSE_TEARDOWN.md)).
+**Pain.** Generic onboarding doesn't acknowledge the vertical's distinct activation path (Pool-singleton + lazy reserve creation + dual-reserve liquidation handling).
 
-**Proposed dual-fix.** Tech: a leaderboard-grade query architecture pattern doc that names the analytical query patterns prediction markets actually run. Business: a Dedicated-tier conversation ("the leaderboard tier") triggered when the customer's product surface starts hitting query-latency limits.
+**Proposed dual-fix.** Tech: route money-market prospects to the vertical template from the docs entry-point. Business: a money-market-shaped 2-month trial that converts to Production tier when utilization-curve query volume crosses a threshold.
 
-**Named accounts impacted.** Polymarket (4B events; market analytics + top-trader leaderboards already running), Limitless (daily-market leaderboards), wave-2 (post-launch).
+**Named accounts impacted.** Wave-2.
 
-**Owning artifact.** [ENVIO_LEADERBOARD_QUERY_ARCHITECTURE.md](./ENVIO_LEADERBOARD_QUERY_ARCHITECTURE.md).
+**Owning artifact.** [ENVIO_MONEY_MARKET_POSITIONING_AUDIT.md](./ENVIO_MONEY_MARKET_POSITIONING_AUDIT.md).
 
-### Monetization × Business root cause — Prediction Markets
+### Monetization × Tech root cause — Money Market
 
-**Pain.** Tier-up case isn't made in the prediction-market builder's language. Dedicated tier sounds generic; "leaderboard tier" sounds inevitable.
+**Pain.** Risk dashboards, liquidator leaderboards, utilization curves, and historical rate analysis are first-class product features in money markets — the analytics workload IS the product. The Postgres-backed default doesn't scale to per-reserve utilization-curve queries over 12-month windows or liquidator-leaderboard refresh times ([ENVIO_CLICKHOUSE_TEARDOWN.md](./ENVIO_CLICKHOUSE_TEARDOWN.md)).
 
-**Proposed dual-fix.** Tech: per-tier feature matrix called out for prediction-markets workload (leaderboards, settlement-corrections, oracle history). Business: position Dedicated explicitly as the leaderboard tier in PM-vertical copy.
+**Proposed dual-fix.** Tech: a risk-dashboard-grade query architecture pattern doc naming the analytical query patterns money markets actually run. Business: a Dedicated-tier conversation ("the risk-dashboard tier") triggered when the customer's product surface hits query-latency limits.
 
-**Named accounts impacted.** Polymarket (Dedicated upgrade conversation grounded in the published 4B-events case study), Limitless (Dedicated queued for the moment leaderboard latency becomes visible), wave-2 (post-launch tier-up path).
+**Named accounts impacted.** Aave (mainnet utilization-curve volume), Compound V3, Spark, Morpho, wave-2 (post-launch).
 
-**Owning artifact.** [ENVIO_PREDICTION_MARKETS_POSITIONING_AUDIT.md](./ENVIO_PREDICTION_MARKETS_POSITIONING_AUDIT.md).
+**Owning artifact.** [ENVIO_RISK_DASHBOARD_QUERY_ARCHITECTURE.md](./ENVIO_RISK_DASHBOARD_QUERY_ARCHITECTURE.md).
 
-### Retention × Tech root cause — Prediction Markets
+### Monetization × Business root cause — Money Market
 
-**Pain.** Settlement event handling is the trickiest production concern in the vertical (multi-step settlement with potential oracle corrections). Mishandled settlement = wrong leaderboard = product bug visible to end users. Customers leave.
+**Pain.** Tier-up case isn't made in the money-market builder's language. Dedicated tier sounds generic; "the risk-dashboard tier" sounds inevitable for a risk-monitoring product.
 
-**Proposed dual-fix.** Tech: a settlement-event handler reference that documents correction-handling cleanly. Business: an architectural check-in cadence with PM accounts as their volume scales.
+**Proposed dual-fix.** Tech: per-tier feature matrix called out for money-market workload (utilization curves, liquidator leaderboards, multi-asset reserve sprawl, time-bucketed rate history). Business: position Dedicated explicitly as the risk-dashboard tier in money-market-vertical copy.
 
-**Named accounts impacted.** Polymarket, Limitless, wave-2.
+**Named accounts impacted.** Aave (Dedicated upgrade conversation grounded in TVL leadership), Compound V3, Spark, Morpho, wave-2 (post-launch tier-up path).
 
-**Owning artifact.** [ENVIO_SETTLEMENT_HANDLER_REFERENCE.md](./ENVIO_SETTLEMENT_HANDLER_REFERENCE.md).
+**Owning artifact.** [ENVIO_MONEY_MARKET_POSITIONING_AUDIT.md](./ENVIO_MONEY_MARKET_POSITIONING_AUDIT.md).
 
-### Retention × Business root cause — Prediction Markets
+### Retention × Tech root cause — Money Market
 
-**Pain.** No structured PM-specific check-in. Polymarket case study exists; Limitless has no published quarterly architectural review.
+**Pain.** Liquidation event handling is the trickiest production concern in the vertical. `LiquidationCall` affects two reserves AND two users (victim + liquidator); naive handlers update one side and leave the data inconsistent. Mishandled liquidation = wrong risk dashboard = product bug visible to end users + governance teams. Customers leave.
 
-**Proposed dual-fix.** Tech: per-account architectural health note covering settlement integrity + leaderboard query latency. Business: a quarterly architectural check-in with Polymarket and Limitless; published case-study refresh on Polymarket once a year.
+**Proposed dual-fix.** Tech: a liquidation-handler reference that documents the dual-reserve + dual-user pattern cleanly. Business: an architectural check-in cadence with money-market accounts as their volume scales.
 
-**Named accounts impacted.** Polymarket, Limitless.
+**Named accounts impacted.** Aave, Compound V3, Spark, Morpho, wave-2.
 
-**Owning artifact.** [ENVIO_PREDICTION_MARKETS_TECH_DIAGNOSTIC.md](./ENVIO_PREDICTION_MARKETS_TECH_DIAGNOSTIC.md) sketches the health-note shape.
+**Owning artifact.** [ENVIO_LIQUIDATION_HANDLER_REFERENCE.md](./ENVIO_LIQUIDATION_HANDLER_REFERENCE.md).
 
-### Expansion × Tech root cause — Prediction Markets
+### Retention × Business root cause — Money Market
 
-**Pain.** Successful prediction markets expand by adding new market types (sports → politics → crypto-prices → custom), not by adding chains. The default playbook models multi-chain expansion, not intra-product expansion.
+**Pain.** No structured money-market-specific check-in cadence — the vertical is being newly opened. Once anchor accounts are acquired, this becomes the highest-NRR-impact intervention.
 
-**Proposed dual-fix.** Tech: the prediction-markets template ships with a market-type taxonomy already; expansion is "add a market type" not "add a chain." Business: name the intra-product expansion path in the customer-facing copy and the account roadmap.
+**Proposed dual-fix.** Tech: per-account architectural health note covering liquidation correctness + utilization-query latency. Business: a quarterly architectural check-in with each anchor account (initially Aave + 2-3 secondary protocols).
 
-**Named accounts impacted.** Polymarket (politics → crypto-prices → custom), Limitless (daily-market type expansion), wave-2.
+**Named accounts impacted.** Aave (post-acquisition), Compound V3, Spark, Morpho.
 
-**Owning artifact.** [ENVIO_PREDICTION_MARKETS_TEMPLATE.md](./ENVIO_PREDICTION_MARKETS_TEMPLATE.md).
+**Owning artifact.** [ENVIO_MONEY_MARKET_TECH_DIAGNOSTIC.md](./ENVIO_MONEY_MARKET_TECH_DIAGNOSTIC.md) sketches the health-note shape.
 
-### Expansion × Business root cause — Prediction Markets
+### Expansion × Tech root cause — Money Market
 
-**Pain.** No PM expansion playbook. Default playbook is multi-chain shaped, not intra-product shaped.
+**Pain.** Money markets expand by adding chains continuously. Aave is on 6+ chains; expansion ARR per account is structurally significant. Without a one-config-change expansion path, customers defer chain #N.
 
-**Proposed dual-fix.** Tech: the template above. Business: an intra-product expansion runbook for PM accounts (analogous to the multi-chain runbook for DeFi). Out of scope for this set; flagged for follow-up.
+**Proposed dual-fix.** Tech: the money-market template ships an `add-chain` CLI; Aave's deterministic deployment means most chains share the same Pool address (one config change). Business: name expansion as a one-afternoon task in the customer-facing copy; offer the runbook as a co-engineering session for Aave / Compound / Spark.
 
-**Named accounts impacted.** Polymarket, Limitless, wave-2.
+**Named accounts impacted.** Aave (6+ chains, every new L2 is potential expansion ARR), Compound V3, Spark, Morpho.
 
-**Owning artifact.** Not yet — flagged. The PM template covers the *shape* of intra-product expansion; a dedicated runbook is a follow-up artifact.
+**Owning artifact.** [ENVIO_MULTICHAIN_EXPANSION_RUNBOOK.md](./ENVIO_MULTICHAIN_EXPANSION_RUNBOOK.md), [ENVIO_MONEY_MARKET_TEMPLATE.md](./ENVIO_MONEY_MARKET_TEMPLATE.md).
+
+### Expansion × Business root cause — Money Market
+
+**Pain.** No expansion playbook. Without a quarterly account roadmap, expansion happens by customer initiative not Envio's.
+
+**Proposed dual-fix.** Tech: the runbook above. Business: a quarterly account roadmap that lists each anchor's pending chain expansions and queues the technical co-engineering offer ahead of their decision.
+
+**Named accounts impacted.** Aave, Compound V3, Spark, Morpho.
+
+**Owning artifact.** [ENVIO_MULTICHAIN_EXPANSION_RUNBOOK.md](./ENVIO_MULTICHAIN_EXPANSION_RUNBOOK.md), [ENVIO_MONEY_MARKET_POSITIONING_AUDIT.md](./ENVIO_MONEY_MARKET_POSITIONING_AUDIT.md).
 
 ---
 
 ## §4 Cells With No Owning Artifact (The Honest Gap)
 
-Two cells in this matrix have no owning artifact in the 11-doc set:
+One cell in this matrix has no owning artifact in the artifact set:
 
-- **DeFi · Activation × Business** — per-protocol-shape entry-point on the docs (DEX vs perp vs money market vs execution layer). The DeFi 60-min template covers DEX shape; sibling per-shape templates would close the cell. Flagged for Q2 follow-up.
-- **PM · Expansion × Business** — intra-product expansion runbook for prediction markets. The PM template sketches the shape; a dedicated runbook would close the cell. Flagged for Q2 follow-up.
+- **DeFi · Activation × Business** — per-protocol-shape entry-point on the docs (DEX vs perp vs money market vs execution layer). The DeFi 60-min template covers DEX shape; the perp template covers perp; the money-market template covers money market — three of four DeFi shapes shipped. The execution-layer shape is flagged for Q2 follow-up; until then this cell isn't fully owned.
+
+(The PM vertical previously had two entries in this list; both are removed since the PM vertical itself has been dropped from this package — see CHANGELOG.md and the §3 frame above for the rationale.)
 
 Naming the gaps is the point. A matrix that pretends every cell has a play is dishonest. The two unowned cells are where the next two artifacts go after the first 11 ship.
 
@@ -252,7 +255,7 @@ The matrix is the conversation-shaping tool. The 10 derivative artifacts are the
 
 > **Cell:** All 20 cells (10 per vertical) — this is the index doc for the rest of the set.
 > **Revenue mechanism:** All three (net-new acquisition, tier-up to Dedicated, expansion at existing accounts).
-> **Named accounts:** Sablier, Velodrome, Aerodrome, LI.FI, Beefy, Polymarket, Limitless, plus DeFi wave-2 (20 protocols) and PM wave-2 (~10 builders).
-> **Sibling artifacts:** All 10 — this matrix is the index they cite back to.
+> **Named accounts:** Sablier, Velodrome, Aerodrome, LI.FI, Beefy (DeFi DEX); Aave, Compound V3, Spark, Morpho (money market); plus DeFi wave-2 (~20 protocols) and money-market wave-2 (~10 builders).
+> **Sibling artifacts:** All — this matrix is the index they cite back to.
 
 — Kaustubh

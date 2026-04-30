@@ -100,8 +100,8 @@ The expansion conversion mechanism: each successful chain expansion at an anchor
 
 ## §7 What This Runbook Doesn't Cover
 
-- **Intra-product expansion (PM vertical)** — see [ENVIO_PREDICTION_MARKETS_TEMPLATE.md](./ENVIO_PREDICTION_MARKETS_TEMPLATE.md) for the market-type expansion shape; the multi-chain runbook is DeFi-shaped.
-- **Cross-chain aggregation queries** — analytics-tier concern; see [ENVIO_LEADERBOARD_QUERY_ARCHITECTURE.md](./ENVIO_LEADERBOARD_QUERY_ARCHITECTURE.md) for the query layer.
+- **Money-market multi-chain shape** — see [ENVIO_MONEY_MARKET_TEMPLATE.md](./ENVIO_MONEY_MARKET_TEMPLATE.md). Aave V3's deterministic deployment means most chains share the same Pool address; the runbook applies but the address-discovery step is trivial.
+- **Cross-chain analytical queries** — analytics-tier concern; see [ENVIO_RISK_DASHBOARD_QUERY_ARCHITECTURE.md](./ENVIO_RISK_DASHBOARD_QUERY_ARCHITECTURE.md) for the query layer.
 
 ---
 
