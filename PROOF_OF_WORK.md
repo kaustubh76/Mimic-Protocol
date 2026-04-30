@@ -4,6 +4,22 @@
 
 ---
 
+## 🟢 Live on Envio hosted service
+
+The money-market template (Aave V3, Polygon) is **deployed and queryable right now** on Envio's hosted indexing service:
+
+**GraphQL endpoint:** [`https://indexer.dev.hyperindex.xyz/8fc0607/v1/graphql`](https://indexer.dev.hyperindex.xyz/8fc0607/v1/graphql)
+
+```bash
+curl -sX POST https://indexer.dev.hyperindex.xyz/8fc0607/v1/graphql \
+  -H 'Content-Type: application/json' \
+  -d '{"query":"{ ReserveAggregator(order_by:{totalSupplied:desc}, limit:5){ asset totalSupplied uniqueBorrowers totalLiquidations } }"}'
+```
+
+Deployed from branch [`envio-deploy-money-market`](https://github.com/kaustubh76/Growth_Engineer_at_ENVIO/tree/envio-deploy-money-market) — pushes to that branch trigger redeploys. See [`DEPLOY.md`](https://github.com/kaustubh76/Growth_Engineer_at_ENVIO/blob/envio-deploy-money-market/DEPLOY.md) on that branch for sample queries.
+
+---
+
 ## What was built
 
 Three forkable Envio HyperIndex templates, each anchored to a different real DeFi vertical and a real production protocol — not synthesised toys.

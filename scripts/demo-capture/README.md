@@ -102,3 +102,21 @@ The literal stdout from the recorded `pnpm assert*` runs is checked in alongside
 | Perp (Arbitrum GMX v2) | [`docs/screenshots/queries-perp/HARNESS_OUTPUT.txt`](../../docs/screenshots/queries-perp/HARNESS_OUTPUT.txt) | 2,522 / 2,522 ✓ |
 
 These are the recorded numbers from a 2026-04-30 run. Re-running `pnpm assert{,:defi,:perp}` against fresh chain state will give slightly different totals (the indexer sees more events as the chain advances).
+
+---
+
+## Running the harness against the live hosted indexer
+
+The money-market template is deployed on Envio's hosted service at:
+
+```
+https://indexer.dev.hyperindex.xyz/8fc0607/v1/graphql
+```
+
+You can run the assertion harness against the live hosted endpoint instead of a local `pnpm dev` instance — no local indexer required:
+
+```bash
+GRAPHQL_URL=https://indexer.dev.hyperindex.xyz/8fc0607/v1/graphql pnpm assert
+```
+
+The scripts already read `GRAPHQL_URL` from the environment (see [`assertions.mjs:26`](./assertions.mjs)) and fall back to localhost only if it's unset. Same pattern works for `pnpm capture`.
